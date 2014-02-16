@@ -378,11 +378,11 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
 		}
 	    }
 	    for (i = 0; i < newschedule.availableplayers.length; i++ ) {
-		currentItem = newschedule.availableplayers[i];
-		if (currentItem.player != $scope.currentUser) {
-		    $scope.currentEdit.potentialPlayers.push(currentItem);
-		}
-	    }
+    		currentItem = newschedule.availableplayers[i];
+    		if ((currentItem.player != $scope.currentUser) && (typeof $scope.currentEdit.timeframe.gaming[currentItem.player] == "undefined")) {
+    		    $scope.currentEdit.potentialPlayers.push(currentItem);
+    	    }
+    	}
     };
 
     $scope.openSettingEditor = function() {
@@ -419,7 +419,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
             delay: 100,
             fixed: true,
             event: 'mouseleave unfocus',
-	    inactive: 2000
+	    inactive: 10000
         },
         events: {
             hide: function(event, api) {

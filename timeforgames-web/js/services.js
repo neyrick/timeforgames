@@ -14,10 +14,10 @@ timeForGamesApp.factory('logger', [function () {
 	};
 }]);
 
-timeForGamesApp.factory('config', [function () {
+timeForGamesApp.factory('config', ['$window', function ($window) {
 
 	return {
-		urlbase : window.location.procol.concat("//").concat(window.location.hostname).concat("/rs/tfgf"),
+		urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat("/rs/tfg"),
 		FIRST_DAY_OF_WEEK : 1
     };
 }]);
@@ -66,7 +66,7 @@ timeForGamesApp.factory('settingsService', ['$http', 'config', function ($http, 
 				});
 		}
 		
-	}
+	};
 }]);
 
 timeForGamesApp.factory('planningBuilderService', ['config', function (config) {
@@ -92,7 +92,7 @@ timeForGamesApp.factory('planningBuilderService', ['config', function (config) {
 			}
 		}
 		return undefined;	
-	}
+	};
 
     var addSchedule = function (rawschedule, timeframe, allSettings, me) {
         var g, game;
@@ -136,7 +136,7 @@ timeForGamesApp.factory('planningBuilderService', ['config', function (config) {
 	    if (rawschedule.idcomment != null) tfSetting.idcomment = rawschedule.idcomment;
 	    if (rawschedule.message != null) tfSetting.message = rawschedule.message;
         }
-    }
+    };
     
 	return {
 		MS_IN_DAY : 1000 * 60 * 60 * 24,
@@ -219,7 +219,7 @@ timeForGamesApp.factory('planningBuilderService', ['config', function (config) {
 				currdow++;
 				if (currdow > 6) {
 					currdow = 0;
-					currweek = { days : [] }
+					currweek = { days : [] };
 					weeks.push(currweek);
 				}
 				currday = this.initDay(currtime);
@@ -323,6 +323,6 @@ timeForGamesApp.factory('plannerService', ['$http', 'config', 'planningBuilderSe
 			else comment = { player : pm_player, dayid : pm_dayid, timeframe : pm_timeframe, setting : pm_setting, message : pm_message};
 			$http.post(config.urlbase + '/comment?log_action=' + action, comment).success(callback).error(genericError);
 		}
-	}
+	};
 }]);
 

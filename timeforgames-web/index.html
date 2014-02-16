@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <title>Rêves et Légendes - Planification des Parties</title>
 
-<link rel="stylesheet" href="css/jquery.qtip.css">
+<link rel="stylesheet" href="lib/jquery.qtip.css">
 <link rel="stylesheet" href="css/gg.css">
 
-<script src="js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="js/jquery.qtip.js"></script>
+<script src="lib/jquery.js"></script>
+<script type="text/javascript" src="lib/jquery.qtip.js"></script>
 
 <script src="lib/angular/angular.js"></script>
 <script src="lib/angular-local-storage.min.js"></script>
@@ -169,19 +169,19 @@
 	<div class="ggpanelItem">
 	  <span class="tfSettingSubbox">MJ Disponible(s):</span>
 	  <ul class="gameRoster">
-	    <li ng-repeat="playerSchedule in currentEdit.schedule.availablegms" class="nomMJ"><span ng-class="{busyplayer : timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+	    <li ng-repeat="playerSchedule in currentEdit.schedule.availablegms" class="nomMJ"><span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
 	  </ul>
 	</div>
 	<div class="ggpanelItem">
 	  <span class="tfSettingSubbox">Joueur(s) Disponible(s):</span>
 	  <ul class="gameRoster">
-	    <li ng-repeat="playerSchedule in currentEdit.schedule.availableplayers" class="nomPJ"><span ng-class="{busyplayer : timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+	    <li ng-repeat="playerSchedule in currentEdit.schedule.availableplayers" class="nomPJ"><span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
 	  </ul>
 	</div>
 	<div class="ggpanelItem">
           <span class="tfSettingSubbox">Ne sont pas disponible(s):</span>
 	  <ul class="gameRoster">
-	    <li ng-repeat="playerSchedule in currentEdit.schedule.unavailable"><span ng-class="{busyplayer : timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+	    <li ng-repeat="playerSchedule in currentEdit.schedule.unavailable"><span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
 	  </ul>
 	</div>              
   	<div class="ggpanelItem ggbuttonbox ggclickableitem hoverDay"><span class="badge buttonBadge histButton" ng-click="showHistory($event)">Voir l'historique</span></div>

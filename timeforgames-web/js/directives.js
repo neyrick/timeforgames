@@ -15,34 +15,6 @@ timeForGamesApp.directive('ggTfSetting', function() {
 			    $scope.history.date = $scope.dowcodes[$scope.day.dow] + ' ' + $scope.day.dom + '/' + $scope.day.month;
 			    $scope.history.timeframe = $scope.timeframesDesc[$scope.timeframe.code].name;
 			    $scope.resetTfSettingData($scope.schedule);
-/*
-		            $scope.currentEdit.schedule = $scope.schedule;
-		            $scope.currentEdit.status = $scope.schedule.mystatus;
-		            $scope.currentEdit.gamePlayers = {};
-		            $scope.currentEdit.potentialPlayers = new Array();
-		            $scope.currentEdit.numPlayers = 0;
-		            $scope.historyList.length = 0;
-	                    $scope.history.setting = $scope.schedule.name;
-*/
-/*
-		            var i, j, currentItem;
-		            for (i = 0; i < $scope.schedule.games.length; i++) {
-		                currentItem = $scope.schedule.games[i];
-		                if (currentItem.gm.name == $scope.currentUser) {
-		                    for (j = 0; j < currentItem.players.length; j++) {
-		                        $scope.currentEdit.gamePlayers[currentItem.players[j].name] = currentItem.players[j];
-		                        $scope.currentEdit.potentialPlayers.push(currentItem.players[j]);
-		                        $scope.currentEdit.numPlayers++;
-		                    }
-		                }
-		            }
-		            for (i = 0; i < $scope.schedule.availableplayers.length; i++ ) {
-		                currentItem = $scope.schedule.availableplayers[i];
-		                if (currentItem.name != $scope.currentUser) {
-		                    $scope.currentEdit.potentialPlayers.push(currentItem);
-		                }
-		            }
-*/
 		    });
 		    var api =  $('#tfSettingTooltipContainer').qtip('api');
 		    api.set('position.target', $(element));
@@ -115,7 +87,7 @@ timeForGamesApp.directive('ggTimeframeBox', function() {
 		    api.reposition();
 		    api.show();
                 }
-            }
+            };
         },
 		restrict: 'E',
 		templateUrl: 'directives/timeframebox.html',
