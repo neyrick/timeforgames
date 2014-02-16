@@ -1,0 +1,9 @@
+{
+    "default": "dev",
+
+    "dev": {
+        "driver": "pg",
+        "connectionString": "postgres://devel:devel@jafar:5432/tfg",
+        "trace": true
+    }
+}

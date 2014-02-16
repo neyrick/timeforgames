@@ -1,0 +1,5 @@
+	<img class="timeFrameItem timeFramePic" bo-attr bo-attr-ttip="timeframesDesc[timeframe.code].name" bo-src="timeframesDesc[timeframe.code].pic"/>
+	<div class="dummyInlineContainer" ng-repeat="schedule in timeframe.settings">
+		<gg-tf-setting />
+	</div>
+	<div class="timeFrameItem dropdown plusBox tfExtra" ng-show="!timeframe.busy"><span> </span></div>

@@ -1,0 +1,19 @@
+<span ng-switch="action">
+	<span ng-switch-when="ADD_DISPO"><span class="name">{{player}}</span> s'est déclaré <span class="yes">disponible</span> pour {{role}}
+	</span>
+	<span ng-switch-when="DEL_DISPO"><span class="name">{{player}}</span> s'est déclaré <span class="no">indisponible</span> pour {{role}}
+	</span>
+	<span ng-switch-when="ADD_GAME"><span class="name">{{player}}</span> a <span class="yes">validé une partie</span> avec: <span class="name" ng-repeat="person in data.players"><span ng-show="$index > 0">, </span>{{person.name}}</span>
+	</span>
+	<span ng-switch-when="RFM_GAME"><span class="name">{{player}}</span> a modifié la liste de ses joueurs. <span class="no">Supprimé(s):</span> <span class="name" ng-repeat="person in data.dumped"><span ng-show="$index > 0">, </span>{{person.name}}</span> / <span class="no">Ajouté(s):</span> <span class="name" ng-repeat="person in data.added"><span ng-show="$index > 0">, </span>{{person.name}}</span>
+	</span>
+	<span ng-switch-when="DEL_GAME"><span class="name">{{player}}</span> a <span class="no">annulé la partie</span>
+	</span>
+	<span ng-switch-when="DRP_GAME"><span class="name">{{player}}</span> a <span class="no">quitté la partie</span>
+	</span>
+	<span ng-switch-when="SET_COMMENT"><span class="name">{{player}}</span> a mis le commentaire: "{{data.message}}"
+	</span>
+	<span ng-switch-when="DEL_COMMENT"><span class="name">{{player}}</span> a supprimé son commentaire.
+	</span>
+	<span ng-switch-default>Là il s'est passé un truc, mais je sais pas quoi (bref, y'a un bug)</span>
+</span>

@@ -1,0 +1,26 @@
+{{ include ../parts/header-html }}
+
+<div>
+{{= gm.player }} a annulé la partie de {{= setting }} du {{= date }} {{= timeframe }} avec:
+<ul>
+ {{ players.forEach( function (player) { }}
+	<li> {{= player.player }} 
+	{{ if (player.idcomment) { }}
+<span class="comment">({{= player.comment }})</span>
+
+{{ } }}
+
+	</li>
+ {{ }) }}
+</ul>
+</div>
+
+{{ if (gm.idcomment > 0) { }}
+<div>
+Commentaire du MJ: {{= gm.comment }}
+</div>
+
+{{ } }}
+
+{{ include ../parts/footer-html }}
+

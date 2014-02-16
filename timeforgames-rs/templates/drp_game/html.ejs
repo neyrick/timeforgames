@@ -1,0 +1,26 @@
+{{ include ../parts/header-html }}
+
+<div>
+{{= actor }} s'est retiré de la partie de {{= setting }} du {{= date }} {{= timeframe }} maîtrisée par {{= gm.player }} avec:
+<ul>
+ {{ players.forEach( function (player) {
+	if (player.player != actor) { }}
+		<li> {{= player.player }} 
+		{{ if (player.idcomment) { }} <span class="comment">({{= player.comment }})</span>{{ } }} </li>
+        {{ } else { }}
+		<li><span class="no"> {{= player.player }} </span>
+		{{ if (player.idcomment) { }} <span class="comment">({{= player.comment }})</span>{{ } }} </li>
+	{{ } }}
+{{ }) }}
+</ul>
+</div>
+
+{{ if (gm.idcomment > 0) { }}
+<div>
+Commentaire du MJ: {{= gm.comment }}
+</div>
+
+{{ } }}
+
+{{ include ../parts/footer-html }}
+

@@ -1,0 +1,9 @@
+{
+	"smtp" : {
+	      "service" : "Gmail",
+	      "auth" : {
+		"user" : "neyrick@gmail.com",
+		"pass" : "######"
+	      }
+	}
+}

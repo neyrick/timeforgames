@@ -1,0 +1,32 @@
+{
+  "name": "gamegrinder-rs",
+  "preferGlobal": true,
+  "version": "0.1.0",
+  "author": "Neyrick <neyrick@gmail.com>",
+  "description": "Serveur REST pour la planification des parties de Reves et Legendes",
+  "contributors": [ ],
+  "bin": { },
+  "scripts": {
+    "start": "node ./server"
+  },
+  "main": "./server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neyrick/gayming.git"
+  },
+  "keywords": [],
+  "dependencies" : {},
+  "analyze": true,
+  "devDependencies": {
+    "vows"    :  "0.5.x",
+    "request" :  "2.1.x"
+  },
+  "bundledDependencies": [
+    "pg",
+    "persist"
+  ],  
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10"
+  }
+}

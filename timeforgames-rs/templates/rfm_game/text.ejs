@@ -1,0 +1,16 @@
+{{ include ../parts/header-text }}
+
+{{= gm.player }} a modifié la liste des joueurs de la partie de {{= setting }} du {{= date }} {{= timeframe }}. La nouvelle liste est:
+ {{ players.kept.forEach( function (schedule) { }}
+ - {{= schedule.player }} {{ if (schedule.idcomment) { }} ({{= schedule.comment }}){{ } }}
+ {{ }) }}
+ {{ players.added.forEach( function (schedule) { }}
+ - {{= schedule.player }} {{ if (schedule.idcomment) { }} ({{= schedule.comment }}){{ } }}
+ {{ }) }}
+
+{{ if (gm.idcomment > 0) { }}
+Commentaire du MJ: {{= gm.comment }}
+{{ } }}
+
+{{ include ../parts/footer-text }}
+

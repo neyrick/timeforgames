@@ -1,0 +1,22 @@
+[
+{
+	"id": 1,
+	"name": "Eclipse Phase",
+	"code": "EP"
+},
+{
+	"id": 2,
+	"name": "7th Sea: Pirates",
+	"code": "7SP"
+},
+{
+	"id": 3,
+	"name": "Shadowrun: Québec",
+	"code": "SRQ"
+},
+{
+	"id": 4,
+	"name": "D&D: Terres Balafrées",
+	"code": "TB"
+},
+]
