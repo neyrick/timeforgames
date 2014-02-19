@@ -1,0 +1,21 @@
+.dayPanel {
+	margin: 5px;
+}
+.day-heading {
+	margin-bottom: 5px;
+}
+.list-group-item {
+	padding: 5px 8px;
+}
+.list-group-item > .tfSettingBadge {
+	float: left;
+	min-width: 40px;
+	margin-right: 5px;
+}
+.headerButtons {
+	width: 100%;
+	padding: 5px;
+}
+.headerButton {
+	width: 50%;
+}
