@@ -1,11 +1,11 @@
 .dayPanel {
-	margin: 5px;
+	margin-bottom: 5px;
 }
 .day-heading {
 	margin-bottom: 5px;
 }
 .list-group-item {
-	padding: 5px 8px;
+	padding: 2px 8px;
 }
 .list-group-item > .tfSettingBadge {
 	float: left;
@@ -18,4 +18,24 @@
 }
 .headerButton {
 	width: 50%;
+}
+#ggloading {
+	display: none;
+	opacity: 0;
+	z-index: 20000;
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	-webkit-transition: opacity .5s ease-out;
+	-moz-transition:  opacity .5s ease-out;
+	-ms-transition:  opacity .5s ease-out;
+	-o-transition:  opacity .5s ease-out;
+	transition:  opacity .5s ease-out;
+	background: #000000 url('../images/loading.gif') no-repeat fixed center;
+}
+.weekPanel {
+	margin: 5px;
+	padding: 5px;
 }

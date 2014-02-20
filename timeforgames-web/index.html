@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="timeForGamesApp">
+<html lang="fr" ng-app="timeForGamesApp">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
@@ -8,10 +8,10 @@
 <link rel="stylesheet" href="lib/jquery.qtip.css">
 <link rel="stylesheet" href="css/tfg.css">
 
-<script src="lib/jquery.js"></script>
+<script src="lib/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="lib/jquery.qtip.js"></script>
 
-<script src="lib/angular/angular.js"></script>
+<script src="lib/angular/angular.min.js"></script>
 <script src="lib/angular-local-storage.min.js"></script>
 <script src="lib/bindonce.js"></script>
 <script src="js/gg.js"></script>
@@ -26,6 +26,8 @@
 	<script type="text/javascript">
 
 		$(function() {
+			angular.element('body').scope().initDesktop();
+			
 			$.fn.qtip.modal_zindex = 16000;
 			$('#logindialogcontainer').qtip({
 			    style: {
@@ -89,7 +91,7 @@
 				},
 				function(event) {
 					$(this).text($(this).attr("norm-text"));
-				})
+				});
 			});
 			$("[alt-text]").show(function() {
 					$(this).text($(this).attr("norm-text"));
@@ -131,7 +133,7 @@
    <div id="ggoverlay" ng-class="{ active :  tooltipLock.mainlock == true }">
 	<div></div>
    </div>
-   <div id="ggloading">
+   <div id="ggloading" ng-class="{ active :  loading === true }">
 	<div></div>
    </div>
 

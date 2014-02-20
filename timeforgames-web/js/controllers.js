@@ -16,7 +16,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
     }
 
     function initPlanning()  {
-		$('#ggloading').addClass('active');
+		$scope.loading = true;
         setTimeout(function() {
             plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
                  $scope.weeks = planningBuilderService.buildWeeksPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
@@ -27,7 +27,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
                     applyFilters();
                 });
             });
-            $('#ggloading').removeClass('active');
+            $scope.loading = false;
         }, 0);
     }
     
@@ -80,6 +80,8 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
         localStorageService.add('ggconfig-' + $scope.currentUser, JSON.stringify($scope.config));
     }
 
+    $scope.loading = false;
+
     $scope.newsetting = { name : '', mode : -1, status : 0, code : ''};
 
     $scope.dayCount = 42;
@@ -107,6 +109,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
 	 loadConfig();
 	 initPlanning();
      };
+     
     $scope.logout=function() {
         reset();
          delete $scope.currentUser;
@@ -136,6 +139,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
               }
           });
           if (andPlanning && (typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null)) initPlanning();	 
+          $scope.settingsReady = true;
       }); 
   };
     
@@ -169,11 +173,11 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
           }
       }
 	storeConfig();
-  }
+  };
 
   $scope.isInArray = function(item, list) {
 	return (list.indexOf('' + item) > -1);
-  }
+  };
 
   $scope.statusDesc = [
     { id: 0, desc : "Pas dispo / intéressé", style: "notAvailableBadge", visible : true },
@@ -258,21 +262,24 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
             $scope.currentEdit.gamePlayers[playerSchedule.player] = playerSchedule;
             $scope.currentEdit.numPlayers++;
         }
-    }
+    };
+    
     $scope.disbandGame = function() {
         plannerService.disbandGame(getMyGMScheduleId($scope.currentUser, $scope.currentEdit.schedule.games), function() {
             $scope.tooltipLock.mainlock = false;
 //            $('#tfSettingTooltipContainer').qtip('api').hide();
             $scope.refreshTimeframe();
         });
-    }
+    };
+    
     $scope.dropGame = function() {
         plannerService.dropGame(getMyPlayerScheduleId($scope.currentUser, $scope.currentEdit.schedule.games), function() {
             $scope.tooltipLock.mainlock = false;
 //            $('#tfSettingTooltipContainer').qtip('api').hide();
             $scope.refreshTimeframe();
         });
-    }
+    };
+    
     $scope.validateGame = function($event) {
         $scope.tooltipLock.mainlock = false;
 //        $('#tfSettingTooltipContainer').qtip('api').hide();
@@ -286,14 +293,16 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
                 $scope.refreshTimeframe();
             });
         }
-    }
+    };
+    
     $scope.setComment = function() {
         plannerService.setComment( $scope.currentUser, $scope.currentEdit.day.id, $scope.currentEdit.timeframe.code, $scope.currentEdit.schedule.settingid, $scope.currentEdit.schedule.idcomment, $scope.currentEdit.schedule.message, function() {
             $scope.tooltipLock.mainlock = false;
 //            $('#tfSettingTooltipContainer').qtip('api').hide();
             $scope.refreshTimeframe();
          });
-    }
+    };
+    
     $scope.setDispo = function(role) {
         plannerService.setDispo($scope.currentUser, $scope.currentEdit.day.id, $scope.currentEdit.timeframe.code, $scope.currentEdit.schedule.settingid, role, function() {
             $scope.tooltipLock.mainlock = false;
@@ -391,13 +400,14 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
         var $box=$('.settingEditor');
         $box.slideDown(200);
         $box.find('.inputSettingName').focus();
-	}
+	};
 
     $scope.closeSettingEditor = function() {
         $('.settingEditor').slideUp(200);
         $('.settingTrigger').slideDown(200);
-	}
+	};
 
+    $scope.initDesktop = function() {
     $('#tfSettingTooltipContainer').qtip({
         style: {
             classes: 'ggpanel tfSettingEditBox'
@@ -482,7 +492,8 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
             }
         }
     });
-
+    };
+    
 }]);
 
 

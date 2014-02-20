@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" ng-app="timeForGamesApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,6 +10,7 @@
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="css/tfg-mobile.css" rel="stylesheet">
 
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -17,7 +18,10 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body>
+  <body ng-controller="CalendarCtrl">
+   <div id="ggloading">
+	<div></div>
+   </div>
 
 <div class="modal fade" id="addSettingModal" tabindex="-1" role="dialog" aria-labelledby="addSettingModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -111,40 +115,8 @@
 	  <button type="button" class="btn btn-default headerButton">Changer d'Utilisateur</button>
 	</div>
 
-	  <ul class="list-group dayPanel">
-	    <li class="list-group-item list-group-item-success">Lundi 17 février</li>
-	    <li class="list-group-item list-group-item-info">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	    <li class="list-group-item list-group-item-info">Soir <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	  </ul>
-
-	  <ul class="list-group dayPanel">
-	    <li class="list-group-item list-group-item-success">Mardi 18 février</li>
-	    <li class="list-group-item list-group-item-info">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	    <li class="list-group-item list-group-item-info">Soir <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	  </ul>
-
-	  <ul class="list-group dayPanel">
-	    <li class="list-group-item list-group-item-success">Mercredi 19 février</li>
-	    <li class="list-group-item list-group-item-info">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	    <li class="list-group-item list-group-item-info">Soir <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	  </ul>
-
-	  <ul class="list-group dayPanel">
-	    <li class="list-group-item list-group-item-success">Jeudi 20 février</li>
-	    <li class="list-group-item list-group-item-info">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	    <li class="list-group-item list-group-item-info">Soir <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	  </ul>
-
-
-	  <ul class="list-group dayPanel">
+  <div class="well weekPanel">
+	  <ul class="list-group dayPanel"  ng-repeat="day in weeks[0].days">
 	    <li class="list-group-item list-group-item-success">Vendredi 21 février</li>
 	    <li class="list-group-item list-group-item-info">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
 </span></li>
@@ -158,11 +130,20 @@
 	    <li class="list-group-item"><span class="badge tfSettingBadge">TB</span>Terres Balafrées</li>
 	    <li class="list-group-item"><span class="badge tfSettingBadge">EP</span>Eclipse Phase</li>
 	  </ul>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
+</div>
+    
+    	<script src="lib/angular/angular.min.js"></script>
+	<script src="lib/angular-local-storage.min.js"></script>
+	<script src="lib/bindonce.js"></script>
+    <script src="lib/jquery-1.11.0.min.js"></script>
     <script src="lib/bootstrap.min.js"></script>
+	<script src="js/gg.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/controllers.js"></script>
+	<script src="js/filters.js"></script>
+	<script src="js/services.js"></script>
+	<script src="js/directives.js"></script>
+
   </body>
 </html>
 
