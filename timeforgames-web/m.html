@@ -18,10 +18,33 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body ng-controller="CalendarCtrl">
+  <body ng-controller="CalendarCtrl" data-display="mobile">
    <div id="ggloading">
 	<div></div>
    </div>
+
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="loginModalLabel">C'est qui ?</h4>
+      </div>
+      <div class="modal-body">
+		<form class="form-inline" id="loginForm" role="form" name="loginForm" ng-submit="login()">
+			<div class="input-group input-group-lg">
+				<span class="input-group-addon">Tape ton pseudo</span>
+				<input type="text" id="inputName" class="form-control input-lg"
+					name="userinput" placeholder="Ton pseudo sur le forum"
+					ng-model="tempUser" required />
+				<span class="input-group-btn">
+					<button class="btn btn-default" type="submit" ng-disabled="loginForm.$invalid">Valider</button>
+				</span>
+			</div>
+		</form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal fade" id="addSettingModal" tabindex="-1" role="dialog" aria-labelledby="addSettingModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -111,14 +134,15 @@
 </div>
 
 	<div class="btn-group headerButtons">
+	  <div class="btn headerButton">Salut {{ currentUser }} !</div>
 	  <button type="button" class="btn btn-default headerButton" data-toggle="modal" data-target="#filtersModal">Mes Filtres</button>
-	  <button type="button" class="btn btn-default headerButton">Changer d'Utilisateur</button>
+	  <button type="button" class="btn btn-default headerButton" ng-click="logout()">Changer d'Utilisateur</button>
 	</div>
 
-  <div class="well weekPanel">
-	  <ul class="list-group dayPanel"  ng-repeat="day in weeks[0].days">
-	    <li class="list-group-item list-group-item-success">Vendredi 21 février</li>
-	    <li class="list-group-item list-group-item-info">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
+  <div bindonce class="well weekPanel" ng-repeat="week in weeks">
+	  <ul bindonce class="list-group dayPanel"  ng-repeat="day in week.days">
+	    <li class="list-group-item list-group-item-success"><span bo-text="day.date | date : 'fullDate' "></span></li>
+	    <li class="list-group-item list-group-item-info" ng-repeat="timeframe in day.timeframes">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
 </span></li>
 	    <li class="list-group-item list-group-item-info">Après-midi</li>
 	    <li class="list-group-item"><span class="badge tfSettingBadge">TB</span>Terres Balafrées</li>
@@ -132,10 +156,11 @@
 	  </ul>
 </div>
     
+    <script src="lib/jquery-1.11.0.min.js"></script>
     	<script src="lib/angular/angular.min.js"></script>
+    	<script src="lib/angular-locale_fr-fr.js"></script>
 	<script src="lib/angular-local-storage.min.js"></script>
 	<script src="lib/bindonce.js"></script>
-    <script src="lib/jquery-1.11.0.min.js"></script>
     <script src="lib/bootstrap.min.js"></script>
 	<script src="js/gg.js"></script>
 	<script src="js/app.js"></script>
@@ -143,6 +168,22 @@
 	<script src="js/filters.js"></script>
 	<script src="js/services.js"></script>
 	<script src="js/directives.js"></script>
+
+	<script type="text/javascript">
+
+		$(function() {
+            
+            // Etat de login initial
+            
+			var currentUser = angular.element('body').scope().currentUser;
+			if ((typeof currentUser == 'undefined') || (currentUser == null)) {
+				$( "#loginModal" ).modal('show');
+			}
+			$('#loginForm').submit(function(event) {
+				$( "#loginModal" ).modal('hide');
+			});
+		});
+	</script>
 
   </body>
 </html>

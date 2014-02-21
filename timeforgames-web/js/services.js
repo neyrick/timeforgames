@@ -172,6 +172,7 @@ timeForGamesApp.factory('planningBuilderService', ['config', function (config) {
 			result.dom = day.getDate();
 			result.month = day.getMonth()+1;
 			result.year = day.getFullYear();
+			result.date = day;
 			result.timeframes = [ { code : 'AFTERNOON', settings : [], busy : false, gaming : {} }, { code : 'EVENING', settings : [], busy : false, gaming : {} }];
 			return result;
 		},

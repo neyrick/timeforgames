@@ -80,6 +80,9 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
         localStorageService.add('ggconfig-' + $scope.currentUser, JSON.stringify($scope.config));
     }
 
+    $scope.display = $('body').data('display');
+    if (typeof $scope.display == "undefined") $scope.display = "desktop";
+
     $scope.loading = false;
 
     $scope.newsetting = { name : '', mode : -1, status : 0, code : ''};
@@ -114,8 +117,13 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
         reset();
          delete $scope.currentUser;
          localStorageService.remove('ggUser');
-         $( "#logindialogcontainer" ).qtip( "toggle", true ); }
-    ;
+         if ($scope.display == 'mobile') {
+             $( "#loginModal" ).modal('show');
+         }
+         else if ($scope.display == 'desktop') {
+            $( "#logindialogcontainer" ).qtip( "toggle", true );
+         }
+    };
 
   $scope.refreshSettings = function(andPlanning) {
       settingsService.getSettings( function(settings) {
@@ -407,7 +415,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
         $('.settingTrigger').slideDown(200);
 	};
 
-    $scope.initDesktop = function() {
+    if ($scope.display == 'desktop') {
     $('#tfSettingTooltipContainer').qtip({
         style: {
             classes: 'ggpanel tfSettingEditBox'
@@ -492,7 +500,7 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
             }
         }
     });
-    };
+    }
     
 }]);
 
