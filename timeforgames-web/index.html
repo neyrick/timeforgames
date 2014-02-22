@@ -9,9 +9,10 @@
 <link rel="stylesheet" href="css/tfg.css">
 
 <script src="lib/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="lib/jquery.qtip.js"></script>
+<script src="lib/jquery.qtip.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
 
-<script src="lib/angular/angular.min.js"></script>
+<script src="lib/angular-locale_fr-fr.js"></script>
 <script src="lib/angular-local-storage.min.js"></script>
 <script src="lib/bindonce.js"></script>
 <script src="js/gg.js"></script>
@@ -22,11 +23,10 @@
 <script src="js/directives.js"></script>
 
 </head>
-<body ng-controller="CalendarCtrl">
+<body ng-controller="CalendarCtrl" data-display="desktop">
 	<script type="text/javascript">
 
 		$(function() {
-//			angular.element('body').scope().initDesktop();
 			
 			$.fn.qtip.modal_zindex = 16000;
 			$('#logindialogcontainer').qtip({
@@ -128,6 +128,7 @@
 			$('#loginForm').submit(function(event) {
 				$( "#logindialogcontainer" ).qtip( "toggle", false );
 			});
+			
 		});
 	</script>
    <div id="ggoverlay" ng-class="{ active :  tooltipLock.mainlock == true }">
@@ -322,26 +323,8 @@
         <div class="dummyContainer">
             <div bindonce class="weekPanel" ng-repeat="week in weeks">
     
-                <div class="day1 dayPanel">
-                    <gg-day-tab day="week.days[0]">
-                </div>
-                <div class="day2 dayPanel">
-                    <gg-day-tab day="week.days[1]">
-                </div>
-                <div class="day3 dayPanel">
-                    <gg-day-tab day="week.days[2]">
-                </div>
-                <div class="day4 dayPanel">
-                    <gg-day-tab day="week.days[3]">
-                </div>
-                <div class="day5 dayPanel">
-                    <gg-day-tab day="week.days[4]">
-                </div>
-                <div class="day6 dayPanel">
-                    <gg-day-tab day="week.days[5]">
-                </div>
-                <div class="day7 dayPanel">
-                    <gg-day-tab day="week.days[6]">
+                <div bindonce class="dayPanel" bo-class="'day' + (1+$index)" ng-repeat="day in week.days">
+                    <gg-day-tab day="day" display="desktop">
                 </div>
             </div>
 

@@ -4,27 +4,36 @@
 
 timeForGamesApp.directive('ggTfSetting', function() {
 
+    var templates = {
+        desktop : 'directives/tfsetting.html',
+        mobile : 'directives/tfsetting-mobile.html'
+    };
     
 	return {
         controller : function ($scope, $element, $attrs) {
             $scope.triggerTfSettingTooltip = function(element) {
                 if($scope.tooltipLock.mainlock === false) {
-		    $scope.$apply( function () {
-		            $scope.currentEdit.day = $scope.day;
-		            $scope.currentEdit.timeframe = $scope.timeframe;
-			    $scope.history.date = $scope.dowcodes[$scope.day.dow] + ' ' + $scope.day.dom + '/' + $scope.day.month;
-			    $scope.history.timeframe = $scope.timeframesDesc[$scope.timeframe.code].name;
-			    $scope.resetTfSettingData($scope.schedule);
-		    });
-		    var api =  $('#tfSettingTooltipContainer').qtip('api');
-		    api.set('position.target', $(element));
-		    api.reposition();
-		    api.show();
+        		    $scope.$apply( function () {
+        		            $scope.currentEdit.day = $scope.day;
+        		            $scope.currentEdit.timeframe = $scope.timeframe;
+        			    $scope.history.date = $scope.dowcodes[$scope.day.dow] + ' ' + $scope.day.dom + '/' + $scope.day.month;
+        			    $scope.history.timeframe = $scope.timeframesDesc[$scope.timeframe.code].name;
+        			    $scope.resetTfSettingData($scope.schedule);
+        		    });
+        		    if ($scope.display == 'desktop') {
+                	    var api =  $('#tfSettingTooltipContainer').qtip('api');
+                	    api.set('position.target', $(element));
+                	    api.reposition();
+                	    api.show();
+                    }
+                    else if ($scope.display == 'mobile') {
+                        // TODO: reposition
+                    }
                 }
             };
         },
 		restrict: 'E',
-		templateUrl: 'directives/tfsetting.html',
+		templateUrl: function(element, attrs) { return templates[attrs.display]; },
 		scope: true,
 		link: function(scope, element, attrs) {
 		        var classes = [];
@@ -47,16 +56,21 @@ timeForGamesApp.directive('ggTfSetting', function() {
             }
 			scope.settingClasses = classes;
 
-			$(element).find('.tfSetting').mouseenter(function (event) {
-				var $this = $(this);
-				$this.data('ggdelay', setTimeout( function () {
-					scope.triggerTfSettingTooltip(event.target);
-				}, 200));
-			});
-			$(element).find('.tfSetting').mouseleave(function (event) {
-				var $this = $(this);
-				clearTimeout($this.data('ggdelay'));				
-			});
+            if (scope.display == 'desktop') {
+                $(element).find('.tfSetting').mouseenter(function (event) {
+                    var $this = $(this);
+                    $this.data('ggdelay', setTimeout( function () {
+                        scope.triggerTfSettingTooltip(event.target);
+                    }, 200));
+                });
+                $(element).find('.tfSetting').mouseleave(function (event) {
+                    var $this = $(this);
+                    clearTimeout($this.data('ggdelay'));                
+                });
+            }
+            else if (scope.display == 'mobile') {
+            }
+
 		}
 	};
 });
@@ -64,6 +78,11 @@ timeForGamesApp.directive('ggTfSetting', function() {
 
 timeForGamesApp.directive('ggTimeframeBox', function() {
 
+    var templates = {
+        desktop : 'directives/timeframebox.html',
+        mobile : 'directives/timeframebox-mobile.html'
+    };
+    
 	var timeframesDesc = {
 			    "AFTERNOON": {"code":"AFTERNOON", pic:"images/aprem.png", name:"Après-midi"},
 			    "EVENING": {"code":"EVENING", pic:"images/soir.png", name:"Soirée"},
@@ -76,21 +95,28 @@ timeForGamesApp.directive('ggTimeframeBox', function() {
 			$scope.timeframesDesc = timeframesDesc;
             $scope.triggerExtraSettingTooltip = function(element) {
                 if($scope.tooltipLock.mainlock === false) {
-		    $scope.$apply( function () {
+	       	    $scope.$apply( function () {
 		            $scope.currentEdit.day = $scope.day;
 		            $scope.currentEdit.timeframe = $scope.timeframe;
-			    delete $scope.currentEdit.schedule;
+			        delete $scope.currentEdit.schedule;
 		            $scope.currentEdit.possibleSettings = allPossibleSettings[$scope.day.id + '-' + $scope.timeframe.code];
-		    });
-		    var api =  $('#addSettingTooltipContainer').qtip('api');
-		    api.set('position.target', $(element));
-		    api.reposition();
-		    api.show();
-                }
+                    if ($scope.display == 'desktop') {
+                        var api =  $('#addSettingTooltipContainer').qtip('api');
+                        api.set('position.target', $(element));
+                        api.reposition();
+                        api.show();
+                    }
+                    else if ($scope.display == 'mobile') {
+                        // TODO: reposition
+                    }
+                });
+              }
             };
         },
 		restrict: 'E',
-		templateUrl: 'directives/timeframebox.html',
+        templateUrl: function(element, attrs) { 
+            return templates[attrs.display];
+             },
 		scope: true,
 		link: function(scope, element, attrs) {
             var presentSettings = [];
@@ -104,31 +130,35 @@ timeForGamesApp.directive('ggTimeframeBox', function() {
                 }
             });
             allPossibleSettings[scope.day.id + '-' + scope.timeframe.code] = possibleSettings;
-			$(element).find('.timeFramePic').qtip({
-				style: { classes: 'infoTooltip' },
-				content: { text: timeframesDesc[scope.timeframe.code].name },
-				position: {
-					my: 'bottom left',
-					at: 'top right'
-				},
-				show: {
-					event: 'mouseenter click',
-				},
-				hide: {
-					delay: 10,
-					event: 'mouseleave',
-				}
-			});
-			$(element).find('.tfExtra').mouseenter(function (event) {
-				var $this = $(this);
-				$this.data('ggdelay', setTimeout( function () {
-					scope.triggerExtraSettingTooltip(event.target);
-				}, 200));
-			});
-			$(element).find('.tfExtra').mouseleave(function (event) {
-				var $this = $(this);
-				clearTimeout($this.data('ggdelay'));				
-			});
+            if (scope.display == 'desktop') {
+    			$(element).find('.timeFramePic').qtip({
+    				style: { classes: 'infoTooltip' },
+    				content: { text: timeframesDesc[scope.timeframe.code].name },
+    				position: {
+    					my: 'bottom left',
+    					at: 'top right'
+    				},
+    				show: {
+    					event: 'mouseenter click',
+    				},
+    				hide: {
+    					delay: 10,
+    					event: 'mouseleave',
+    				}
+    			});
+    			$(element).find('.tfExtra').mouseenter(function (event) {
+    				var $this = $(this);
+    				$this.data('ggdelay', setTimeout( function () {
+    					scope.triggerExtraSettingTooltip(event.target);
+    				}, 200));
+    			});
+    			$(element).find('.tfExtra').mouseleave(function (event) {
+    				var $this = $(this);
+    				clearTimeout($this.data('ggdelay'));				
+    			});
+    	   }
+           else if (scope.display == 'mobile') {
+    	   }
 		}
 	};
 });
@@ -137,9 +167,16 @@ timeForGamesApp.directive('ggDayTab', function() {
 
 	var dowcodes = { "0":"DIM","1":"LUN","2":"MAR","3":"MER","4":"JEU","5":"VEN","6":"SAM"};
 
+    var templates = {
+        desktop : 'directives/daytab.html',
+        mobile : 'directives/daytab-mobile.html'
+    };
+    
 	return {
 		restrict: 'E',
-		templateUrl: 'directives/daytab.html',
+        templateUrl: function(element, attrs) {
+             return templates[attrs.display];
+         },
 		scope: true,
 		link: function(scope, element, attrs) {
             scope.day = scope.$eval(attrs['day']);

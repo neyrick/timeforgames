@@ -9,5 +9,5 @@ timeForGamesApp.config(function ($httpProvider) {
     });
 
 timeForGamesApp.config(['localStorageServiceProvider', function(localStorageServiceProvider){
-  localStorageServiceProvider.setPrefix('ggPrefix');
+  localStorageServiceProvider.setPrefix('tfgPrefix');
 }]);

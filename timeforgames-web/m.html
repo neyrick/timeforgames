@@ -141,18 +141,7 @@
 
   <div bindonce class="well weekPanel" ng-repeat="week in weeks">
 	  <ul bindonce class="list-group dayPanel"  ng-repeat="day in week.days">
-	    <li class="list-group-item list-group-item-success"><span bo-text="day.date | date : 'fullDate' "></span></li>
-	    <li class="list-group-item list-group-item-info" ng-repeat="timeframe in day.timeframes">Après-midi <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	    <li class="list-group-item list-group-item-info">Après-midi</li>
-	    <li class="list-group-item"><span class="badge tfSettingBadge">TB</span>Terres Balafrées</li>
-	    <li class="list-group-item"><span class="badge tfSettingBadge">EP</span>Eclipse Phase</li>
-	    <li class="list-group-item"><span class="badge tfSettingBadge">7SP</span>7ème Mer: Pirates !</li>
-	    <li class="list-group-item"><span class="badge tfSettingBadge">COP</span>COPS: Ombres et Lumières</li>
-	    <li class="list-group-item list-group-item-info">Soir <span class="badge"><span class="glyphicon glyphicon-plus-sign"></span>
-</span></li>
-	    <li class="list-group-item"><span class="badge tfSettingBadge">TB</span>Terres Balafrées</li>
-	    <li class="list-group-item"><span class="badge tfSettingBadge">EP</span>Eclipse Phase</li>
+	       <gg-day-tab day="day" display="mobile">
 	  </ul>
 </div>
     

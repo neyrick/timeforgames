@@ -1,0 +1,6 @@
+<li class="list-group-item list-group-item-info">
+	<img class="timeFrameItem timeFramePic" bo-attr bo-attr-ttip="timeframesDesc[timeframe.code].name" bo-src="timeframesDesc[timeframe.code].pic"/>
+	{{ timeframesDesc[timeframe.code].name }}<span class="badge"><span class="glyphicon glyphicon-plus-sign"></span></span>
+</li>
+
+<gg-tf-setting display="desktop" ng-repeat="schedule in timeframe.settings"/>
