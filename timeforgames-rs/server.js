@@ -1,6 +1,7 @@
 var serv = require("./lib/services");
 
 var restify = require('restify');
+var config = require("./config.json");
 
 var server = restify.createServer();
 server.use(restify.acceptParser(server.acceptable));
@@ -10,6 +11,8 @@ server.use(restify.queryParser());
 server.use(restify.jsonp());
 server.use(restify.gzipResponse());
 server.use(restify.bodyParser());
+server.use( restify.CORS( {origins: config.http.allowedOrigins}) );
+server.use( restify.fullResponse() );
 
 server.get('/tfg/setting', serv.fetchAllSettings);
 server.get('/tfg/setting/:code', serv.findSettingByCode);

@@ -1,3 +1,6 @@
+ul li {
+	list-style-type: none;
+}
 .dayPanel {
 	margin-bottom: 5px;
 }
@@ -19,6 +22,60 @@
 .headerButton {
 	width: 33%;
 }
+.tfgModalFooter {
+	padding: 0px 20px 8px 20px;
+	border-top: none;
+}
+.ggSubPanelItem.radio {
+	padding: 2px 8px;
+	border-bottom: 1px solid #DDD;
+	margin-top: 0px;
+	margin-bottom: 3px;
+}
+.ggSubPanelItem {
+	padding: 2px 8px;
+	border-bottom: 1px solid #DDD;
+	margin-top: 0px;
+	margin-bottom: 3px;
+}
+.ggSubPanelItem:last-child {
+	padding: 2px 8px;
+	border-bottom: none;
+}
+.ggSubPanelItem.radio {
+	padding-left: 28px;
+}
+li.oddline {
+    background-color: #E0E0E0;
+}
+li.evenline {
+    background-color: #FFFFFF;
+}
+ul.gameRoster {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+ul.gameRoster li {
+	background-repeat: no-repeat;
+	background-position: 10px 5px;
+	padding-top: 4px;
+	padding-left: 45px;
+	min-height: 22px;
+}
+ul.gameRoster li.nomMJ {
+	background-image: url("../images/mj.png");
+}
+ul.gameRoster li.nomPJ {
+	background-image: url("../images/dice.png");
+}
+.busyplayer {
+	text-decoration: line-through;
+}
+.commentDisplay {
+	font-style: italic;
+	font-size: 12px;
+}
 #ggloading {
 	display: none;
 	opacity: 0;
@@ -35,7 +92,112 @@
 	transition:  opacity .5s ease-out;
 	background: #000000 url('../images/loading.gif') no-repeat fixed center;
 }
+.badge {
+	display: inline-block;
+	min-width: 10px;
+	padding: 2px 7px;
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 1;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+	background-color: white;
+	border-radius: 10px;
+	border: solid 1px #000000;
+	color: #000050;
+}
+a.badge:hover, a.badge:focus {
+    background-color: #3245a3;
+    color: #FFFFFF;
+    cursor: pointer;
+}
 .weekPanel {
 	margin: 5px;
 	padding: 5px;
+}
+.playBadge > .badge {
+	background-color: #00FF00;
+}
+.noPlayBadge > .badge {
+	background-color: #C0C0FF;
+}
+.availableBadge > .badge {
+	background-color: #FFFF00;
+}
+.notAvailableBadge > .badge {
+	background-color: #606060;
+	color: #FFFFFF;
+}
+.bg-primary {
+    color: #FFF;
+    background-color: #428BCA;
+}
+.collapsed {
+	display: none;
+}
+.settingBadge.ggHidden {
+    display: none;
+}
+.ggDisabledItem {
+	background-color: #F0F0F0;
+	color: #909090;
+	text-decoration: line-through;
+}
+.dummyContainer {
+	margin: 0px;
+	padding: 0px;
+}
+.modalTrim {
+	padding: 0px;
+}
+.pasDispoDiv {
+	background-image: url("../images/pasdispo.png");
+}
+.pasDispoDiv:hover {
+	background-image: url("../images/dispo.png");
+}
+.dispoDiv {
+	background-image: url("../images/dispo.png");
+}
+.dispoDiv:hover {
+	background-image: url("../images/pasdispo.png");
+}
+.validateDiv {
+	background-image: url("../images/checked.png");
+}
+.cancelDiv {
+	background-image: url("../images/unchecked.png");
+}
+.ggbuttonbox {
+	text-align: center;
+}
+span.name {
+	font-weight: bold;
+	color: #e37c0c;
+}
+span.yes {
+	font-weight: bold;
+	color: #00A000;
+}
+span.no {
+	font-weight: bold;
+	color: #FF0000;
+}
+span.role {
+	font-weight: bold;
+	color: #0000A0;
+}
+.tfSettingAction {
+	background-position:12px 3px;
+	background-repeat: no-repeat;
+	padding-left: 45px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+.warningDiv {
+	background-image: url("../images/warning.png");
+}
+.noteDiv {
+	background-image: url("../images/note.png");
 }

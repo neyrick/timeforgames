@@ -231,7 +231,12 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
             $scope.newsetting.status = 0;
             $scope.newsetting.code = '';
             $scope.tooltipLock.mainlock = false;
-            $('#addSettingTooltipContainer').qtip('api').hide();
+            if ($scope.display == 'desktop') {
+                $('#addSettingTooltipContainer').qtip('api').hide();
+            }
+            else if ($scope.display == 'mobile') {
+                $( "#addSettingModal" ).modal('hide');
+            }
         });
         
     };
@@ -241,7 +246,12 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
     
          $scope.toggleSettingVisibility(setting.id, true);
             $scope.tooltipLock.mainlock = false;
-            $('#addSettingTooltipContainer').qtip('api').hide();
+            if ($scope.display == 'desktop') {
+                $('#addSettingTooltipContainer').qtip('api').hide();
+            }
+            else if ($scope.display == 'mobile') {
+                $( "#addSettingModal" ).modal('hide');
+            }
             $scope.refreshTimeframe();
         });
     };
@@ -368,8 +378,13 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
             for (var i = 0; i < history.length; i++) {
                 $scope.historyList.push(history[i]);
             }
-        $scope.tooltipLock.mainlock = true;
-            $($event.target).qtip('api').show();
+            if ($scope.display == 'desktop') {
+                $scope.tooltipLock.mainlock = true;
+                $($event.target).qtip('api').show();
+            }
+            else if ($scope.display == 'mobile') {
+                $('#historyModal').modal('show');
+            }
         });
         
     };
@@ -416,92 +431,108 @@ timeForGamesApp.controller('CalendarCtrl', [ '$scope', 'settingsService', 'plann
 	};
 
     if ($scope.display == 'desktop') {
-    $('#tfSettingTooltipContainer').qtip({
-        style: {
-            classes: 'ggpanel tfSettingEditBox'
-        },
-        content: {
-            text: $('.tfSettingDropdown')
-        },
-        position: {
-            my: 'top center',
-            at: 'bottom center',
-            target: $('#tfSettingTooltipContainer'),
-	    adjust: { x : -10, y : -9 }
-        },
-        show: {
-            event: false,
-	    solo: true
-        },
-        hide: {
-            delay: 100,
-            fixed: true,
-            event: 'mouseleave unfocus',
-	    inactive: 10000
-        },
-        events: {
-            hide: function(event, api) {
-                if (($scope.tooltipLock.mainlock === true) && ((event.originalEvent.type != 'mousedown') || (event.originalEvent.target.id != 'ggoverlay'))){
-                    event.preventDefault();
-                    return;
-                }
-                $scope.closeCommentEditor();
-                $scope.closeGameEditor();
-                if ($scope.$$phase == null) {
-                    $scope.$apply( function () {
+        $('#tfSettingTooltipContainer').qtip({
+            style: {
+                classes: 'ggpanel tfSettingEditBox'
+            },
+            content: {
+                text: $('.tfSettingDropdown')
+            },
+            position: {
+                my: 'top center',
+                at: 'bottom center',
+                target: $('#tfSettingTooltipContainer'),
+    	    adjust: { x : -10, y : -9 }
+            },
+            show: {
+                event: false,
+    	    solo: true
+            },
+            hide: {
+                delay: 100,
+                fixed: true,
+                event: 'mouseleave unfocus',
+    	    inactive: 10000
+            },
+            events: {
+                hide: function(event, api) {
+                    if (($scope.tooltipLock.mainlock === true) && ((event.originalEvent.type != 'mousedown') || (event.originalEvent.target.id != 'ggoverlay'))){
+                        event.preventDefault();
+                        return;
+                    }
+                    $scope.closeCommentEditor();
+                    $scope.closeGameEditor();
+                    if ($scope.$$phase == null) {
+                        $scope.$apply( function () {
+                            $scope.tooltipLock.mainlock = false;
+                        });
+                    }
+                    else {
                         $scope.tooltipLock.mainlock = false;
-                    });
-                }
-                else {
-                    $scope.tooltipLock.mainlock = false;
+                    }
                 }
             }
-        }
-    });
-
-    $('#addSettingTooltipContainer').qtip({
-        style: {
-            classes: 'ggpanel extraSettingEditBox'
-        },
-        content: {
-            text: $('.addSettingDropdown')
-        },
-        position: {
-            my: 'top center',
-            at: 'bottom left',
-            target: $('#addSettingTooltipContainer'),
-	    adjust: { x : -4, y : -12 }
-        },
-        show: {
-            event: false,
-            solo: true
-        },
-        hide: {
-            delay: 100,
-            fixed: true,
-            event: 'mouseleave unfocus',
-	    inactive: 2000
-        },
-        events: {
-            hide: function(event, api) {
-                if (($scope.tooltipLock.mainlock === true) && ((event.originalEvent.type != 'mousedown') || (event.originalEvent.target.id != 'ggoverlay'))){
-                    event.preventDefault();
-                    return;
-                }
-                $scope.closeSettingEditor();
-                if ($scope.$$phase == null) {
-                    $scope.$apply( function () {
-                        $scope.tooltipLock.mainlock = false;
-                    });
-                }
-                else {
-                    $scope.tooltipLock.mainlock = false;
-                }
-            }
-        }
-    });
-    }
+        });
     
+        $('#addSettingTooltipContainer').qtip({
+            style: {
+                classes: 'ggpanel extraSettingEditBox'
+            },
+            content: {
+                text: $('.addSettingDropdown')
+            },
+            position: {
+                my: 'top center',
+                at: 'bottom left',
+                target: $('#addSettingTooltipContainer'),
+    	    adjust: { x : -4, y : -12 }
+            },
+            show: {
+                event: false,
+                solo: true
+            },
+            hide: {
+                delay: 100,
+                fixed: true,
+                event: 'mouseleave unfocus',
+    	    inactive: 2000
+            },
+            events: {
+                hide: function(event, api) {
+                    if (($scope.tooltipLock.mainlock === true) && ((event.originalEvent.type != 'mousedown') || (event.originalEvent.target.id != 'ggoverlay'))){
+                        event.preventDefault();
+                        return;
+                    }
+                    $scope.closeSettingEditor();
+                    if ($scope.$$phase == null) {
+                        $scope.$apply( function () {
+                            $scope.tooltipLock.mainlock = false;
+                        });
+                    }
+                    else {
+                        $scope.tooltipLock.mainlock = false;
+                    }
+                }
+            }
+        });
+    }
+
+    if ($scope.display == 'mobile') {
+        $('#addSettingModal').on('hidden.bs.modal', function (e) {
+            $scope.closeSettingEditor();
+        });        
+        $('#tfSettingModal').on('hidden.bs.modal', function (e) {
+            $scope.closeCommentEditor();
+            $scope.closeGameEditor();
+        });        
+        $('#historyModal').on('show.bs.modal', function (e) {
+            $('#tfSettingModal').modal('hide');
+        });        
+        $('#historyModal').on('hidden.bs.modal', function (e) {
+            $('#tfSettingModal').modal('show');
+        });        
+    }
+
 }]);
 
 

@@ -1,7 +1,7 @@
 <span ng-switch="action">
-	<span ng-switch-when="ADD_DISPO"><span class="name">{{player}}</span> s'est déclaré <span class="yes">disponible</span> pour {{role}}
+	<span ng-switch-when="ADD_DISPO"><span class="name">{{player}}</span> s'est déclaré <span class="yes">disponible</span> pour <span class="role">{{roles[data.role]}}</span>
 	</span>
-	<span ng-switch-when="DEL_DISPO"><span class="name">{{player}}</span> s'est déclaré <span class="no">indisponible</span> pour {{role}}
+	<span ng-switch-when="DEL_DISPO"><span class="name">{{player}}</span> s'est déclaré <span class="no">indisponible</span> pour  <span class="role">{{roles[data.role]}}</span>
 	</span>
 	<span ng-switch-when="ADD_GAME"><span class="name">{{player}}</span> a <span class="yes">validé une partie</span> avec: <span class="name" ng-repeat="person in data.players"><span ng-show="$index > 0">, </span>{{person.name}}</span>
 	</span>

@@ -30,16 +30,13 @@
         <h4 class="modal-title" id="loginModalLabel">C'est qui ?</h4>
       </div>
       <div class="modal-body">
-		<form class="form-inline" id="loginForm" role="form" name="loginForm" ng-submit="login()">
-			<div class="input-group input-group-lg">
-				<span class="input-group-addon">Tape ton pseudo</span>
-				<input type="text" id="inputName" class="form-control input-lg"
+		<form role="form" id="loginForm" name="loginForm" ng-submit="login()">
+			<div class="form-group">
+				<input type="text" id="inputName" class="form-control"
 					name="userinput" placeholder="Ton pseudo sur le forum"
 					ng-model="tempUser" required />
-				<span class="input-group-btn">
-					<button class="btn btn-default" type="submit" ng-disabled="loginForm.$invalid">Valider</button>
-				</span>
 			</div>
+			<button class="btn btn-default" type="submit" ng-disabled="loginForm.$invalid">Valider</button>
 		</form>
       </div>
     </div>
@@ -53,16 +50,40 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title" id="addSettingModalLabel">Proposer une partie</h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modalTrim">
 
 	<ul class="list-group">
-	  <li class="list-group-item">Nouvelle Chronique / One-Shot</li>
-	  <li class="list-group-item">Chronique 1</li>
-	  <li class="list-group-item">Chronique 2</li>
+	  <li class="list-group-item settingTrigger collapsible bg-primary ggbuttonbox" ng-click="openSettingEditor()">Créer une Chronique / One-Shot ...</li>
+	  <li class="list-group-item settingEditor collapsed dummyContainer">
+            <form class="form" role="form" name="createSettingForm" ng-submit="createAndAddSetting()" novalidate>
+                <div class="form-group ggSubPanelItem bg-primary">
+                    Nouvelle Chronique / One-Shot
+                </div>
+                <div class="form-group ggSubPanelItem">
+                    <label for="settingName">Nom</label>
+                	<input type="text" class="inputSettingName expand" name="settingName" placeholder="Nom de la chronique" ng-model="newsetting.name" required maxlength="32"/>
+                </div>
+                <div class="radio ggSubPanelItem">
+                	<input type="radio" name="settingMode0" id="settingMode0" value="0" ng-model="newsetting.mode">Ouverte
+                </div>
+                <div class="radio ggSubPanelItem">
+                    <input type="radio" name="settingMode1" id="settingMode1" value="1" ng-model="newsetting.mode">Fermée
+                </div>
+                <div class="radio ggSubPanelItem">
+                    <input type="radio" name="settingMode2" id="settingMode2" value="2" ng-model="newsetting.mode">One-Shot
+                </div>
+                <div class="form-group ggSubPanelItem">
+                	<label for="settingCode">Code (3 lettres max)</label>
+                     <input type="text" class="inputSettingCode" name="settingCode" placeholder="XXX" ng-model="newsetting.code" required size="3" maxlength="3"/>
+                </div>
+                <button class="btn btn-primary btn-block" ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">Valider</button>
+             </form>
+	  </li>
+	  <li class="list-group-item" ng-repeat="setting in currentEdit.possibleSettings" ng-click="addSetting(setting)" ng-class-odd="'oddline'" ng-class-even="'evenline'">{{setting.name}}</li>
 	</ul>
 
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer tfgModalFooter">
         <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
       </div>
     </div>
@@ -74,23 +95,92 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="tfSettingModalLabel">Bla bla titre</h4>
+        <h4 class="modal-title" id="tfSettingModalLabel">{{currentEdit.schedule.name}}</h4>
       </div>
-      <div class="modal-body">
-
-	<ul class="list-group">
-	  <li class="list-group-item">Nouvelle Chronique / One-Shot</li>
-	  <li class="list-group-item">Chronique 1</li>
-	  <li class="list-group-item">Chronique 2</li>
+      <div class="modal-body modalTrim">
+    <ul class="list-group">
+        <li class="list-group-item dispoDiv tfSettingAction" ng-show="currentEdit.status.dispoPJ && (!currentEdit.timeframe.busy)" alt-text="Pas dispo pour jouer ?" ng-click="clearDispo('PLAYER')" norm-text="Je suis dispo pour jouer"></li>
+        <li class="list-group-item pasDispoDiv tfSettingAction" ng-show="(!currentEdit.status.dispoPJ) && (!currentEdit.timeframe.busy)" alt-text="Dispo pour jouer ?" ng-click="setDispo('PLAYER')" norm-text="Je ne suis pas dispo pour jouer"></li>
+        <li class="list-group-item dispoDiv tfSettingAction" ng-show="currentEdit.status.dispoMJ && (!currentEdit.timeframe.busy)" alt-text="Pas dispo pour maîtriser ?" ng-click="clearDispo('GM')" norm-text="Je suis dispo pour maîtriser"></li>
+        <li class="list-group-item validateDiv tfSettingAction collapsible" ng-show="((!editingGame) && (currentEdit.status.dispoMJ) && (!currentEdit.timeframe.busy) && (currentEdit.potentialPlayers.length > 0))" ng-click="openGameEditor()"><span>Valider une partie...</span></li>
+        <li class="list-group-item validateDiv tfSettingAction collapsible" ng-show="((!editingGame) && (currentEdit.status.mj))" ng-click="openGameEditor()"><span>Modifier ma partie...</span></li>
+        <li class="list-group-item pasDispoDiv tfSettingAction" ng-show="!currentEdit.status.dispoMJ && (!currentEdit.timeframe.busy)" alt-text="Dispo pour maîtriser ?" ng-click="setDispo('GM')" norm-text="Je ne suis pas dispo pour maîtriser"></li>
+        <li class="list-group-item warningDiv tfSettingAction" ng-show="currentEdit.timeframe.busy && (currentEdit.timeframe.gaming[currentUser] != currentEdit.schedule.settingid)">Je suis déjà sur une autre partie !</li>
+        <li class="list-group-item cancelDiv tfSettingAction" ng-show="currentEdit.status.pj" ng-click="dropGame()">Quitter la partie</li>
+        <li class="list-group-item cancelDiv tfSettingAction" ng-show="currentEdit.status.mj" ng-click="disbandGame()">Annuler la partie</li>
+        <li class="list-group-item gameEditor dummyContainer" ng-show="editingGame">
+          <div class="ggpanelSubheader hoverDay">Choisis tes joueurs... <span class="rightbutton badge buttonBadge" ng-show="currentEdit.numPlayers > 0" ng-click="validateGame(day.id, timeframe.code, schedule.id, $event)">... Puis clique ici !</span></div>
+          <div class="ggclickablelistitem ggpanelSubitem tfSettingAction" ng-repeat="playerSchedule in currentEdit.potentialPlayers" ng-class="{validateDiv : currentEdit.gamePlayers[playerSchedule.player]}" ng-click="toggleGamePlayer(playerSchedule)">{{ playerSchedule.player }}</div>
+        </li>
+        <li class="list-group-item noteDiv commentTrigger tfSettingAction collapsible" ng-click="openCommentEditor()" ng-show="!editingComment"><span ng-show="!(currentEdit.schedule.idcomment>0)">Ajouter un commentaire...</span><span ng-show="currentEdit.schedule.idcomment>0">Modifier mon commentaire...</span></li>
+        <li class="list-group-item commentEdit" ng-show="editingComment">
+              <form id="commentForm" role="form" name="commentForm" ng-submit="setComment()" novalidate>
+            <button class="commentButton rightbutton" ng-disabled="commentForm.$invalid" type="submit">Valider</button>
+            <span class="inputContainer"><input type="text" class="inputComment expand" name="comment" placeholder="Tape ton commentaire" ng-model="currentEdit.schedule.message"/><span>
+          </form>
+            </li>
+        <li class="list-group-item" ng-repeat="game in currentEdit.schedule.games">
+          <span class="confirmedgame tfSettingSubbox">Partie confirmée:</span>
+          <ul class="gameRoster">
+            <li class="nomMJ">{{ game.gm.player }}<span class="commentDisplay" ng-show="game.gm.comment"> - {{ game.gm.comment }}</span></li>
+            <li ng-repeat="playerSchedule in game.players" class="nomPJ">{{ playerSchedule.player }}<span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+          </ul>
+        </li>
+        <li class="list-group-item">
+          <span class="tfSettingSubbox">MJ Disponible(s):</span>
+          <ul class="gameRoster">
+            <li ng-repeat="playerSchedule in currentEdit.schedule.availablegms" class="nomMJ"><span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+          </ul>
+        </li>
+        <li class="list-group-item">
+          <span class="tfSettingSubbox">Joueur(s) Disponible(s):</span>
+          <ul class="gameRoster">
+            <li ng-repeat="playerSchedule in currentEdit.schedule.availableplayers" class="nomPJ"><span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+          </ul>
+        </li>
+        <li class="list-group-item">
+              <span class="tfSettingSubbox">Ne sont pas disponible(s):</span>
+          <ul class="gameRoster">
+            <li ng-repeat="playerSchedule in currentEdit.schedule.unavailable"><span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span></li>
+          </ul>
+        </li>              
+        <li class="list-group-item settingTrigger collapsible bg-primary ggbuttonbox" ng-click="showHistory($event)">Voir l'historique</li>
 	</ul>
 
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+      <div class="modal-footer tfgModalFooter">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Revenir au calendrier</button>
       </div>
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="historyModalLabel">{{ history.setting }} - {{ history.date }} - {{ history.timeframe }}</h4>
+      </div>
+      <div class="modal-body modalTrim">
+        <table class="table historydialog" cellspacing="0">
+            <tr class="" ng-class-even="'evenline'" ng-class-odd="'oddline'" ng-repeat="history in historyList">
+                <td class="" ng-class-even="'evenline'" ng-class-odd="'oddline'"><span>{{ history.tstamp | date:'dd/MM/yyyy'}}</span></td>
+                <td class="" ng-class-even="'evenline'" ng-class-odd="'oddline'"><span>{{ history.tstamp | date:'H:mm'}}</span></td>
+                <td class=""><gg-history row="history"/></td>
+            </tr>
+        </table>
+      </div>
+      <div class="modal-footer tfgModalFooter">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer l'historique</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+   <div id="historydialogcontainer" style="display: none">
+    </div>
 
 <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="filtersModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -99,34 +189,29 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title" id="filtersModalLabel">Mes filtres d'affichage</h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modalTrim">
 
 	<ul class="list-group">
-	  <li class="list-group-item">Par statut</li>
-	  <li class="list-group-item">Statut 1</li>
-	  <li class="list-group-item">Statut 2</li>
+	  <li class="list-group-item bg-primary">Par statut</li>
+	  <li class="list-group-item" ng-class="{ggDisabledItem : !statusItem.visible, notAvailableBadge : statusItem.id == 0,
+	      noPlayBadge : statusItem.id == 1, availableBadge : statusItem.id == 2, playBadge : statusItem.id == 3 }" ng-click="toggleStatusVisibility(statusItem.id)" ng-repeat="statusItem in statusDesc" bindonce >
+	      <span class="badge tfSettingBadge">--</span>{{ statusItem.desc }}
+	  </li>
+      <li class="list-group-item bg-primary">One-shots</li> 
+      <li class="list-group-item" ng-class="{ggDisabledItem : !setting.visible}" ng-click="toggleSettingVisibility(setting.id)" ng-repeat="setting in oneShots" bindonce >
+          <span class="badge tfSettingBadge" bo-text="setting.code"></span>{{ setting.name }}
+      </li>
+      <li class="list-group-item bg-primary">Chroniques Ouvertes</li>
+      <li class="list-group-item" ng-class="{ggDisabledItem : !setting.visible}" ng-click="toggleSettingVisibility(setting.id)" ng-repeat="setting in openSettings" bindonce >
+          <span class="badge tfSettingBadge" bo-text="setting.code"></span>{{ setting.name }}
+      </li>
+      <li class="list-group-item bg-primary">Chroniques Fermées</li>
+      <li class="list-group-item" ng-class="{ggDisabledItem : !setting.visible}" ng-click="toggleSettingVisibility(setting.id)" ng-repeat="setting in closedSettings" bindonce >
+          <span class="badge tfSettingBadge" bo-text="setting.code"></span>{{ setting.name }}
+      </li>
 	</ul>
-
-	<ul class="list-group">
-	  <li class="list-group-item">One Shots</li>
-	  <li class="list-group-item">One shot 1</li>
-	  <li class="list-group-item">One shot 2</li>
-	</ul>
-
-	<ul class="list-group">
-	  <li class="list-group-item">Chroniques Ouvertes</li>
-	  <li class="list-group-item">Chronique 1</li>
-	  <li class="list-group-item">Chronique 2</li>
-	</ul>
-
-	<ul class="list-group">
-	  <li class="list-group-item">Chroniques Fermées</li>
-	  <li class="list-group-item">Chronique 1</li>
-	  <li class="list-group-item">Chronique 2</li>
-	</ul>
-
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer tfgModalFooter">
         <button type="button" class="btn btn-default" data-dismiss="modal">Revenir au planning</button>
       </div>
     </div>
@@ -146,7 +231,7 @@
 </div>
     
     <script src="lib/jquery-1.11.0.min.js"></script>
-    	<script src="lib/angular/angular.min.js"></script>
+    	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
     	<script src="lib/angular-locale_fr-fr.js"></script>
 	<script src="lib/angular-local-storage.min.js"></script>
 	<script src="lib/bindonce.js"></script>
@@ -171,6 +256,21 @@
 			$('#loginForm').submit(function(event) {
 				$( "#loginModal" ).modal('hide');
 			});
+			
+			            // ELements du tfSetting
+            
+            $("[alt-text]").each(function() {
+                $(this).hover(function(event) {
+                    $(this).text($(this).attr("alt-text"));
+                },
+                function(event) {
+                    $(this).text($(this).attr("norm-text"));
+                });
+            });
+            $("[alt-text]").show(function() {
+                    $(this).text($(this).attr("norm-text"));
+            });
+
 		});
 	</script>
 

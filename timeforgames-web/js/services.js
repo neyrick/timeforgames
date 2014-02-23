@@ -17,7 +17,7 @@ timeForGamesApp.factory('logger', [function () {
 timeForGamesApp.factory('config', ['$window', function ($window) {
 
 	return {
-		urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat("/rs/tfg"),
+		urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat(":5000/tfg"),
 		FIRST_DAY_OF_WEEK : 1
     };
 }]);

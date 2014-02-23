@@ -88,6 +88,10 @@ span.no {
 	font-weight: bold;
 	color: #FF0000;
 }
+span.role {
+	font-weight: bold;
+	color: #0000A0;
+}
 tr.oddline {
     background-color: #E0E0E0;
 }

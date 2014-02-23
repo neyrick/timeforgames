@@ -1,4 +1,7 @@
 {
+	"http" : {
+		"allowedOrigins" : [ "*"]
+	},
 	"smtp" : {
 	      "service" : "Gmail",
 	      "auth" : {
