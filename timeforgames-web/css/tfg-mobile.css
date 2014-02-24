@@ -15,9 +15,8 @@ ul li {
 	min-width: 40px;
 	margin-right: 5px;
 }
-.headerButtons {
-	width: 100%;
-	padding: 5px;
+.headerLink, .headerLink:hover, headerLink:focus {
+	color: #000000;
 }
 .headerButton {
 	width: 33%;
@@ -31,15 +30,16 @@ ul li {
 	border-bottom: 1px solid #DDD;
 	margin-top: 0px;
 	margin-bottom: 3px;
+	overflow:hidden;
 }
 .ggSubPanelItem {
 	padding: 2px 8px;
 	border-bottom: 1px solid #DDD;
 	margin-top: 0px;
 	margin-bottom: 3px;
+	overflow:hidden;
 }
 .ggSubPanelItem:last-child {
-	padding: 2px 8px;
 	border-bottom: none;
 }
 .ggSubPanelItem.radio {
@@ -187,6 +187,9 @@ span.no {
 span.role {
 	font-weight: bold;
 	color: #0000A0;
+}
+.rightbutton {
+	float: right;
 }
 .tfSettingAction {
 	background-position:12px 3px;

@@ -79,7 +79,7 @@
                 <button class="btn btn-primary btn-block" ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">Valider</button>
              </form>
 	  </li>
-	  <li class="list-group-item" ng-repeat="setting in currentEdit.possibleSettings" ng-click="addSetting(setting)" ng-class-odd="'oddline'" ng-class-even="'evenline'">{{setting.name}}</li>
+	  <li class="list-group-item" ng-repeat="setting in currentEdit.timeframe.possibleNewSettings" ng-click="addSetting(setting)" ng-class-odd="'oddline'" ng-class-even="'evenline'">{{setting.name}}</li>
 	</ul>
 
       </div>
@@ -109,16 +109,19 @@
         <li class="list-group-item cancelDiv tfSettingAction" ng-show="currentEdit.status.pj" ng-click="dropGame()">Quitter la partie</li>
         <li class="list-group-item cancelDiv tfSettingAction" ng-show="currentEdit.status.mj" ng-click="disbandGame()">Annuler la partie</li>
         <li class="list-group-item gameEditor dummyContainer" ng-show="editingGame">
-          <div class="ggpanelSubheader hoverDay">Choisis tes joueurs... <span class="rightbutton badge buttonBadge" ng-show="currentEdit.numPlayers > 0" ng-click="validateGame(day.id, timeframe.code, schedule.id, $event)">... Puis clique ici !</span></div>
-          <div class="ggclickablelistitem ggpanelSubitem tfSettingAction" ng-repeat="playerSchedule in currentEdit.potentialPlayers" ng-class="{validateDiv : currentEdit.gamePlayers[playerSchedule.player]}" ng-click="toggleGamePlayer(playerSchedule)">{{ playerSchedule.player }}</div>
+          <div class="ggSubPanelItem bg-primary">
+                Choisis tes joueurs...
+                <button class="btn btn-default btn-xs rightbutton" ng-disabled="currentEdit.numPlayers < 1" ng-click="validateGame(day.id, timeframe.code, schedule.id, $event)">... Puis clique ici !</button>
+          </div>
+          <div class="ggSubPanelItem tfSettingAction" ng-repeat="playerSchedule in currentEdit.potentialPlayers" ng-class="{validateDiv : currentEdit.gamePlayers[playerSchedule.player]}" ng-click="toggleGamePlayer(playerSchedule)">{{ playerSchedule.player }}</div>
         </li>
         <li class="list-group-item noteDiv commentTrigger tfSettingAction collapsible" ng-click="openCommentEditor()" ng-show="!editingComment"><span ng-show="!(currentEdit.schedule.idcomment>0)">Ajouter un commentaire...</span><span ng-show="currentEdit.schedule.idcomment>0">Modifier mon commentaire...</span></li>
         <li class="list-group-item commentEdit" ng-show="editingComment">
-              <form id="commentForm" role="form" name="commentForm" ng-submit="setComment()" novalidate>
-            <button class="commentButton rightbutton" ng-disabled="commentForm.$invalid" type="submit">Valider</button>
-            <span class="inputContainer"><input type="text" class="inputComment expand" name="comment" placeholder="Tape ton commentaire" ng-model="currentEdit.schedule.message"/><span>
+          <form class="form-inline" id="commentForm" role="form" name="commentForm" ng-submit="setComment()" novalidate>
+            <div class="form-group inputContainer"><input type="text" class="form-control input-sm inputComment expand" name="comment" placeholder="Tape ton commentaire" ng-model="currentEdit.schedule.message"/></div>
+            <button class="btn btn-primary btn-sm commentButton rightbutton" ng-disabled="commentForm.$invalid" type="submit">Valider</button>
           </form>
-            </li>
+        </li>
         <li class="list-group-item" ng-repeat="game in currentEdit.schedule.games">
           <span class="confirmedgame tfSettingSubbox">Partie confirmée:</span>
           <ul class="gameRoster">
@@ -218,20 +221,20 @@
   </div>
 </div>
 
-	<div class="btn-group headerButtons">
-	  <div class="btn headerButton">Salut {{ currentUser }} !</div>
-	  <button type="button" class="btn btn-default headerButton" data-toggle="modal" data-target="#filtersModal">Mes Filtres</button>
-	  <button type="button" class="btn btn-default headerButton" ng-click="logout()">Changer d'Utilisateur</button>
+	<div class="btn-group btn-group-justified">
+	  <a class="btn headerLink" href="#">Salut {{ currentUser }} !</a>
+	  <a class="btn headerLink" ng-click="logout()"><span class="glyphicon glyphicon-off text-danger"></span> Déconnexion</a>
 	</div>
+    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#filtersModal">Mes Filtres</button>
 
   <div bindonce class="well weekPanel" ng-repeat="week in weeks">
 	  <ul bindonce class="list-group dayPanel"  ng-repeat="day in week.days">
 	       <gg-day-tab day="day" display="mobile">
 	  </ul>
 </div>
-    
     <script src="lib/jquery-1.11.0.min.js"></script>
     	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+    	<script src="https:////ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular-touch.js"</script>
     	<script src="lib/angular-locale_fr-fr.js"></script>
 	<script src="lib/angular-local-storage.min.js"></script>
 	<script src="lib/bindonce.js"></script>
@@ -246,7 +249,6 @@
 	<script type="text/javascript">
 
 		$(function() {
-            
             // Etat de login initial
             
 			var currentUser = angular.element('body').scope().currentUser;

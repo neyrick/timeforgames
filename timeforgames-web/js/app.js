@@ -2,7 +2,7 @@
 
 /* App Module */
 
-var timeForGamesApp = angular.module('timeForGamesApp', ['LocalStorageModule', 'pasvaz.bindonce']);
+var timeForGamesApp = angular.module('timeForGamesApp', ['ngTouch', 'LocalStorageModule', 'pasvaz.bindonce']);
 
 timeForGamesApp.config(function ($httpProvider) {
         delete $httpProvider.defaults.headers.common['X-Requested-With'];

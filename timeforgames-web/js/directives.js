@@ -94,13 +94,10 @@ timeForGamesApp.directive('ggTimeframeBox', function() {
 			    "EVENING": {"code":"EVENING", pic:"images/soir.png", name:"Soirée"},
 			};
     
-    var allPossibleSettings = {};
-    
     function initAddSetting($scope) {
         $scope.currentEdit.day = $scope.day;
         $scope.currentEdit.timeframe = $scope.timeframe;
         delete $scope.currentEdit.schedule;
-        $scope.currentEdit.possibleSettings = allPossibleSettings[$scope.day.id + '-' + $scope.timeframe.code];
     }
     
 	return {
@@ -130,17 +127,6 @@ timeForGamesApp.directive('ggTimeframeBox', function() {
              },
 		scope: true,
 		link: function(scope, element, attrs) {
-            var presentSettings = [];
-            var possibleSettings = [];
-            scope.timeframe.settings.forEach(function (item) {
-                presentSettings.push(item.settingid);
-            });
-            scope.settingsList.forEach(function (item) {
-                if ((item.status == 0) && (presentSettings.indexOf(item.id) == -1)) {
-                    possibleSettings.push(item);
-                }
-            });
-            allPossibleSettings[scope.day.id + '-' + scope.timeframe.code] = possibleSettings;
             if (scope.display == 'desktop') {
     			$(element).find('.timeFramePic').qtip({
     				style: { classes: 'infoTooltip' },
