@@ -2,8 +2,8 @@
 
 /* Controllers */
 
-timeForGamesApp.controller('CalendarCtrl', ['$scope', 'settingsService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
-function CalendarCtrl($scope, settingsService, plannerService, planningBuilderService, config, localStorageService, historyService) {
+timeForGamesApp.controller('CalendarCtrl', ['$scope', 'settingsService', 'userService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
+function CalendarCtrl($scope, settingsService, userService, plannerService, planningBuilderService, config, localStorageService, historyService) {
 
     function sortSettings(settings) {
         return settings.sort(function(settinga, settingb) {
@@ -121,6 +121,7 @@ function CalendarCtrl($scope, settingsService, plannerService, planningBuilderSe
     $scope.editingGame = false;
     $scope.editingComment = false;
 
+    $scope.loginMessage = "C'est qui ?";
     $scope.currentUser = localStorageService.get('ggUser');
     $scope.currentEdit = {};
     $scope.historyList = [];
@@ -129,12 +130,27 @@ function CalendarCtrl($scope, settingsService, plannerService, planningBuilderSe
     loadConfig();
 
     $scope.login = function() {
-        $scope.currentUser = $scope.tempUser;
-        $scope.tempUser = '';
-        localStorageService.add('ggUser', $scope.currentUser);
-        $scope.weeks = [];
-        loadConfig();
-        initPlanning();
+        
+        userService.checkUsername($scope.tempUser, function(result) {
+           if (result.id > -1) {
+                $scope.currentUser = $scope.tempUser;
+                $scope.tempUser = '';
+                localStorageService.add('ggUser', $scope.currentUser);
+                $scope.weeks = [];
+                loadConfig();
+                initPlanning(); 
+                if ($scope.display == 'desktop') {
+                    $("#logindialogcontainer").qtip("toggle", false);               
+                }
+                else if ($scope.display == 'mobile') {
+                    $( "#loginModal" ).modal('hide');                    
+                }                              
+           } 
+           else {
+               $scope.loginMessage = $scope.tempUser + '? Connais pas !';
+               $scope.tempUser = "";
+           }
+        });
     };
 
     $scope.logout = function() {

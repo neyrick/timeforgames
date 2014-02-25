@@ -27,7 +27,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="loginModalLabel">C'est qui ?</h4>
+        <h4 class="modal-title" id="loginModalLabel">{{ loginMessage }}</h4>
       </div>
       <div class="modal-body">
 		<form role="form" id="loginForm" name="loginForm" ng-submit="login()">
@@ -255,9 +255,6 @@
 			if ((typeof currentUser == 'undefined') || (currentUser == null)) {
 				$( "#loginModal" ).modal('show');
 			}
-			$('#loginForm').submit(function(event) {
-				$( "#loginModal" ).modal('hide');
-			});
 			
 			            // ELements du tfSetting
             

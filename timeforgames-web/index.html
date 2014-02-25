@@ -133,10 +133,6 @@
                 if (( typeof currentUser == 'undefined') || (currentUser == null)) {
                     $("#logindialogcontainer").qtip("toggle", true);
                 }
-                $('#loginForm').submit(function(event) {
-                    $("#logindialogcontainer").qtip("toggle", false);
-                });
-
             });
         </script>
         <div id="ggoverlay" ng-class="{ active :  tooltipLock.mainlock == true }">
@@ -291,7 +287,7 @@
                 <form class="form-inline" id="loginForm" role="form"
                 name="loginForm" ng-submit="login()">
                     <div class="ggpanelHeader ggpanelItem glossyHeader hoverDay">
-                        C'est qui ?
+                        {{ loginMessage }}
                     </div>
                     <div class="ggpanelItem">
                         <button id="nameButton" class="rightbutton" ng-disabled="loginForm.$invalid" type="submit">

@@ -24,6 +24,21 @@ function($window) {
     };
 }]);
 
+timeForGamesApp.factory('userService', ['$http', 'config',
+function($http, config) {
+
+    return {
+
+        checkUsername : function(username, callback) {
+            $http.get(config.urlbase + '/usercheck/' + username).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                window.alert("Impossible de vérifier l'utilisateur: " + data);
+            });
+        }
+    };
+}]);
+
 timeForGamesApp.factory('historyService', ['$http', 'config',
 function($http, config) {
 

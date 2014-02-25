@@ -37,6 +37,8 @@ server.get('/tfg/updates', serv.fetchUpdates);
 
 server.get('/tfg/history', serv.fetchHistory);
 
+server.get('/tfg/usercheck/:name', serv.userCheck);
+
 server.listen(5000, function() {
     console.log('Démarrage de l\'écoute de', server.name, server.url);
 });
