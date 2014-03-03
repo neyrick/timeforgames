@@ -264,6 +264,14 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         settingsService.createSetting($scope.newsetting, function(newsetting) {
             $scope.settingsList.push(newsetting);
             sortSettings($scope.settingsList);
+            $scope.weeks.forEach(function(week) {
+                week.days.forEach(function(day) {
+                    day.timeframes.forEach(function(timeframe) {
+                        timeframe.possibleNewSettings.push(newsetting);
+                        sortSettings(timeframe.possibleNewSettings);
+                    });
+                });
+            });
             $scope.addSetting(newsetting);
             newsetting.visible = true;
             if (newsetting.mode == 0) {
@@ -496,7 +504,6 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             },
             show : {
                 event : false,
-                solo : true
             },
             hide : {
                 delay : 100,
@@ -505,6 +512,9 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 inactive : 10000
             },
             events : {
+                show : function(event, api) {
+                    $('#addSettingTooltipContainer').qtip('hide');
+                },
                 hide : function(event, api) {
                     if (($scope.tooltipLock.mainlock === true) && ((event.originalEvent.type != 'mousedown') || (event.originalEvent.target.id != 'ggoverlay'))) {
                         event.preventDefault();
@@ -541,7 +551,6 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             },
             show : {
                 event : false,
-                solo : true
             },
             hide : {
                 delay : 100,
@@ -550,6 +559,9 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 inactive : 2000
             },
             events : {
+                show : function(event, api) {
+                    $('#tfSettingTooltipContainer').qtip('hide');
+                },
                 hide : function(event, api) {
                     if (($scope.tooltipLock.mainlock === true) && ((event.originalEvent.type != 'mousedown') || (event.originalEvent.target.id != 'ggoverlay'))) {
                         event.preventDefault();
