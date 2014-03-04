@@ -170,6 +170,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             $scope.openSettings = [];
             $scope.closedSettings = [];
             $scope.oneShots = [];
+            $scope.clubEvents = [];
             $scope.settingsList.forEach(function(item) {
                 if (item.status > 0)
                     return;
@@ -182,6 +183,9 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 } else if (item.mode == 2) {
                     $scope.oneShots.push(item);
                     item.visible = ($scope.config.invisibleOneShots.indexOf(item.id) == -1);
+                } else if (item.mode == 3) {
+                    $scope.clubEvents.push(item);
+                    item.visible = true;
                 }
             });
             if (andPlanning && ( typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null))
@@ -189,7 +193,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             $scope.settingsReady = true;
         });
     };
-
+/*
     $scope.toggleStatusVisibility = function(status) {
         if ($scope.statusDesc[status].visible) {
             $('.' + $scope.statusDesc[status].style).addClass('ggHidden');
@@ -200,7 +204,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         }
         storeConfig();
     };
-
+*/
     $scope.toggleSettingVisibility = function(settingid, force) {
         var setting;
         for (var i = 0; i < $scope.settingsList.length; i++) {
@@ -283,6 +287,9 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             } else if (newsetting.mode == 2) {
                 $scope.oneShots.push(newsetting);
                 sortSettings($scope.oneShots);
+            } else if (newsetting.mode == 3) {
+                $scope.clubEvents.push(newsetting);
+                sortSettings($scope.clubEvents);
             }
             storeConfig();
             $scope.newsetting.name = '';

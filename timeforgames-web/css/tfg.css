@@ -341,19 +341,6 @@ tr.ggpanelItem:hover {
 	padding-left: 20px;
 	padding-right: 20px;
 }
-.playBadge {
-	background-color: #00FF00;
-}
-.noPlayBadge {
-	background-color: #C0C0FF;
-}
-.availableBadge {
-	background-color: #FFFF00;
-}
-.notAvailableBadge {
-	background-color: #606060;
-	color: #FFFFFF;
-}
 .plusBox {
 	display: inline-block;
 	background-repeat: no-repeat;
@@ -580,3 +567,20 @@ ul.gameRoster li.nomPJ {
 .ggHidden {
     display: none;
 }
+.playBadge {
+	background-color: #00FF00;
+	display: inline-block;
+}
+.noPlayBadge {
+	background-color: #C0C0FF;
+	display: inline-block;
+}
+.availableBadge {
+	background-color: #FFFF00;
+	display: inline-block;
+}
+.notAvailableBadge {
+	background-color: #606060;
+	color: #FFFFFF;
+}
+

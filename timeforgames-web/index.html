@@ -314,11 +314,11 @@
                 </div>
             </div>
 
-            <div id="legendContainer" class="ggpanel" ttip="Clique sur une ligne pour cacher/afficher les sessions correspondantes">
+            <div id="legendContainer" class="ggpanel">
                 <div class="ggpanelItem ggpanelHeader glossyHeader">
                     Légende
                 </div>
-                <div bindonce class="ggpanelItem ggclickablelistitem" ng-class="{ggDisabledItem : !statusDesc[0].visible}" ng-click="toggleStatusVisibility(0)">
+                <div class="ggpanelItem">
                     <div class="legendBadge settingCell ggpanelCell">
                         <span class="badge notAvailableBadge">--</span>
                     </div>
@@ -326,7 +326,7 @@
                         <span>Pas dispo / intéressé</span>
                     </div>
                 </div>
-                <div bindonce class="ggpanelItem ggclickablelistitem" ng-class="{ggDisabledItem : !statusDesc[1].visible}" ng-click="toggleStatusVisibility(1)">
+                <div class="ggpanelItem">
                     <div class="legendBadge settingCell ggpanelCell">
                         <span class="badge noPlayBadge">--</span>
                     </div>
@@ -334,7 +334,7 @@
                         <span>Partie sans moi</span>
                     </div>
                 </div>
-                <div bindonce class="ggpanelItem ggclickablelistitem" ng-class="{ggDisabledItem : !statusDesc[2].visible}" ng-click="toggleStatusVisibility(2)">
+                <div class="ggpanelItem">
                     <div class="legendBadge settingCell ggpanelCell">
                         <span class="badge availableBadge">--</span>
                     </div>
@@ -342,7 +342,7 @@
                         <span>Je suis dispo</span>
                     </div>
                 </div>
-                <div bindonce class="ggpanelItem ggclickablelistitem" ng-class="{ggDisabledItem : !statusDesc[3].visible}" ng-click="toggleStatusVisibility(3)">
+                <div class="ggpanelItem">
                     <div class="legendBadge settingCell ggpanelCell">
                         <span class="badge playBadge">--</span>
                     </div>
@@ -361,6 +361,21 @@
             </div>
 
             <div id="campaignsContainer" class="dummyContainer">
+                <div class="ggpanel" >
+                    <div class="ggpanelItem ggpanelHeader glossyHeader">
+                        Événements
+                    </div>
+
+                    <div bindonce class="ggpanelItem" ng-repeat="setting in clubEvents">
+                        <div class="legendBadge settingCell ggpanelCell">
+                            <span class="badge" bo-text="setting.code"></span>
+                        </div>
+                        <div class="settingCell ggpanelCell legendCell">
+                            <span bo-text="setting.name"></span>
+                        </div>
+                    </div>
+
+                </div>
                 <div class="ggpanel" ttip="Clique sur un one-shot pour le rendre visible/invisible dans ton planning">
                     <div class="ggpanelItem ggpanelHeader glossyHeader">
                         One-Shots
