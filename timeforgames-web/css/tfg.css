@@ -63,7 +63,7 @@ body {
 	font: 15px/22px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif;
 	background-color: #E0E0E0;
 }
-input.expand {
+.expand {
 	width: 100%;
 }
 .inputLabel {
@@ -546,6 +546,10 @@ ul.gameRoster li.nomPJ {
 .commentDisplay {
 	font-style: italic;
 	font-size: 12px;
+	display: inline-block;
+	vertical-align: top;
+	unicode-bidi: embed;
+	white-space: pre;
 }
 .rightbutton {
 	float: right;

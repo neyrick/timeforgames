@@ -184,8 +184,9 @@
                             Valider
                         </button>
                         <span class="inputContainer">
-                            <input type="text" class="inputComment expand" name="comment" placeholder="Tape ton commentaire" ng-model="currentEdit.schedule.message"/>
-                            <span>
+                            <textarea class="inputComment expand" rows="5" name="comment" placeholder="Tape ton commentaire" wrap="soft" ng-model="currentEdit.schedule.message"></textarea>
+                        </span>
+
                     </form>
                 </div>
                 <div class="ggpanelItem" ng-repeat="game in currentEdit.schedule.games">
@@ -203,7 +204,7 @@
                     <span class="tfSettingSubbox">MJ Disponible(s):</span>
                     <ul class="gameRoster">
                         <li ng-repeat="playerSchedule in currentEdit.schedule.availablegms" class="nomMJ">
-                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span>
+                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> {{ playerSchedule.comment }}</span>
                         </li>
                     </ul>
                 </div>
@@ -211,7 +212,7 @@
                     <span class="tfSettingSubbox">Joueur(s) Disponible(s):</span>
                     <ul class="gameRoster">
                         <li ng-repeat="playerSchedule in currentEdit.schedule.availableplayers" class="nomPJ">
-                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span>
+                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> {{ playerSchedule.comment }}</span>
                         </li>
                     </ul>
                 </div>
@@ -219,7 +220,7 @@
                     <span class="tfSettingSubbox">Ne sont pas disponible(s):</span>
                     <ul class="gameRoster">
                         <li ng-repeat="playerSchedule in currentEdit.schedule.unavailable">
-                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span>
+                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> {{ playerSchedule.comment }}</span>
                         </li>
                     </ul>
                 </div>
