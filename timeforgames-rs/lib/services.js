@@ -1,5 +1,7 @@
 var entities = require("./entities");
 var mailer = require("./mailer");
+var security = require("./security");
+var crypto = require('crypto');
 
 var persist = require("persist");
 
@@ -14,7 +16,19 @@ var connection;
 
 persist.connect(function(err, conn) {
     connection = conn;
+    loadAPIKeys();
 });
+
+function loadAPIKeys() {
+    entities.apikey.all(connection, function(err, result) {
+        if (err) {
+            console.log("Erreur: " + err);
+        }
+        else {
+            security.initApiKeys(result);
+        }
+    });
+}
 
 function assignGame(idgame, masterschedule, players, callback) {
     var updateStatement = 'UPDATE schedule SET game = ? WHERE id IN ( ?';
@@ -46,7 +60,7 @@ function createBaseLogData(req, source) {
     var result = {
         action : req.params['log_action'],
         address : req.connection.remoteAddress
-    }
+    };
     if ( typeof source != "undefined") {
         result.dayid = source.dayid;
         result.tstamp = new Date();
@@ -219,23 +233,76 @@ exports.createSchedule = function(req, res, next) {
         next();
     });
 };
-/*
- exports.deleteSchedule = function(req, res, next) {
- schedule.where(JSON.parse(req.body)).deleteAll(connection, function(err) {
- if (err) res.send("Erreur: " + err);
- else res.send("OK");
- next();
- });
- };
- */
-exports.userCheck = function(req, res, next) {
-    playerData.where({ name : req.params.name}).first(connection, function(err, result) {
+
+exports.login = function(req, res, next) {
+    playerData.where({ name : req.body.username}).first(connection, function(err, result) {
         if (err) {
+            res.send("Erreur: " + err);
+            next();
+        }
+        else {
+            if (result == null) {
+                res.send({ id : -1, error : req.body.username + '? Connais pas!'});
+                next();
+            }
+            else {
+                var passSum = crypto.createHash('sha1').update(req.body.password).digest().toString('hex');
+                if (result.password != passSum) {
+                    res.send({ id : -1, error : 'Enlève tes moufles et retape ton mot de passe'});
+                    next();
+                }
+                else {
+                    var apikey = security.createApiKey();
+                    security.updateApiKey(req.body.username, apikey, req.apikey);
+                    var keyEntity;
+                    if (typeof req.apikey != "undefined") {
+                        entities.apikey.where('key = ? and username = ?', [req.apikey, req.body.username]).updateAll(connection, { key : apikey}, function(err) {
+                            if (err) {
+                                console.log("Error: " + err);
+                            }
+                            else {
+                                res.send({ id : 0, token : security.createToken(req.body.username, apikey)});
+                            }
+                            next();
+                        });
+                    }
+                    else {
+                        var newkey = new entities.apikey({ username : req.body.username, key : apikey}).save(connection, function(err) {
+                            if (err) {
+                                console.log("Error: " + err);
+                            }
+                            else {
+                                res.send({ id : 0, token : security.createToken(req.body.username, apikey)});
+                            }
+                            next();
+                        });
+                    }
+                }
+            }
+        }
+    });
+};
+
+
+
+exports.relogin = function(req, res, next) {
+    
+    var apikey = security.createApiKey();
+    security.updateApiKey(req.user, req.apikey, apikey);
+    res.send(security.createToken(req.user, apikey));
+    next();
+};
+
+exports.expireToken = function(req, res, next) {
+    
+    entities.apikey.where({ username : req.user, key : req.apikey}).deleteAll(connection, function(err) {
+        if (err) {
+            console.log("Error: " + err);
             res.send("Erreur: " + err);
         }
         else {
-            if (result == null) res.send({ id : -1});
-            else res.send({ id : result.id});
+            security.clearApiKey(req.user, req.apikey);
+            res.send("OK");
         }
         next();
     });

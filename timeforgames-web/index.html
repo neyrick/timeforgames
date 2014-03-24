@@ -292,14 +292,23 @@
                         {{ loginMessage }}
                     </div>
                     <div class="ggpanelItem">
-                        <button id="nameButton" class="rightbutton" ng-disabled="loginForm.$invalid" type="submit">
-                            Valider
-                        </button>
                         <label for="inputName">Tape ton
                             pseudo:</label>
                         <input type="text" id="inputName"
                         name="userinput" placeholder="Ton pseudo sur le forum"
                         ng-model="tempUser" required />
+                    </div>
+                    <div class="ggpanelItem">
+                        <label for="inputPassword">Tape ton
+                            mot de passe:</label>
+                        <input type="password" id="inputPassword"
+                        name="passwordinput" placeholder="Ton mot de passe"
+                        ng-model="tempPassword" required />
+                    </div>
+                    <div class="ggpanelItem centered">
+                        <button id="nameButton" ng-disabled="loginForm.$invalid" type="submit">
+                            Valider
+                        </button>
                     </div>
                 </form>
             </div>
@@ -361,7 +370,7 @@
                 </div>
             </div>
 
-            <div id="campaignsContainer" class="dummyContainer">
+            <div id="campaignsContainer" class="dummyContainer" ng-if="settingsReady">
                 <div class="ggpanel" >
                     <div class="ggpanelItem ggpanelHeader glossyHeader">
                         Événements

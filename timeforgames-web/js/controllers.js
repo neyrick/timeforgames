@@ -43,6 +43,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
 
     function reset() {
         $scope.tempUser = '';
+        $scope.tempPassword = '';
         $scope.weeks = Array();
         $scope.config = {
             invisibleStatus : [],
@@ -131,14 +132,17 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
 
     $scope.login = function() {
         
-        userService.checkUsername($scope.tempUser, function(result) {
+        userService.login($scope.tempUser, $scope.tempPassword, function(result) {
            if (result.id > -1) {
                 $scope.currentUser = $scope.tempUser;
                 $scope.tempUser = '';
+                $scope.tempPassword = '';
                 localStorageService.add('ggUser', $scope.currentUser);
+                localStorageService.add('ggLoginToken', result.token);
                 $scope.weeks = [];
                 loadConfig();
-                initPlanning(); 
+                $scope.refreshSettings(true);
+
                 if ($scope.display == 'desktop') {
                     $("#logindialogcontainer").qtip("toggle", false);               
                 }
@@ -147,21 +151,28 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 }                              
            } 
            else {
-               $scope.loginMessage = $scope.tempUser + '? Connais pas !';
-               $scope.tempUser = "";
+               if (typeof result.error != "undefined") {
+                   $scope.loginMessage = result.error;
+               }
+               else {
+                   $scope.loginMessage = "Raté !";
+               }
            }
         });
     };
 
     $scope.logout = function() {
-        reset();
-        delete $scope.currentUser;
-        localStorageService.remove('ggUser');
-        if ($scope.display == 'mobile') {
-            $("#loginModal").modal('show');
-        } else if ($scope.display == 'desktop') {
-            $("#logindialogcontainer").qtip("toggle", true);
-        }
+        userService.expireToken(function() {
+            reset();
+            delete $scope.currentUser;
+            localStorageService.remove('ggUser');
+            localStorageService.remove('ggLoginToken');
+            if ($scope.display == 'mobile') {
+                $("#loginModal").modal('show');
+            } else if ($scope.display == 'desktop') {
+                $("#logindialogcontainer").qtip("toggle", true);
+            }
+        });
     };
 
     $scope.refreshSettings = function(andPlanning) {
@@ -258,8 +269,6 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     $scope.showNext = function() {
         timeSlide($scope.dayCount);
     };
-
-    $scope.refreshSettings(true);
 
     // Fonctions au  niveau de la timeframe
 

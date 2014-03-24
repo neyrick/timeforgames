@@ -24,18 +24,63 @@ function($window) {
     };
 }]);
 
-timeForGamesApp.factory('userService', ['$http', 'config',
-function($http, config) {
+timeForGamesApp.factory('authInterceptor', ['localStorageService', function (localStorageService) {
+  return {
+    request: function (config) {
+      config.headers = config.headers || {};
+      var logintoken = localStorageService.get('ggLoginToken');
+      if (logintoken != null) {
+        config.headers.Authorization = 'Bearer ' + logintoken;
+      }
+      return config;
+    },
+    response: function (response) {
+      if (response.status === 401) {
+        // handle the case where the user is not authenticated
+      }
+      return response || $q.when(response);
+    }
+  };
+}]);
+
+timeForGamesApp.factory('userService', ['$http', 'config', 'localStorageService', 
+function($http, config, localStorageService) {
 
     return {
 
-        checkUsername : function(username, callback) {
-            $http.get(config.urlbase + '/usercheck/' + username).success(function(data, status) {
+        login : function(pm_username, pm_password, callback) {
+            $http.post(config.urlbase + '/login', {
+                username : pm_username,
+                password : pm_password
+            }).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 window.alert("Impossible de vérifier l'utilisateur: " + data);
             });
-        }
+        },
+
+        relogin : function(callback) {
+            $http.get(config.urlbase + '/relogin').success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                window.alert("Impossible de vérifier l'utilisateur: " + data);
+            });
+        },
+        
+        expireToken : function(callback) {
+            var token = localStorageService.get('ggLoginToken'); 
+            if (token == null) {
+                callback();
+            }
+            else {
+                $http.get(config.urlbase + '/expireToken').success(function(data, status) {
+                    callback(data);
+                }).error(function(data, status) {
+                    window.alert("Impossible de vérifier l'utilisateur: " + data);
+                });
+            }
+        },
+                
     };
 }]);
 

@@ -26,6 +26,7 @@ var comment = persist.define("comment", {
 
 var history = persist.define("history", {
           "address": type.STRING,
+          "apikey": type.STRING,
           "tstamp": type.DATETIME,
           "dayid": type.INTEGER,
           "timeframe": type.STRING,
@@ -36,8 +37,14 @@ var history = persist.define("history", {
 
 var player = persist.define("player", {
           "name": type.STRING,
-          "email": type.STRING
+          "email": type.STRING,
+          "password": type.STRING          
     }, { tableName: "player" });
+
+var apikey = persist.define("apikey", {
+          "username": type.STRING,
+          "key": type.STRING
+    }, { tableName: "apikey" });
 
 
 exports.setting = setting;
@@ -46,3 +53,4 @@ exports.schedule = schedule;
 exports.comment = comment;
 exports.history = history;
 exports.player = player;
+exports.apikey = apikey;

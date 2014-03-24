@@ -8,5 +8,8 @@
 		"user" : "neyrick@gmail.com",
 		"pass" : "######"
 	      }
+	},
+	"jwt" : {
+		"secret" : "******"
 	}
 }
