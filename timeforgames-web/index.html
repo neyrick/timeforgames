@@ -27,31 +27,6 @@
     <body ng-controller="CalendarCtrl" data-display="desktop">
         <script type="text/javascript">
             $(function() {
-
-                $.fn.qtip.modal_zindex = 16000;
-                $('#logindialogcontainer').qtip({
-                    style : {
-                        classes : 'ggpanel logindialog'
-                    },
-                    content : {
-                        text : $('#logindialog')
-                    },
-                    position : {
-                        my : 'center',
-                        at : 'center',
-                        target : $(window)
-                    },
-                    show : {
-                        autofocus : '#inputName',
-                        event : false,
-                        modal : {
-                            on : true,
-                            blur : false,
-                            escape : false
-                        }
-                    },
-                    hide : false
-                });
                 $('[ttip-low!=""]').qtip({
                     style : {
                         classes : 'infoTooltip'
@@ -128,12 +103,7 @@
                     hide : 'unfocus',
                 });
 
-                // Etat de login initial
-
-                var currentUser = angular.element('body').scope().currentUser;
-                if (( typeof currentUser == 'undefined') || (currentUser == null)) {
-                    $("#logindialogcontainer").qtip("toggle", true);
-                }
+		angular.element('body').scope().relogin();
             });
         </script>
         <div id="ggoverlay" ng-class="{ active :  tooltipLock.mainlock == true }">

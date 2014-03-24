@@ -12,14 +12,33 @@ function isRestricted(url) {
     return (publicResources.indexOf(url) == -1);
 }
 
+function isKeyValid(username, key) {
+    var registered = apikeys[key];
+    if (typeof registered == "undefined") return false;
+    if (registered !== username) return false;
+    return true;
+}
+
 exports.authParser = function(req, res, next) {
     if (req.headers && req.headers.authorization) {
       var tokenMatch = req.headers.authorization.match(/^Bearer (.*)$/);
       if (tokenMatch) {
-          console.log("Token match !");
-          authdata = jwt.decode(tokenMatch, config.jwt.secret);
+         try {
+          authdata = jwt.decode(tokenMatch[1], config.jwt.secret);
           req.user = authdata.username;
-          req.apikey = authdata;
+          req.apikey = authdata.apikey;
+
+          if (!isKeyValid(req.user, req.apikey)) {
+            return next(new restify.NotAuthorizedError('Token expiré'));              
+          }
+         }
+         catch (error) {
+    	    console.log("Erreur JWT:" + error);
+	    if (isRestricted(req.url)) {
+	      return next(new restify.NotAuthorizedError('Format de token invalide'));              
+	    }
+         }
+
       } else {
           console.log("Token invalide");
           if (isRestricted(req.url)) {
@@ -27,7 +46,6 @@ exports.authParser = function(req, res, next) {
           }
       }
     } else {
-          console.log("Token absent pour " + req.url);
           if (isRestricted(req.url)) {
               return next(new restify.NotAuthorizedError('Token absent'));
           }

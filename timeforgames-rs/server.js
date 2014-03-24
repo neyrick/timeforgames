@@ -4,6 +4,8 @@ var security = require("./lib/security");
 var restify = require('restify');
 var config = require("./config.json");
 
+restify.CORS.ALLOW_HEADERS.push('authorization');
+
 var server = restify.createServer();
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.authorizationParser());

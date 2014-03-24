@@ -28,7 +28,7 @@ timeForGamesApp.factory('authInterceptor', ['localStorageService', function (loc
   return {
     request: function (config) {
       config.headers = config.headers || {};
-      var logintoken = localStorageService.get('ggLoginToken');
+      var logintoken = localStorageService.get('tfgLoginToken');
       if (logintoken != null) {
         config.headers.Authorization = 'Bearer ' + logintoken;
       }
@@ -59,11 +59,17 @@ function($http, config, localStorageService) {
             });
         },
 
-        relogin : function(callback) {
+        relogin : function(callback, deniedcallback, errorcallback) {
             $http.get(config.urlbase + '/relogin').success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
-                window.alert("Impossible de vérifier l'utilisateur: " + data);
+                console.log("Status: " + status);
+                if (status == 404) {
+                    deniedcallback("Token invalide ou expiré");
+                }
+                else {
+                    errorcallback("Erreur d'authentification");
+                }
             });
         },
         
@@ -400,11 +406,10 @@ function($http, config, planningBuilderService) {
             }).error(genericError);
         },
 
-        setDispo : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_role, callback) {
+        setDispo : function(pm_dayid, pm_timeframe, pm_setting, pm_role, callback) {
             var schedule = {
                 dayid : pm_dayid,
                 timeframe : pm_timeframe,
-                player : pm_player,
                 role : pm_role,
                 setting : pm_setting
             };

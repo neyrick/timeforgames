@@ -91,44 +91,14 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         localStorageService.add('ggconfig-' + $scope.currentUser, JSON.stringify($scope.config));
     }
 
-
-    $scope.display = $('body').data('display');
-    if ( typeof $scope.display == "undefined")
-        $scope.display = "desktop";
-
-    $scope.loading = false;
-
-    $scope.newsetting = {
-        name : '',
-        mode : -1,
-        status : 0,
-        code : ''
-    };
-
-    if ($scope.display == 'desktop') {
-        $scope.dayCount = 42;        
+    function loginPrompt() {
+	if ($scope.display == 'desktop') {
+	    $("#logindialogcontainer").qtip("toggle", true);
+	}
+	else if ($scope.display == 'mobile') {
+// TODO: fenetre de login mobile
+	}
     }
-    else if ($scope.display == 'mobile') {
-        $scope.dayCount = 42;        
-    }
-
-    $scope.firstday = planningBuilderService.getDefaultMinDay();
-
-    $scope.settingsReady = false;
-
-    $scope.tooltipLock = {
-        mainlock : false
-    };
-    $scope.editingGame = false;
-    $scope.editingComment = false;
-
-    $scope.loginMessage = "C'est qui ?";
-    $scope.currentUser = localStorageService.get('ggUser');
-    $scope.currentEdit = {};
-    $scope.historyList = [];
-    $scope.history = {};
-    reset();
-    loadConfig();
 
     $scope.login = function() {
         
@@ -137,8 +107,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 $scope.currentUser = $scope.tempUser;
                 $scope.tempUser = '';
                 $scope.tempPassword = '';
-                localStorageService.add('ggUser', $scope.currentUser);
-                localStorageService.add('ggLoginToken', result.token);
+                localStorageService.set('tfgLoginToken', result.token);
                 $scope.weeks = [];
                 loadConfig();
                 $scope.refreshSettings(true);
@@ -161,12 +130,36 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         });
     };
 
+    $scope.relogin = function() {
+        var oldtoken = localStorageService.get('tfgLoginToken');
+        if (oldtoken != null) {
+		userService.relogin(function(result) {
+		    localStorageService.set('tfgLoginToken', result.token);
+		    $scope.currentUser = result.username;
+		    $scope.tempUser = '';
+		    $scope.tempPassword = '';
+		    $scope.weeks = [];
+		    loadConfig();
+		    $scope.refreshSettings(true);
+		},function(denialmsg) {
+		    localStorageService.remove('tfgLoginToken');
+		    window.alert("Identification invalide: " + denialmsg);
+                    loginPrompt();
+		},function(errormsg) {
+		    window.alert("Impossible de te reconnecter: " + errormsg);
+                    loginPrompt();
+		});
+	}
+        else {
+            loginPrompt();
+        }
+    }
+
     $scope.logout = function() {
         userService.expireToken(function() {
             reset();
             delete $scope.currentUser;
-            localStorageService.remove('ggUser');
-            localStorageService.remove('ggLoginToken');
+            localStorageService.remove('tfgLoginToken');
             if ($scope.display == 'mobile') {
                 $("#loginModal").modal('show');
             } else if ($scope.display == 'desktop') {
@@ -316,7 +309,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     };
 
     $scope.addSetting = function(setting) {
-        plannerService.setDispo($scope.currentUser, $scope.currentEdit.day.id, $scope.currentEdit.timeframe.code, setting.id, 'GM', function() {
+        plannerService.setDispo($scope.currentEdit.day.id, $scope.currentEdit.timeframe.code, setting.id, 'GM', function() {
 
             $scope.toggleSettingVisibility(setting.id, true);
             $scope.tooltipLock.mainlock = false;
@@ -394,7 +387,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     };
 
     $scope.setDispo = function(role) {
-        plannerService.setDispo($scope.currentUser, $scope.currentEdit.day.id, $scope.currentEdit.timeframe.code, $scope.currentEdit.schedule.settingid, role, function() {
+        plannerService.setDispo($scope.currentEdit.day.id, $scope.currentEdit.timeframe.code, $scope.currentEdit.schedule.settingid, role, function() {
             $scope.tooltipLock.mainlock = false;
             //            $('#tfSettingTooltipContainer').qtip('api').hide();
             $scope.refreshTimeframe();
@@ -501,7 +494,37 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         $('.settingTrigger').slideDown(200);
     };
 
+    $scope.display = $('body').data('display');
+    if ( typeof $scope.display == "undefined")
+        $scope.display = "desktop";
+
     if ($scope.display == 'desktop') {
+
+        $.fn.qtip.modal_zindex = 16000;
+        $('#logindialogcontainer').qtip({
+            style : {
+                classes : 'ggpanel logindialog'
+            },
+            content : {
+                text : $('#logindialog')
+            },
+            position : {
+                my : 'center',
+                at : 'center',
+                target : $(window)
+            },
+            show : {
+                autofocus : '#inputName',
+                event : false,
+                modal : {
+                    on : true,
+                    blur : false,
+                    escape : false
+                }
+            },
+            hide : false
+        });
+
         $('#tfSettingTooltipContainer').qtip({
             style : {
                 classes : 'ggpanel tfSettingEditBox'
@@ -614,6 +637,39 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             $('#inputName').focus();
         });
     }
+
+    $scope.loading = false;
+
+    $scope.newsetting = {
+        name : '',
+        mode : -1,
+        status : 0,
+        code : ''
+    };
+
+    if ($scope.display == 'desktop') {
+        $scope.dayCount = 42;        
+    }
+    else if ($scope.display == 'mobile') {
+        $scope.dayCount = 42;        
+    }
+
+    $scope.firstday = planningBuilderService.getDefaultMinDay();
+
+    $scope.settingsReady = false;
+
+    $scope.tooltipLock = {
+        mainlock : false
+    };
+    $scope.editingGame = false;
+    $scope.editingComment = false;
+
+    $scope.loginMessage = "C'est qui ?";
+    $scope.currentEdit = {};
+    $scope.historyList = [];
+    $scope.history = {};
+    reset();
+//    relogin();
 
 }]);
 

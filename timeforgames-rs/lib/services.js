@@ -46,7 +46,7 @@ function storelog(logdata) {
         if (err)
             console.log("Error: " + err);
     });
-    console.log("Logdata: %j", logdata);
+//    console.log("Logdata: %j", logdata);
     setTimeout(function() {
         mailer.notify(logdata, function(msgData) {
             console.log("Message envoyé à " + msgData.recipient.name + ' (' + msgData.recipient.address + ')');
@@ -66,7 +66,8 @@ function createBaseLogData(req, source) {
         result.tstamp = new Date();
         result.timeframe = source.timeframe;
         result.setting = source.setting;
-        result.player = source.player;
+        result.player = req.user;
+        result.apikey = req.apikey;
     }
     return result;
 }
@@ -214,7 +215,7 @@ exports.createSchedule = function(req, res, next) {
     var querySchedule = {
         dayid : newSchedule.dayid,
         timeframe : newSchedule.timeframe,
-        player : newSchedule.player
+        player : req.user
     };
     schedule.using(connection).where(querySchedule).each(function(err, sameschedule) {
         if (sameschedule._game != null)
@@ -288,13 +289,20 @@ exports.login = function(req, res, next) {
 exports.relogin = function(req, res, next) {
     
     var apikey = security.createApiKey();
-    security.updateApiKey(req.user, req.apikey, apikey);
-    res.send(security.createToken(req.user, apikey));
-    next();
+    entities.apikey.where({ username : req.user, key : req.apikey}).updateAll(connection, { key: apikey }, function(err) {
+        if (err) {
+            console.log("Error: " + err);
+            res.send("Erreur: " + err);
+        }
+        else {
+            security.updateApiKey(req.user, apikey, req.apikey);
+            res.send({ username : req.user, token : security.createToken(req.user, apikey)});
+        }
+        next();
+    });
 };
 
 exports.expireToken = function(req, res, next) {
-    
     entities.apikey.where({ username : req.user, key : req.apikey}).deleteAll(connection, function(err) {
         if (err) {
             console.log("Error: " + err);
@@ -312,6 +320,9 @@ exports.deleteSchedule = function(req, res, next) {
     fetchCompleteScheduleById(req.params.idschedule, function(err, targetschedule) {
         if (err)
             res.send("Erreur: " + err);
+        else if (req.user != targetschedule.player) {
+            res.send("Erreur: Pas touche !");
+        }
         else {
             var logdata = createBaseLogData(req, targetschedule);
             logdata.data = {
@@ -438,6 +449,9 @@ exports.createGame = function(req, res, next) {
     fetchCompleteScheduleById(req.body.masterschedule, function(err, masterschedule) {
         if (err)
             res.send("Erreur: " + err);
+        else if (req.user != masterschedule.player) {
+            res.send("Erreur: Pas touche !");
+        }
         else {
             var newgame = new game({
                 masterschedule : req.body.masterschedule
@@ -479,6 +493,10 @@ exports.reformGame = function(req, res, next) {
             for (var i = 0; i < oldplayers.length; i++) {
                 if (oldplayers[i].role == 'GM') {
                     masterschedule = oldplayers.splice(i, 1)[0];
+		    if (req.user != masterschedule.player) {
+		        res.send("Erreur: Pas touche !");
+                        next();
+		    }
                 }
             }
             var playercopy;
@@ -568,9 +586,9 @@ exports.fetchUpdates = function(req, res, next) {
 exports.fetchSettingById = function(id, callback) {
     setting.getById(connection, id, callback);
 };
-
+/*
 exports.fetchPlayerData = function(players, callback) {
     var basequery = "SELECT * FROM player WHERE name IN ('" + players.join("','") + "')";
     connection.runSqlAll(basequery, [], callback);
 };
-
+*/
