@@ -224,7 +224,9 @@ exports.createSchedule = function(req, res, next) {
         if (conflict) {
             console.log("Conflit détecté !");
         } else {
-            genericCreate(req, res, next, new schedule(req.body));
+            var newschedule = new schedule(req.body);
+            newschedule.player = req.user;
+            genericCreate(req, res, next, newschedule);
             var logdata = createBaseLogData(req, req.body);
             logdata.data = {
                 role : req.body.role

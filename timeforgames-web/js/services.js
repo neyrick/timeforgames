@@ -169,6 +169,7 @@ function(config) {
                     settingid : settingref.id,
                     code : settingref.code,
                     name : settingref.name,
+                    newStuff : false,
                     mode : settingref.mode,
                     status : settingref.status,
                     games : [],
@@ -307,6 +308,7 @@ function(config) {
         getDefaultMinDay : function() {
 
             var today = new Date();
+            today.setHours(12, 0, 0, 0);
             var currtime = today.getTime();
             var dow = today.getDay();
 

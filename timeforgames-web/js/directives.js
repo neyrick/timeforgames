@@ -54,6 +54,9 @@ timeForGamesApp.directive('ggTfSetting', function() {
 		            else classes.push('availableBadge');
 		        }
 			else classes.push('notAvailableBadge');
+			if (scope.schedule.newStuff) {
+			    classes.push('newStuff');
+			}
             for (var i = 0; i < scope.settingsList.length; i++) {
                 if (scope.settingsList[i].id == scope.schedule.settingid) {
                     if (!scope.settingsList[i].visible) classes.push('ggHidden');

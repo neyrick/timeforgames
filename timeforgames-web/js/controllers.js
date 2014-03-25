@@ -19,11 +19,12 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     function initPlanning() {
         $scope.loading = true;
         setTimeout(function() {
-            plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
-                $scope.weeks = planningBuilderService.buildWeeksPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
-                plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
-                    planningBuilderService.dispatchUpdatesFlags(updatesHash, $scope.weeks, $scope.lastUpdate);
-                    $scope.lastUpdate = new Date().getTime();
+            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
+                plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
+                    var weeks = planningBuilderService.buildWeeksPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
+                    planningBuilderService.dispatchUpdatesFlags(updatesHash, weeks, $scope.config.lastUpdate);
+                    $scope.config.lastUpdate = new Date().getTime();
+                    $scope.weeks = weeks;
                     storeConfig();
                     applyFilters();
                 });
