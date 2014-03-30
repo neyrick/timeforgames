@@ -318,6 +318,22 @@ exports.expireToken = function(req, res, next) {
     });
 };
 
+exports.expireAllTokens = function(req, res, next) {
+    var targetuser = req.user;
+    if (req.admin) targetuser = req.params.user;
+    entities.apikey.where({ username : targetuser}).deleteAll(connection, function(err) {
+        if (err) {
+            console.log("Error: " + err);
+            res.send("Erreur: " + err);
+        }
+        else {
+            security.clearAllApiKeys(req.user);
+            res.send("OK");
+        }
+        next();
+    });
+};
+
 exports.deleteSchedule = function(req, res, next) {
     fetchCompleteScheduleById(req.params.idschedule, function(err, targetschedule) {
         if (err)

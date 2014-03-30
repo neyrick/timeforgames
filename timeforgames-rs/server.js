@@ -20,6 +20,7 @@ server.use( restify.fullResponse() );
 
 server.get('/tfg/relogin', serv.relogin);
 server.get('/tfg/expireToken', serv.expireToken);
+server.get('/tfg/expireAllTokens/:user', serv.expireToken);
 server.post('/tfg/login', serv.login);
 
 server.get('/tfg/setting', serv.fetchAllSettings);
