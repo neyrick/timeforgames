@@ -20,13 +20,13 @@ server.use( restify.fullResponse() );
 
 server.get('/tfg/relogin', serv.relogin);
 server.get('/tfg/expireToken', serv.expireToken);
+server.get('/tfg/resetPassword/:user', serv.resetPassword);
 server.get('/tfg/expireAllTokens/:user', serv.expireToken);
 server.post('/tfg/login', serv.login);
 
 server.get('/tfg/setting', serv.fetchAllSettings);
 server.get('/tfg/setting/:code', serv.findSettingByCode);
 server.put('/tfg/setting', serv.createSetting);
-server.post('/tfg/setting', serv.updateSetting);
 
 server.get('/tfg/schedule', serv.fetchSchedule);
 server.get('/tfg/schedule/:player', serv.fetchSchedule);
@@ -45,6 +45,13 @@ server.get('/tfg/planning', serv.fetchPlanning);
 server.get('/tfg/updates', serv.fetchUpdates);
 
 server.get('/tfg/history', serv.fetchHistory);
+
+server.post('/tfg/admin/setting', serv.editSetting);
+server.del('/tfg/admin/setting/:id', serv.deleteSetting);
+
+server.post('/tfg/admin/user', serv.editUser);
+server.del('/tfg/admin/user/:name', serv.deleteUser);
+
 
 server.listen(5000, function() {
     console.log('Démarrage de l\'écoute de', server.name, server.url);

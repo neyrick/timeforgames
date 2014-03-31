@@ -1,7 +1,7 @@
 var entities = require("./entities");
 var mailer = require("./mailer");
 var security = require("./security");
-var crypto = require('crypto');
+
 
 var persist = require("persist");
 
@@ -42,7 +42,10 @@ function assignGame(idgame, masterschedule, players, callback) {
 }
 
 function storelog(logdata) {
-    new history(logdata).save(connection, function(err) {
+    
+    var logclone = JSON.parse( JSON.stringify(logdata) );
+    delete logclone.data.password;
+    new history(logclone).save(connection, function(err) {
         if (err)
             console.log("Error: " + err);
     });
@@ -59,7 +62,9 @@ function storelog(logdata) {
 function createBaseLogData(req, source) {
     var result = {
         action : req.params['log_action'],
-        address : req.connection.remoteAddress
+        address : req.connection.remoteAddress,
+        apikey : req.apikey,
+        admin : req.admin
     };
     if ( typeof source != "undefined") {
         result.dayid = source.dayid;
@@ -67,7 +72,6 @@ function createBaseLogData(req, source) {
         result.timeframe = source.timeframe;
         result.setting = source.setting;
         result.player = req.user;
-        result.apikey = req.apikey;
     }
     return result;
 }
@@ -204,10 +208,6 @@ exports.createSetting = function(req, res, next) {
     genericCreate(req, res, next, new setting(req.body));
 };
 
-exports.updateSetting = function(req, res, next) {
-    genericUpdate(req, res, next, setting);
-};
-
 exports.createSchedule = function(req, res, next) {
     // Verification que le joueur est bien disponible
     var newSchedule = req.body;
@@ -249,7 +249,7 @@ exports.login = function(req, res, next) {
                 next();
             }
             else {
-                var passSum = crypto.createHash('sha1').update(req.body.password).digest().toString('hex');
+                var passSum = security.hashPassword(req.body.password);
                 if (result.password != passSum) {
                     res.send({ id : -1, error : 'Enlève tes moufles et retape ton mot de passe'});
                     next();
@@ -327,7 +327,7 @@ exports.expireAllTokens = function(req, res, next) {
             res.send("Erreur: " + err);
         }
         else {
-            security.clearAllApiKeys(req.user);
+            security.clearAllApiKeys(targetuser);
             res.send("OK");
         }
         next();
@@ -603,6 +603,146 @@ exports.fetchUpdates = function(req, res, next) {
 
 exports.fetchSettingById = function(id, callback) {
     setting.getById(connection, id, callback);
+};
+
+exports.deleteSetting = function(req, res, next) {
+    var pm_setting = new setting({
+            id : req.params.id
+        }).delete(connection,  function(err) {
+        if (err)
+            res.send("Error: " + err);
+        else {
+            var logdata = createBaseLogData(req, masterschedule);
+            logdata.data = req.params.id;
+            logdata.action = "DEL_SETTING";
+            storelog(logdata);            
+            res.send("Delete OK");
+        }
+        next();
+    });
+};
+
+exports.deletePlayer = function(req, res, next) {
+    security.clearAllApiKeys(req.params.name);
+    connection.chain([
+            history.where({ player : req.params.name}).deleteAll,
+            comment.where({ player : req.params.name}).deleteAll,
+            schedule.where({ player : req.params.name}).deleteAll,
+            playerData.where({ name : req.params.name}).deleteAll,
+        ], function(err, results) {
+            if (err)
+                res.send("Error: " + err);
+            else {
+                var logdata = createBaseLogData(req, masterschedule);
+                logdata.action = "DEL_PLAYER";
+                logdata.data = req.params.name;
+                storelog(logdata);            
+                res.send("Delete OK");
+            }
+            next();
+        });
+};
+
+exports.editSetting = function(req, res, next) {
+    var newsetting = req.body.setting;
+    var setting_id = newsetting.id;
+    delete newsetting.id;
+    setting.update(connection, setting_id, newsetting, function(err) {
+        if (err)
+            res.send("Error: " + err);
+        else {
+            var logdata = createBaseLogData(req, masterschedule);
+            logdata.data = req.body.setting;
+            storelog(logdata);            
+            res.send("Edit OK");
+        }
+        next();
+    });
+};
+
+exports.editUser = function(req, res, next) {
+    var newuser = req.body.user;
+    var user_id = newuser.id;
+    delete newuser.id;
+    playerData.where({ id : user_id}).first(connection, function(err, result) {
+            if (err) {
+                res.send("Erreur: " + err);
+                next();
+            }
+            else {
+                if (result == null) {
+                    res.send('Utilisateur introuvable');
+                    next();
+                }
+                else {
+                    var oldname = result.name;
+                    playerData.update(connection, user_id, newuser, function(err) {
+                        if (err) {
+                            res.send("Error: " + err);
+                            next();
+                        }
+                        else if (oldname != newuser.name) {
+                            security.clearAllApiKeys(oldname);
+                            connection.chain([
+                                    apikey.where({ player : oldname}).updateAll({ player : newuser.name}),
+                                    history.where({ player : oldname}).updateAll({ player : newuser.name}),
+                                    comment.where({ player : oldname}).updateAll({ player : newuser.name}),
+                                    schedule.where({ player : oldname}).updateAll({ player : newuser.name}),
+                                ], function(err, results) {
+                                var logdata = createBaseLogData(req);
+                                logdata.data = req.body.user;
+                                storelog(logdata);            
+                                res.send("Edit OK");
+                                next();
+                            });
+                        }
+                        else {
+                            res.send("Edit OK");
+                            next();
+                        }
+                    });
+                }
+            }
+    });    
+};
+
+exports.resetPassword = function(req, res, next) {
+    var targetuser = req.user;
+    if (req.admin) targetuser = req.params.user;
+    var newpass = security.genPassword();
+    var hashpass = security.hashPassword(newpass);
+    
+    playerData.where({ name : req.params.name}).first(connection, function(err, result) {
+            if (err) {
+                res.send("Erreur: " + err);
+                next();
+            }
+            else {
+                if (result == null) {
+                    res.send('Utilisateur introuvable');
+                    next();
+                }
+                else {
+                    var oldname = result.name;
+                    playerData.update(connection, result.id, { password : hashpass }, function(err) {
+                        if (err) {
+                            res.send("Error: " + err);
+                            next();
+                        }
+                        else {
+                            security.clearAllApiKeys(req.params.name);
+                            var logdata = createBaseLogData(req);
+                            logdata.action = 'RES_PW';
+                            logdata.data.player = targetuser;
+                            logdata.data.password = newpass;
+                            storelog(logdata);            
+                            res.send("Reset PW OK");
+                            next();
+                        }
+                    });
+                }
+            }
+    });        
 };
 /*
 exports.fetchPlayerData = function(players, callback) {

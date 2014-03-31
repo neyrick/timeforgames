@@ -25,6 +25,14 @@ function isKeyValid(username, key) {
     return true;
 }
 
+exports.genPassword = function() {
+        return Math.random().toString(36).slice(-8);
+};
+
+exports.hashPassword = function (password) {
+    return crypto.createHash('sha1').update(password).digest().toString('hex');
+};
+
 exports.authParser = function(req, res, next) {
     if (req.headers && req.headers.authorization) {
         var tokenMatch = req.headers.authorization.match(/^Bearer (.*)$/);

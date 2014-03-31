@@ -1,0 +1,14 @@
+{{ include ../parts/header-html }}
+
+<div>
+<p>
+Ton mot de passe a été initialisé, parce qu'un compte vient d'être créé pour toi (petit veinard) ou parce que tu as perdu le post-it où tu l'avais noté (petit boulet).</p>
+
+<p>Tes identifiants sont donc maintenant:<br/>
+login: {{= recipient.name }}<br/>
+mot de passe: {{= password }}
+
+</div>
+
+{{ include ../parts/footer-html }}
+
