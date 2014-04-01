@@ -171,9 +171,27 @@ exports.init = function(conn) {
 };
 
 exports.fetchHistory = function(req, res, next) {
-    history.where({
+    history.include("setting").where({
         dayid : req.params.dayid,
         timeframe : req.params.timeframe,
+        setting : req.params.setting
+    }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
+        genericSendJson(res, result);
+        next();
+    });
+};
+
+exports.fetchUserHistory = function(req, res, next) {
+    history.include("setting").where({
+        player : req.params.user
+    }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
+        genericSendJson(res, result);
+        next();
+    });
+};
+
+exports.fetchSettingHistory = function(req, res, next) {
+    history.include("setting").where({
         setting : req.params.setting
     }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
         genericSendJson(res, result);
@@ -187,6 +205,17 @@ exports.fetchAllSettings = function(req, res, next) {
             res.send("Erreur: " + err);
         else {
             res.send(settings);
+        }
+        next();
+    });
+};
+
+exports.fetchAllUsers = function(req, res, next) {
+    playerData.orderBy('name', persist.Ascending).all(connection, function(err, users) {
+        if (err)
+            res.send("Erreur: " + err);
+        else {
+            res.send(users);
         }
         next();
     });
@@ -256,6 +285,13 @@ exports.login = function(req, res, next) {
                 }
                 else {
                     var apikey = security.createApiKey();
+                    var secToken;
+                    if (result.isadmin) {
+                        secToken = security.createToken(req.body.username, apikey, req.body.username);
+                    }
+                    else {
+                        secToken = security.createToken(req.body.username, apikey);
+                    }
                     security.updateApiKey(req.body.username, apikey, req.apikey);
                     var keyEntity;
                     if (typeof req.apikey != "undefined") {
@@ -264,7 +300,7 @@ exports.login = function(req, res, next) {
                                 console.log("Error: " + err);
                             }
                             else {
-                                res.send({ id : 0, token : security.createToken(req.body.username, apikey)});
+                                res.send({ id : 0, token : secToken});
                             }
                             next();
                         });
@@ -275,7 +311,7 @@ exports.login = function(req, res, next) {
                                 console.log("Error: " + err);
                             }
                             else {
-                                res.send({ id : 0, token : security.createToken(req.body.username, apikey)});
+                                res.send({ id : 0, token : secToken});
                             }
                             next();
                         });
@@ -298,7 +334,7 @@ exports.relogin = function(req, res, next) {
         }
         else {
             security.updateApiKey(req.user, apikey, req.apikey);
-            res.send({ username : req.user, token : security.createToken(req.user, apikey)});
+            res.send({ username : req.user, token : security.createToken(req.user, apikey, req.admin)});
         }
         next();
     });
@@ -622,7 +658,7 @@ exports.deleteSetting = function(req, res, next) {
     });
 };
 
-exports.deletePlayer = function(req, res, next) {
+exports.deleteUser = function(req, res, next) {
     security.clearAllApiKeys(req.params.name);
     connection.chain([
             history.where({ player : req.params.name}).deleteAll,

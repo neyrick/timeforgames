@@ -38,7 +38,9 @@ var history = persist.define("history", {
 var player = persist.define("player", {
           "name": type.STRING,
           "email": type.STRING,
-          "password": type.STRING          
+          "password": type.STRING,
+          "status": type.INTEGER,
+          "isadmin": type.BOOLEAN
     }, { tableName: "player" });
 
 var apikey = persist.define("apikey", {

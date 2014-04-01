@@ -45,10 +45,13 @@ server.get('/tfg/planning', serv.fetchPlanning);
 server.get('/tfg/updates', serv.fetchUpdates);
 
 server.get('/tfg/history', serv.fetchHistory);
+server.get('/tfg/history/user/:user', serv.fetchUserHistory);
+server.get('/tfg/history/setting/:setting', serv.fetchSettingHistory);
 
 server.post('/tfg/admin/setting', serv.editSetting);
 server.del('/tfg/admin/setting/:id', serv.deleteSetting);
 
+server.get('/tfg/admin/user', serv.fetchAllUsers);
 server.post('/tfg/admin/user', serv.editUser);
 server.del('/tfg/admin/user/:name', serv.deleteUser);
 

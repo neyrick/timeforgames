@@ -48,6 +48,14 @@ function($http, config, localStorageService) {
 
     return {
 
+        getUsers : function(callback, errorcallback) {
+	    $http.get(config.urlbase + '/admin/user').success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
         login : function(pm_username, pm_password, callback) {
             $http.post(config.urlbase + '/login', {
                 username : pm_username,
@@ -101,7 +109,24 @@ function($http, config) {
             }).error(function(data, status) {
                 window.alert("Impossible de récupérer l'historique: " + data);
             });
+        },
+
+        getUserHistory : function(username, callback) {
+            $http.get(config.urlbase + '/history/user/' + username).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                window.alert("Impossible de récupérer l'historique: " + data);
+            });
+        },
+
+        getSettingHistory : function(settingid, callback) {
+            $http.get(config.urlbase + '/history/setting/' + settingid).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                window.alert("Impossible de récupérer l'historique: " + data);
+            });
         }
+
     };
 }]);
 

@@ -2,14 +2,15 @@
 
 /* Controllers */
 
-timeForGamesApp.controller('CalendarCtrl', ['$scope', 'settingsService', 'userService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
-function CalendarCtrl($scope, settingsService, userService, plannerService, planningBuilderService, config, localStorageService, historyService) {
-
     function sortSettings(settings) {
         return settings.sort(function(settinga, settingb) {
             return settinga.name.localeCompare(settingb.name);
         });
     }
+
+
+timeForGamesApp.controller('CalendarCtrl', ['$scope', 'settingsService', 'userService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
+function CalendarCtrl($scope, settingsService, userService, plannerService, planningBuilderService, config, localStorageService, historyService) {
 
     function timeSlide(days) {
         $scope.firstday = $scope.firstday + days * planningBuilderService.MS_IN_DAY;
@@ -671,6 +672,124 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     $scope.history = {};
     reset();
 //    relogin();
+
+}]);
+
+timeForGamesApp.controller('AdminCtrl', ['$scope', 'settingsService', 'userService', 'localStorageService', 'historyService',
+function AdminCtrl($scope, settingsService, userService, localStorageService, historyService) {
+
+    $scope.tab = 'users';
+    $scope.settingsMode = -1;
+    $scope.settingsList = [];
+    $scope.users = [];
+
+    $scope.currentEditUser = null;
+    $scope.currentEditSetting = null;
+    $scope.historyCriterion = null;
+    $scope.showHistorySetting = false;
+    $scope.historyList = [];
+
+    $scope.currentUser = 'Neyrick';
+
+    $scope.loadUsers = function() {
+        userService.getUsers(function(users) {
+            $scope.users = users;
+        }, function(error) {
+            window.alert("Impossible de charger les utilisateurs: " + error);
+        });
+    };
+
+    $scope.loadSettings = function() {
+        settingsService.getSettings(function(settings) {
+            $scope.settingsList = sortSettings(settings);
+        });
+    };
+
+    $scope.logout = function() {
+        userService.expireToken(function() {
+            localStorageService.remove('tfgLoginToken');
+            window.location = 'index.html';
+        });
+    };
+
+    $scope.editUser = function(user) {
+        if (typeof user == "undefined") {
+            $scope.currentEditUser = { name : null, email : null, status : 0, isadmin : true };
+        }
+        else {
+            $scope.currentEditUser = user;
+        }
+        $('#userEditModal').modal('show');
+    };
+
+    $scope.editSetting = function(setting) {
+        if (typeof setting == "undefined") {
+            $scope.currentEditSetting = { name : null, mode : 0, status : 0 };
+        }
+        else {
+            $scope.currentEditSetting = setting;
+        }
+        $('#settingEditModal').modal('show');
+    };
+
+    $scope.storeUser = function() {
+	window.alert("User:" + JSON.stringify($scope.currentEditUser));
+    };
+
+    $scope.storeSetting = function() {
+	window.alert("Setting:" + JSON.stringify($scope.currentEditSetting));
+    };
+
+    $scope.resetPassword = function(user) {
+    };
+
+    $scope.spoofLogin = function(user) {
+    };
+
+    $scope.destroyUser = function(user) {
+    };
+
+    var timeframesNames = { "AFTERNOON": "Après-midi", "EVENING": "Soirée"};
+    $scope.getTfName = function(dayid, timeframe) {
+        var datestr = '' + dayid;
+        var year = datestr.slice(0,4);
+        var month = datestr.slice(4,6);
+        var day = datestr.slice(6);
+        return day + '/' + month + '/' + year + ' ' + timeframesNames[timeframe];
+    };
+
+    $scope.showUserHistory = function(user) {
+        $scope.showHistorySetting = true;
+        $scope.historyCriterion = user.name;
+        historyService.getUserHistory(user.name, function(history) {
+            $scope.historyList = history;
+            $('#historyModal').modal('show');
+        });
+    };
+
+    $scope.showSettingHistory = function(setting) {
+        $scope.showHistorySetting = false;
+        $scope.historyCriterion = setting.name;
+        historyService.getSettingHistory(setting.id, function(history) {
+            $scope.historyList = history;
+            $('#historyModal').modal('show');
+        });
+    };
+
+    $scope.loadSettings();
+    $scope.loadUsers();
+
+    $('body').on('mouseenter', '.functButton', function() {
+            var helper = $( this ).nextAll('.buttonHelper');
+            helper.text(this.dataset['title']);
+            helper.show();
+        });
+
+    $('body').on('mouseleave', '.functButton', function() {
+            var helper = $( this ).nextAll('.buttonHelper');
+            helper.text("");
+            helper.hide();
+        });
 
 }]);
 

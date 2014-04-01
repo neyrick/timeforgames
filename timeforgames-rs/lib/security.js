@@ -47,6 +47,7 @@ exports.authParser = function(req, res, next) {
                     return next(new restify.NotAuthorizedError('Token expiré'));
                 }
                 if (isAdminRestricted(req.url) && (typeof authdata.admin == "undefined")) {
+                    console.log("Restriction admin pour authdata: " + JSON.stringify(authdata));
                     return next(new restify.NotAuthorizedError('Fonction réservée aux administrateurs'));
                 }
             } catch (error) {
@@ -95,6 +96,7 @@ exports.clearAllApiKeys = function(username) {
 };
 
 exports.createToken = function(pm_username, pm_apikey, pm_admin) {
+    console.log('Creation d\'un token avec admin: ' + pm_admin);
     return jwt.encode({
         username : pm_username,
         apikey : pm_apikey,

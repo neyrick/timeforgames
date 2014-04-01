@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="timeForGamesApp">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <title>Rêves et Légendes - Administration du Planificateur</title>
+
+
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="lib/jquery.qtip.css">
+        <link rel="stylesheet" href="css/tfg.css">
+        <link rel="shortcut icon" type="image/x-icon" href="images/logo_t10.jpg" />
+
+        <script src="lib/jquery-1.11.0.min.js"></script>
+        <script src="lib/jquery.qtip.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+
+        <script src="lib/angular-locale_fr-fr.js"></script>
+        <script src="lib/angular-local-storage.min.js"></script>
+        <script src="lib/bindonce.js"></script>
+        <script src="js/gg.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/controllers.js"></script>
+        <script src="js/filters.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/directives.js"></script>
+
+    </head>
+    <body ng-controller="AdminCtrl" data-display="desktop">
+
+<!-- Modale d'edition d'un utilisateur -->
+
+	<div id="userEditModal" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">Édition d'un utilisateur</h4>
+	      </div>
+	      <div class="modal-body">
+
+		<form class="form-horizontal" role="form" name="userEditForm" ng-submit="storeUser()" novalidate>
+		  <div class="form-group" ng-class="{ 'has-error' : userEditForm.name.$invalid && !userEditForm.name.$pristine }">
+		    <label for="inputUserName" class="col-sm-4 control-label">Nom</label>
+		    <div class="col-sm-8">
+		      <input type="text" class="form-control" id="inputUserName" name="name" ng-model="currentEditUser.name" placeholder="Nom d'utilisateur" required>
+		    </div>
+		  </div>
+		  <div class="form-group" ng-class="{ 'has-error' : userEditForm.email.$invalid && !userEditForm.email.$pristine }">
+		    <label for="inputUserEmail" class="col-sm-4 control-label">Email</label>
+		    <div class="col-sm-8">
+		      <input type="email" class="form-control" id="inputUserEmail" name="email" ng-model="currentEditUser.email" placeholder="Adresse E-Mail" required>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputUserStatus" class="col-sm-4 control-label">Actif ?</label>
+		    <div class="col-sm-8">
+			<div class="btn-group">
+			  <label class="btn btn-default" ng-class="{'btn-success active' : currentEditUser.status == 0 }">
+			    <input type="radio" name="inputUserStatus" id="userStatusYes" ng-model="currentEditUser.status" ng-value="0" class="hidden"> Oui
+			  </label>
+			  <label class="btn btn-default" ng-class="{'btn-danger active' : currentEditUser.status == 1 }">
+			    <input type="radio" name="inputUserStatus" id="userStatusNo" ng-model="currentEditUser.status" ng-value="1" class="hidden"> Non
+			  </label>
+			</div>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputUserAdmin" class="col-sm-4 control-label">Administrateur ?</label>
+		    <div class="col-sm-8">
+			<div class="btn-group">
+			  <label class="btn btn-default" ng-class="{'btn-success active' : currentEditUser.isadmin }">
+			    <input type="radio" name="inputUserAdmin" id="userAdminYes" ng-model="currentEditUser.isadmin" ng-value="true" class="hidden"> Oui
+			  </label>
+			  <label class="btn btn-default" ng-class="{'btn-danger active' : !currentEditUser.isadmin }">
+			    <input type="radio" name="inputUserAdmin" id="userAdminNo" ng-model="currentEditUser.isadmin" ng-value="false" class="hidden"> Non
+			  </label>
+			</div>
+		    </div>
+		  </div>
+		  <div class="form-group modalButtonsBox">
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+			<button type="submit" class="btn btn-primary" ng-disabled="userEditForm.$invalid">Enregistrer</button>
+		  </div>
+		</form>
+              </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div>
+
+<!-- Modale d'edition d'une chronique -->
+
+	<div id="settingEditModal" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">Édition d'une chronique</h4>
+	      </div>
+	      <div class="modal-body">
+
+		<form class="form-horizontal" role="form" name="settingEditForm" ng-submit="storeSetting()" novalidate>
+		  <div class="form-group" ng-class="{ 'has-error' : settingEditForm.name.$invalid && !settingEditForm.name.$pristine }">
+		    <label for="inputSettingName" class="col-sm-4 control-label">Nom</label>
+		    <div class="col-sm-8">
+		      <input type="text" class="form-control" id="inputSettingName" name="name" ng-model="currentEditSetting.name" placeholder="Nom de la chronique" required>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputSettingStatus" class="col-sm-4 control-label">Active ?</label>
+		    <div class="col-sm-8">
+			<div class="btn-group">
+			  <label class="btn btn-default" ng-class="{'btn-success active' : currentEditSetting.status == 0 }">
+			    <input type="radio" name="inputSettingStatus" id="settingStatusYes" ng-model="currentEditSetting.status" ng-value="0" class="hidden"> Oui
+			  </label>
+			  <label class="btn btn-default" ng-class="{'btn-danger active' : currentEditSetting.status == 1 }">
+			    <input type="radio" name="inputSettingStatus" id="settingStatusNo" ng-model="currentEditSetting.status" ng-value="1" class="hidden"> Non
+			  </label>
+			</div>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputUserAdmin" class="col-sm-4 control-label">Type</label>
+		    <div class="col-sm-8">
+			<div class="btn-group-vertical">
+			  <label class="btn btn-default" ng-class="{'btn-primary active' : currentEditSetting.mode == 2 }">
+			    <input type="radio" name="inputSettingMode" id="settingMode2" ng-model="currentEditSetting.mode" ng-value="2" class="hidden"> One-Shot
+			  </label>
+			</div>
+			<div class="btn-group-vertical">
+			  <label class="btn btn-default" ng-class="{'btn-primary active' : currentEditSetting.mode == 0 }">
+			    <input type="radio" name="inputSettingMode" id="settingMode2" ng-model="currentEditSetting.mode" ng-value="0" class="hidden"> Ouverte
+			  </label>
+			</div>
+			<div class="btn-group-vertical">
+			  <label class="btn btn-default" ng-class="{'btn-primary active' : currentEditSetting.mode == 1 }">
+			    <input type="radio" name="inputSettingMode" id="settingMode2" ng-model="currentEditSetting.mode" ng-value="1" class="hidden"> Fermée
+			  </label>
+			</div>
+			<div class="btn-group-vertical">
+			  <label class="btn btn-default" ng-class="{'btn-primary active' : currentEditSetting.mode == 3 }">
+			    <input type="radio" name="inputSettingMode" id="settingMode2" ng-model="currentEditSetting.mode" ng-value="3" class="hidden"> Évènement
+			  </label>
+			</div>
+		    </div>
+		  </div>
+		  <div class="form-group modalButtonsBox">
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+			<button type="submit" class="btn btn-primary" ng-disabled="settingEditForm.$invalid">Enregistrer</button>
+		  </div>
+		</form>
+              </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div>
+
+<!-- Modale de visualisation de l'historique -->
+
+	<div id="historyModal" class="modal fade">
+	  <div class="modal-dialog largeModal">
+	    <div class="modal-content">
+	      <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">Historique des opérations de {{ historyCriterion }}</h4>
+	      </div>
+	      <div class="modal-body">
+                  <table class="table table-striped table-condensed">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th ng-if="showHistorySetting">Chronique</th>
+                        <th>Créneau horaire</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr bindonce ng-repeat="history in historyList">
+                        <td><span bo-text="history.tstamp | date:'dd/MM/yyyy'"/></span></td>
+                        <td><span bo-text="history.tstamp | date:'H:mm'"></span></td>
+                        <td bo-if="showHistorySetting"><span bo-text="history.setting.name"/></span></td>
+                        <td><span bo-text="getTfName(history.dayid, history.timeframe)"></span></td>
+                        <td>
+                          <gg-history row="history"/>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+              </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div>
+
+
+
+      <div id="mainNav" class="navBar">
+	<div class="dummyInlineContainer pull-left">
+	  <button type="button" class="btn btn-default btn-lg" ng-class="{'btn-primary' : tab == 'users'}" ng-click="tab = 'users'">Gestion des Utilisateurs</button>
+	  <button type="button" class="btn btn-default btn-lg" ng-class="{'btn-primary' : tab == 'settings'}" ng-click="tab = 'settings'">Gestion des Chroniques</button>
+	</div>
+
+        <div class="dummyInlineContainer pull-right">
+	  <a href="index.html" role="button" class="btn btn-default btn-lg">Retour au Planificateur</a>
+	  <button type="button" class="btn btn-danger btn-lg" ng-click="logout()"><span class="glyphicon glyphicon-off"></span> Déconnexion</button>
+        </div>
+
+        <div class="dummyInlineContainer pull-right"><h3 style="margin: 10px">Salut {{ currentUser }} !</h3></div>
+
+
+      </div>
+
+	<div id="usersManagerPanel" class="panel panel-default managerPanel" ng-show="tab == 'users'">
+
+	  <div class="panel-heading managerHeading">
+             <h3 class="pull-left" style="margin-top: 10px">Gestion des utilisateurs</h3>
+	     <button type="button" class="btn btn-primary btn-lg pull-right" ng-click="editUser()">Ajouter un utilisateur</button>
+	  </div>
+
+
+	  <table class="table table-hover table-condensed"">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Actif ?</th>
+                  <th>Admin ?</th>
+                  <th class="buttonsColumn">Opérations</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr bindonce ng-repeat="user in users">
+                  <td><span bo-text="user.name"></span></td>
+                  <td><span bo-text="user.email"></span></td>
+                  <td>
+                    <div class="dummyInlineContainer text-success" bo-if="user.status == 0"><span class="glyphicon glyphicon-ok"></span> Actif</div>
+                    <div class="dummyInlineContainer text-danger" bo-if="user.status == 1"><span class="glyphicon glyphicon-remove"></span> Inactif</div>
+                  </td>
+                  <td>
+                    <div class="dummyInlineContainer text-success" bo-if="user.isadmin"><span class="glyphicon glyphicon-star"></span> Oui</div>
+                    <div class="dummyInlineContainer text-danger" bo-if="!user.isadmin"><span class="glyphicon glyphicon-star-empty"></span> Non</div>
+                  </td>
+                  <td>
+                    <div class="btn-group">
+<!--
+                      <button type="button" class="btn btn-success btn-sm functButton" data-title="Activer l'utilisateur" bo-show="user.status == 1"><span class="glyphicon glyphicon-ok"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Désactiver l'utilisateur" bo-show="user.status == 0"><span class="glyphicon glyphicon-remove"></span></button>
+                      <button type="button" class="btn btn-success btn-sm functButton" data-title="Donner les droits d'Admin" bo-show="!user.isadmin"><span class="glyphicon glyphicon-star"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Révoquer les droits d'Admin" bo-show="user.isadmin"><span class="glyphicon glyphicon-star-empty"></span></button>
+-->
+                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Modifier l'utilisateur" ng-click="editUser(user)"><span class="glyphicon glyphicon-edit"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Envoyer un nouveau mot de passe" ng-click="resetPassword(user)"><span class="glyphicon glyphicon-envelope"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showUserHistory(user)"><span class="glyphicon glyphicon-calendar"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Se connecter comme l'utilisateur" ng-click="spoofLogin(user)"><span class="glyphicon glyphicon-user"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer l'utilisateur" ng-click="destroyUser(user)"><span class="glyphicon glyphicon-remove"></span></button>
+                       <button type="button" class="btn btn-primary btn-sm buttonHelper"></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+	  </table>
+	</div>
+
+	<div id="settingsManagerPanel" class="panel panel-default managerPanel" ng-show="tab == 'settings'">
+
+	  <div class="panel-heading managerHeading">
+             <h3 class="pull-left" style="margin-top: 10px">Gestion des chroniques</h3>
+	     <button type="button" class="btn btn-primary btn-lg pull-right" ng-click="editSetting()">Ajouter une chronique</button>
+	  </div>
+          <div class="panel-body">
+		<div class="btn-group btn-group-justified">
+                  <div class="btn-group">
+		    <button class="btn btn-default" ng-class="{ active : (settingsMode == 2)}" ng-click="settingsMode = 2">One-Shots</button>
+                  </div>
+                  <div class="btn-group">
+		    <button class="btn btn-default" ng-class="{ active : (settingsMode == 0)}" ng-click="settingsMode = 0">Chroniques Ouvertes</button>
+                  </div>
+                  <div class="btn-group">
+		    <button class="btn btn-default" ng-class="{ active : (settingsMode == 1)}" ng-click="settingsMode = 1">Chroniques Fermées</button>
+                  </div>
+                  <div class="btn-group">
+		    <button class="btn btn-default" ng-class="{ active : (settingsMode == 3)}" ng-click="settingsMode = 3">Évènements</button>
+                  </div>
+		</div>
+          </div>
+
+	  <table class="table table-hover table-condensed" ng-if="settingsMode >= 0">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Nom</th>
+                  <th>Active ?</th>
+                  <th class="buttonsColumn">Opérations</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr bindonce ng-repeat="setting in settingsList | filter : { mode : settingsMode }">
+                  <td>Image...</td>
+                  <td><span bo-text="setting.name"></span></td>
+                  <td>
+                    <div class="dummyInlineContainer text-success" bo-if="setting.status == 0"><span class="glyphicon glyphicon-ok"></span> Active</div>
+                    <div class="dummyInlineContainer text-danger" bo-if="setting.status == 1"><span class="glyphicon glyphicon-remove"></span> Inactive</div>
+                  </td>
+                  <td>
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Modifier la chronique" ng-click="editSetting(setting)"><span class="glyphicon glyphicon-edit"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showSettingHistory(setting)"><span class="glyphicon glyphicon-calendar"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer la chronique"><span class="glyphicon glyphicon-remove"></span></button>
+                       <button type="button" class="btn btn-primary btn-sm buttonHelper"></button>
+                    </div>
+                </tr>
+              </tbody>
+	  </table>
+	</div>
+
+	
+
+    </body>
+</html>
+
