@@ -30,6 +30,50 @@
     </head>
     <body ng-controller="AdminCtrl" data-display="desktop">
 
+<!-- Modale d'alerte en cas de suppression d'un utilisateur -->
+
+	<div id="userDeleteAlert" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header text-warning">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+
+		<h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span> Attention !</h4>
+	      </div>
+	      <div class="modal-body text-warning">
+                Tu es sur le point de supprimer entièrement le compte de <em>{{ currentEditUser.name }}</em>, ce qui l'effacera des données du planificateur. Cette mesure ne devrait être appliquée qu'à des comptes invalides. Dans le cas du départ d'un membre, modifie plutôt l'utilisateur pour le rendre "inactif".
+              </div>
+	      <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+                  <button type="button" class="btn btn-warning" ng-click="destroyUser()">Confirmer</button>
+              </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div>
+
+<!-- Modale d'alerte en cas de suppression d'une chronique -->
+
+	<div id="settingDeleteAlert" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header text-warning">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+
+		<h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span> Attention !</h4>
+	      </div>
+	      <div class="modal-body text-warning">
+                Tu es sur le point de supprimer entièrement la chronique <em>{{ currentEditSetting.name }}</em>, ce qui l'effacera des données du planificateur, en supprimant notamment toute partie ayant eu lieu. Cette mesure ne devrait être appliquée qu'à des chroniques invalides. Dans le cas d'une clôture, modifie plutôt la chronique pour la rendre "inactive" et la supprimer ainsi des possibilités pour une nouvelle partie.
+              </div>
+	      <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+                  <button type="button" class="btn btn-warning" ng-click="destroySetting()">Confirmer</button>
+              </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div>
+
 <!-- Modale d'edition d'un utilisateur -->
 
 	<div id="userEditModal" class="modal fade">
@@ -253,7 +297,7 @@
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Envoyer un nouveau mot de passe" ng-click="resetPassword(user)"><span class="glyphicon glyphicon-envelope"></span></button>
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showUserHistory(user)"><span class="glyphicon glyphicon-calendar"></span></button>
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Se connecter comme l'utilisateur" ng-click="spoofLogin(user)"><span class="glyphicon glyphicon-user"></span></button>
-                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer l'utilisateur" ng-click="destroyUser(user)"><span class="glyphicon glyphicon-remove"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer l'utilisateur" ng-click="promptDestroyUser(user)"><span class="glyphicon glyphicon-remove"></span></button>
                        <button type="button" class="btn btn-primary btn-sm buttonHelper"></button>
                     </div>
                   </td>
@@ -306,7 +350,7 @@
                     <div class="btn-group">
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Modifier la chronique" ng-click="editSetting(setting)"><span class="glyphicon glyphicon-edit"></span></button>
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showSettingHistory(setting)"><span class="glyphicon glyphicon-calendar"></span></button>
-                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer la chronique"><span class="glyphicon glyphicon-remove"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer la chronique" ng-click="promptDestroySetting(setting)"><span class="glyphicon glyphicon-remove"></span></button>
                        <button type="button" class="btn btn-primary btn-sm buttonHelper"></button>
                     </div>
                 </tr>

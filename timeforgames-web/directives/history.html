@@ -15,5 +15,15 @@
 	</span>
 	<span ng-switch-when="DEL_COMMENT"><span class="name">{{player}}</span> a supprimé son commentaire.
 	</span>
+	<span ng-switch-when="RES_PW"><span class="name">{{player}}</span> a réinitialisé le mot de passe de {{data.player}}.
+	</span>
+	<span ng-switch-when="ADMIN_EDIT_USER"><span class="name">{{player}}</span> a modifié l'utiilisateur {{data.name}}.
+	</span>
+	<span ng-switch-when="ADMIN_EDIT_SETTING"><span class="name">{{player}}</span> a modifié la chronique {{data.name}}.
+	</span>
+	<span ng-switch-when="DEL_PLAYER"><span class="name">{{player}}</span> a supprimé l'utilisateur {{data}}.
+	</span>
+	<span ng-switch-when="DEL_SETTING"><span class="name">{{player}}</span> a supprimé la chronique {{data.name}}.
+	</span>
 	<span ng-switch-default>Là il s'est passé un truc, mais je sais pas quoi (bref, y'a un bug)</span>
 </span>

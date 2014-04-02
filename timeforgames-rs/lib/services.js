@@ -64,14 +64,14 @@ function createBaseLogData(req, source) {
         action : req.params['log_action'],
         address : req.connection.remoteAddress,
         apikey : req.apikey,
-        admin : req.admin
+        admin : req.admin,
+        tstamp : new Date(),
+        player : req.user
     };
     if ( typeof source != "undefined") {
         result.dayid = source.dayid;
-        result.tstamp = new Date();
         result.timeframe = source.timeframe;
         result.setting = source.setting;
-        result.player = req.user;
     }
     return result;
 }
@@ -648,8 +648,8 @@ exports.deleteSetting = function(req, res, next) {
         if (err)
             res.send("Error: " + err);
         else {
-            var logdata = createBaseLogData(req, masterschedule);
-            logdata.data = req.params.id;
+            var logdata = createBaseLogData(req);
+            logdata.data = { id : req.params.id, name : req.params.name };
             logdata.action = "DEL_SETTING";
             storelog(logdata);            
             res.send("Delete OK");
@@ -669,7 +669,7 @@ exports.deleteUser = function(req, res, next) {
             if (err)
                 res.send("Error: " + err);
             else {
-                var logdata = createBaseLogData(req, masterschedule);
+                var logdata = createBaseLogData(req);
                 logdata.action = "DEL_PLAYER";
                 logdata.data = req.params.name;
                 storelog(logdata);            
@@ -687,8 +687,10 @@ exports.editSetting = function(req, res, next) {
         if (err)
             res.send("Error: " + err);
         else {
-            var logdata = createBaseLogData(req, masterschedule);
+            var logdata = createBaseLogData(req);
             logdata.data = req.body.setting;
+            logdata.setting = setting_id;
+            logdata.action = 'ADMIN_EDIT_SETTING';
             storelog(logdata);            
             res.send("Edit OK");
         }
@@ -719,13 +721,14 @@ exports.editUser = function(req, res, next) {
                         }
                         else if (oldname != newuser.name) {
                             security.clearAllApiKeys(oldname);
+                            var replaceParams = [ newuser.name, oldname];
                             connection.chain([
-                                    apikey.where({ player : oldname}).updateAll({ player : newuser.name}),
-                                    history.where({ player : oldname}).updateAll({ player : newuser.name}),
-                                    comment.where({ player : oldname}).updateAll({ player : newuser.name}),
-                                    schedule.where({ player : oldname}).updateAll({ player : newuser.name}),
+                                    persist.runSql("UPDATE apikey SET username = $1 where username = $2", replaceParams),
+                                    persist.runSql("UPDATE comment SET player = $1 where player = $2", replaceParams),
+                                    persist.runSql("UPDATE schedule SET player = $1 where player = $2", replaceParams)
                                 ], function(err, results) {
                                 var logdata = createBaseLogData(req);
+                                logdata.action = 'ADMIN_EDIT_USER';
                                 logdata.data = req.body.user;
                                 storelog(logdata);            
                                 res.send("Edit OK");

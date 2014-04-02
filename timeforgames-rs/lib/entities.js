@@ -31,6 +31,7 @@ var history = persist.define("history", {
           "dayid": type.INTEGER,
           "timeframe": type.STRING,
           "player": type.STRING,
+          "admin": type.STRING,
           "action": type.STRING,
           "data": type.JSON
     }, { tableName: "history" }).hasOne(setting, { createHasMany: false, foreignKey : "setting"});

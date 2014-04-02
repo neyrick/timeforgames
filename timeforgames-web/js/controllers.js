@@ -701,7 +701,10 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
 
     $scope.loadSettings = function() {
         settingsService.getSettings(function(settings) {
-            $scope.settingsList = sortSettings(settings);
+//            $scope.settingsList = sortSettings(settings);
+            $scope.settingsList = settings;
+        }, function(error) {
+            window.alert("Impossible de charger les utilisateurs: " + error);
         });
     };
 
@@ -733,11 +736,21 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
     };
 
     $scope.storeUser = function() {
-	window.alert("User:" + JSON.stringify($scope.currentEditUser));
+        userService.editUser($scope.currentEditUser, function(data) {
+            $scope.loadUsers();
+            $('#userEditModal').modal('hide');
+        }, function(data) {
+	    window.alert("Echec de la modification:" + data);
+        });
     };
 
     $scope.storeSetting = function() {
-	window.alert("Setting:" + JSON.stringify($scope.currentEditSetting));
+        settingsService.editSetting($scope.currentEditSetting, function(data) {
+            $scope.loadSettings();
+            $('#settingEditModal').modal('hide');
+        }, function(data) {
+	    window.alert("Echec de la modification:" + data);
+        });
     };
 
     $scope.resetPassword = function(user) {
@@ -746,11 +759,37 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
     $scope.spoofLogin = function(user) {
     };
 
-    $scope.destroyUser = function(user) {
+    $scope.promptDestroyUser = function(user) {
+        $scope.currentEditUser = user;
+        $('#userDeleteAlert').modal('show');
+    };
+
+    $scope.promptDestroySetting = function(setting) {
+        $scope.currentEditSetting = setting;
+        $('#settingDeleteAlert').modal('show');
+    };
+
+    $scope.destroyUser = function() {
+        userService.deleteUser($scope.currentEditUser.name, function(data) {
+            $scope.loadUsers();
+            $('#userDeleteAlert').modal('hide');
+        }, function(data) {
+	    window.alert("Echec de la suppression:" + data);
+        });
+    };
+
+    $scope.destroySetting = function() {
+        settingsService.deleteSetting($scope.currentEditSetting, function(data) {
+            $scope.loadSettings();
+            $('#settingDeleteAlert').modal('hide');
+        }, function(data) {
+	    window.alert("Echec de la suppression:" + data);
+        });
     };
 
     var timeframesNames = { "AFTERNOON": "Après-midi", "EVENING": "Soirée"};
     $scope.getTfName = function(dayid, timeframe) {
+        if ((!dayid) || (!timeframe)) return '';
         var datestr = '' + dayid;
         var year = datestr.slice(0,4);
         var month = datestr.slice(4,6);

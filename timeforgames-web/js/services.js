@@ -48,6 +48,22 @@ function($http, config, localStorageService) {
 
     return {
 
+        editUser : function(pm_user, callback, errorcallback) {
+	    $http.post(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
+        deleteUser : function(username, callback, errorcallback) {
+	    $http.delete(config.urlbase + '/admin/user/' + username).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
         getUsers : function(callback, errorcallback) {
 	    $http.get(config.urlbase + '/admin/user').success(function(data, status) {
                 callback(data);
@@ -132,15 +148,41 @@ function($http, config) {
 
 timeForGamesApp.factory('settingsService', ['$http', 'config',
 function($http, config) {
-
+/*
     var settings = {
         ready : false
     }, updateSettings = function(callback, callback2) {
         $http.get(config.urlbase + '/setting').success(callback).error(callback2);
     };
-
+*/
     return {
 
+        editSetting : function(pm_setting, callback, errorcallback) {
+	    $http.post(config.urlbase + '/admin/setting', { setting : pm_setting}).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
+        deleteSetting : function(setting, callback, errorcallback) {
+	    $http.delete(config.urlbase + '/admin/setting/' + setting.id + '?name=' + setting.name).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
+        getSettings : function(callback, errorcallback) {
+	    $http.get(config.urlbase + '/setting').success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                window.alert("Impossible de récupérer les chroniques: " + error);
+                errorcallback(data);
+            });
+        },
+
+/*
         getSettings : function(callback) {
             if (!settings.ready) {
                 updateSettings(function(result) {
@@ -153,7 +195,7 @@ function($http, config) {
             } else
                 callback(settings);
         },
-
+*/
         createSetting : function(setting, callback) {
             $http.put(config.urlbase + '/setting', setting).success(function(data, status) {
                 callback(data);
