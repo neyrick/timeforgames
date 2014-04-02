@@ -46,6 +46,7 @@ var player = persist.define("player", {
 
 var apikey = persist.define("apikey", {
           "username": type.STRING,
+          "admin": type.STRING,
           "key": type.STRING
     }, { tableName: "apikey" });
 

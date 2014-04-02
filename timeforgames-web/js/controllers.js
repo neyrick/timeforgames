@@ -122,13 +122,15 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 }                              
            } 
            else {
-               if (typeof result.error != "undefined") {
-                   $scope.loginMessage = result.error;
-               }
-               else {
-                   $scope.loginMessage = "Raté !";
-               }
+               $scope.loginMessage = result.error;
            }
+        }, function(error) {
+            if (typeof error == "object") {
+                $scope.loginMessage = error.message;
+            }
+            else {
+                $scope.loginMessage = error;
+            }
         });
     };
 
@@ -155,7 +157,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         else {
             loginPrompt();
         }
-    }
+    };
 
     $scope.logout = function() {
         userService.expireToken(function() {
@@ -197,6 +199,8 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             if (andPlanning && ( typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null))
                 initPlanning();
             $scope.settingsReady = true;
+        }, function (error) {
+                window.alert("Impossible de récupérer les chroniques: " + error);            
         });
     };
 /*
@@ -269,7 +273,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
 
     $scope.createAndAddSetting = function() {
         $scope.newsetting.status = 0;
-        settingsService.createSetting($scope.newsetting, function(newsetting) {
+        settingsService.storeSetting($scope.newsetting, function(newsetting) {
             $scope.settingsList.push(newsetting);
             sortSettings($scope.settingsList);
             $scope.weeks.forEach(function(week) {
@@ -306,6 +310,8 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             } else if ($scope.display == 'mobile') {
                 $("#addSettingModal").modal('hide');
             }
+        }, function(error) {
+            window.alert("Impossible de créer la chronique: " + error);
         });
 
     };
@@ -691,11 +697,20 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
 
     $scope.currentUser = 'Neyrick';
 
+    function showApiError(error) {
+        if (typeof error == "object") {
+            window.alert(error.message);
+        }
+        else {
+            window.alert(error);
+        }        
+    }
+
     $scope.loadUsers = function() {
         userService.getUsers(function(users) {
             $scope.users = users;
         }, function(error) {
-            window.alert("Impossible de charger les utilisateurs: " + error);
+            showApiError(error);
         });
     };
 
@@ -704,7 +719,7 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
 //            $scope.settingsList = sortSettings(settings);
             $scope.settingsList = settings;
         }, function(error) {
-            window.alert("Impossible de charger les utilisateurs: " + error);
+            showApiError(error);
         });
     };
 
@@ -717,7 +732,7 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
 
     $scope.editUser = function(user) {
         if (typeof user == "undefined") {
-            $scope.currentEditUser = { name : null, email : null, status : 0, isadmin : true };
+            $scope.currentEditUser = { name : null, email : null, status : 0, isadmin : false };
         }
         else {
             $scope.currentEditUser = user;
@@ -736,27 +751,38 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
     };
 
     $scope.storeUser = function() {
-        userService.editUser($scope.currentEditUser, function(data) {
+        userService.storeUser($scope.currentEditUser, function(data) {
             $scope.loadUsers();
             $('#userEditModal').modal('hide');
-        }, function(data) {
-	    window.alert("Echec de la modification:" + data);
+        }, function(error) {
+            showApiError(error);
         });
     };
 
     $scope.storeSetting = function() {
-        settingsService.editSetting($scope.currentEditSetting, function(data) {
+          settingsService.storeSetting($scope.currentEditSetting, function(data) {
             $scope.loadSettings();
             $('#settingEditModal').modal('hide');
-        }, function(data) {
-	    window.alert("Echec de la modification:" + data);
+        }, function(error) {
+            showApiError(error);
         });
     };
 
     $scope.resetPassword = function(user) {
+        userService.adminResetPassword(user, function(data) {
+            window.alert('Le mot de passe de ' + user.name + ' a été réinitialisé');
+        }, function(error) {
+            showApiError(error);
+        });
     };
 
     $scope.spoofLogin = function(user) {
+        userService.spoofLogin(user.name, function(result) {
+            localStorageService.set('tfgLoginToken', result.token);
+             window.location = 'index.html';           
+        }, function (result) {
+            showApiError(error);
+        });
     };
 
     $scope.promptDestroyUser = function(user) {
@@ -774,7 +800,7 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
             $scope.loadUsers();
             $('#userDeleteAlert').modal('hide');
         }, function(data) {
-	    window.alert("Echec de la suppression:" + data);
+            showApiError(error);
         });
     };
 
@@ -783,7 +809,7 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
             $scope.loadSettings();
             $('#settingDeleteAlert').modal('hide');
         }, function(data) {
-	    window.alert("Echec de la suppression:" + data);
+            showApiError(error);
         });
     };
 

@@ -48,12 +48,12 @@ function($http, config, localStorageService) {
 
     return {
 
-        editUser : function(pm_user, callback, errorcallback) {
-	    $http.post(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
-                callback(data);
-            }).error(function(data, status) {
-                errorcallback(data);
-            });
+        storeUser : function(pm_user, callback, errorcallback) {
+    	    $http.put(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
+                    callback(data);
+                }).error(function(data, status) {
+                    errorcallback(data);
+                });
         },
 
         deleteUser : function(username, callback, errorcallback) {
@@ -72,14 +72,22 @@ function($http, config, localStorageService) {
             });
         },
 
-        login : function(pm_username, pm_password, callback) {
+        login : function(pm_username, pm_password, callback, errorcallback) {
             $http.post(config.urlbase + '/login', {
                 username : pm_username,
                 password : pm_password
             }).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
-                window.alert("Impossible de vérifier l'utilisateur: " + data);
+                errorcallback(data);
+            });
+        },
+
+        spoofLogin : function(pm_username, callback, errorcallback) {
+            $http.get(config.urlbase + '/admin/spoof/' + pm_username).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
             });
         },
 
@@ -111,6 +119,22 @@ function($http, config, localStorageService) {
             }
         },
                 
+        resetPassword : function(callback, errorcallback) {
+            $http.get(config.urlbase + '/resetPassword').success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
+        adminResetPassword : function(pm_user, callback, errorcallback) {
+            $http.get(config.urlbase + '/admin/resetPassword/' + pm_user.name).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+
     };
 }]);
 
@@ -157,8 +181,8 @@ function($http, config) {
 */
     return {
 
-        editSetting : function(pm_setting, callback, errorcallback) {
-	    $http.post(config.urlbase + '/admin/setting', { setting : pm_setting}).success(function(data, status) {
+        storeSetting : function(pm_setting, callback, errorcallback) {
+	    $http.put(config.urlbase + '/setting', { setting : pm_setting}).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
@@ -177,7 +201,6 @@ function($http, config) {
 	    $http.get(config.urlbase + '/setting').success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
-                window.alert("Impossible de récupérer les chroniques: " + error);
                 errorcallback(data);
             });
         },
@@ -196,11 +219,12 @@ function($http, config) {
                 callback(settings);
         },
 */
-        createSetting : function(setting, callback) {
+        createSetting : function(setting, callback, errorcallback) {
             $http.put(config.urlbase + '/setting', setting).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 window.alert("Impossible de créer la chronique: " + data);
+                errorcallback(data);
             });
         }
     };

@@ -1,7 +1,7 @@
 var entities = require("./entities");
 var mailer = require("./mailer");
 var security = require("./security");
-
+var restify = require('restify');
 
 var persist = require("persist");
 
@@ -233,10 +233,6 @@ exports.findSettingByCode = function(req, res, next) {
     });
 };
 
-exports.createSetting = function(req, res, next) {
-    genericCreate(req, res, next, new setting(req.body));
-};
-
 exports.createSchedule = function(req, res, next) {
     // Verification que le joueur est bien disponible
     var newSchedule = req.body;
@@ -268,89 +264,80 @@ exports.createSchedule = function(req, res, next) {
 
 exports.login = function(req, res, next) {
     playerData.where({ name : req.body.username}).first(connection, function(err, result) {
-        if (err) {
-            res.send("Erreur: " + err);
-            next();
+        if (err) return next(err);
+        if (result == null) {
+            return next(new restify.InvalidCredentialsError(req.body.username + '? Connais pas!'));
+        }
+
+        var passSum = security.hashPassword(req.body.password);
+        if (result.password != passSum) {
+            return next(new restify.InvalidCredentialsError('Enlève tes moufles et retape ton mot de passe'));
+        }
+
+        var apikey = security.createApiKey(req.body.username);
+        var secToken;
+        var adminname;
+        if (result.isadmin) {
+            secToken = security.createToken(req.body.username, apikey, req.body.username);
+            adminname = req.body.username;
         }
         else {
-            if (result == null) {
-                res.send({ id : -1, error : req.body.username + '? Connais pas!'});
-                next();
-            }
-            else {
-                var passSum = security.hashPassword(req.body.password);
-                if (result.password != passSum) {
-                    res.send({ id : -1, error : 'Enlève tes moufles et retape ton mot de passe'});
-                    next();
-                }
-                else {
-                    var apikey = security.createApiKey();
-                    var secToken;
-                    if (result.isadmin) {
-                        secToken = security.createToken(req.body.username, apikey, req.body.username);
-                    }
-                    else {
-                        secToken = security.createToken(req.body.username, apikey);
-                    }
-                    security.updateApiKey(req.body.username, apikey, req.apikey);
-                    var keyEntity;
-                    if (typeof req.apikey != "undefined") {
-                        entities.apikey.where('key = ? and username = ?', [req.apikey, req.body.username]).updateAll(connection, { key : apikey}, function(err) {
-                            if (err) {
-                                console.log("Error: " + err);
-                            }
-                            else {
-                                res.send({ id : 0, token : secToken});
-                            }
-                            next();
-                        });
-                    }
-                    else {
-                        var newkey = new entities.apikey({ username : req.body.username, key : apikey}).save(connection, function(err) {
-                            if (err) {
-                                console.log("Error: " + err);
-                            }
-                            else {
-                                res.send({ id : 0, token : secToken});
-                            }
-                            next();
-                        });
-                    }
-                }
-            }
+            secToken = security.createToken(req.body.username, apikey);
+            adminname = null;
+        }
+        var keyEntity;
+        if (typeof req.apikey != "undefined") {
+            entities.apikey.where('key = ? and username = ?', [req.apikey, req.body.username]).updateAll(connection, { key : apikey}, function(err) {
+                if (err) return next(err);
+                security.clearApiKey(req.apikey);
+                res.send({ id : 0, token : secToken});
+                return next();
+            });
+        }
+        else {
+            var newkey = new entities.apikey({ username : req.body.username, key : apikey, admin : adminname}).save(connection, function(err) {
+                if (err) return next(err);
+                res.send({ id : 0, token : secToken});
+                return next();
+            });
         }
     });
 };
 
+exports.spoofLogin = function(req, res, next) {
+    
+    var apikey = security.createApiKey(req.params.user);
+    var secToken = security.createToken(req.params.user, apikey, req.user);
+    new entities.apikey({ username : req.params.user, key : apikey, admin : null}).save(connection, function(err) {
+        if (err) return next(err);
+        entities.apikey.where({ username : req.user, key : req.apikey}).deleteAll(connection, function(err) {
+            if (err) return next(err);
+            security.clearApiKey(req.user, req.apikey);
+            res.send({ token : secToken});
+            return next();
+        });        
+    });
+};
 
 
 exports.relogin = function(req, res, next) {
     
-    var apikey = security.createApiKey();
+    var apikey = security.createApiKey(req.user);
     entities.apikey.where({ username : req.user, key : req.apikey}).updateAll(connection, { key: apikey }, function(err) {
-        if (err) {
-            console.log("Error: " + err);
-            res.send("Erreur: " + err);
-        }
-        else {
-            security.updateApiKey(req.user, apikey, req.apikey);
-            res.send({ username : req.user, token : security.createToken(req.user, apikey, req.admin)});
-        }
-        next();
+        if (err) return next(err);
+        security.clearApiKey(req.apikey);
+        res.send({ username : req.user, token : security.createToken(req.user, apikey, req.admin)});
+        return next();
     });
 };
 
 exports.expireToken = function(req, res, next) {
+    
     entities.apikey.where({ username : req.user, key : req.apikey}).deleteAll(connection, function(err) {
-        if (err) {
-            console.log("Error: " + err);
-            res.send("Erreur: " + err);
-        }
-        else {
-            security.clearApiKey(req.user, req.apikey);
-            res.send("OK");
-        }
-        next();
+        if (err) return next(err);
+        security.clearApiKey(req.apikey);
+        res.send("OK");
+        return next();
     });
 };
 
@@ -358,15 +345,10 @@ exports.expireAllTokens = function(req, res, next) {
     var targetuser = req.user;
     if (req.admin) targetuser = req.params.user;
     entities.apikey.where({ username : targetuser}).deleteAll(connection, function(err) {
-        if (err) {
-            console.log("Error: " + err);
-            res.send("Erreur: " + err);
-        }
-        else {
-            security.clearAllApiKeys(targetuser);
-            res.send("OK");
-        }
-        next();
+        if (err) return next(err);
+        security.clearAllApiKeys(targetuser);
+        res.send("OK");
+        return next();
     });
 };
 
@@ -679,113 +661,144 @@ exports.deleteUser = function(req, res, next) {
         });
 };
 
-exports.editSetting = function(req, res, next) {
+exports.storeSetting = function(req, res, next) {
     var newsetting = req.body.setting;
     var setting_id = newsetting.id;
-    delete newsetting.id;
-    setting.update(connection, setting_id, newsetting, function(err) {
-        if (err)
-            res.send("Error: " + err);
-        else {
+    if (setting_id) {
+        delete newsetting.id;
+        setting.update(connection, setting_id, newsetting, function(err) {
+            if (err) return next(err);
             var logdata = createBaseLogData(req);
             logdata.data = req.body.setting;
             logdata.setting = setting_id;
             logdata.action = 'ADMIN_EDIT_SETTING';
             storelog(logdata);            
             res.send("Edit OK");
-        }
-        next();
-    });
+            return next();
+        });
+    }
+    else {
+        var savedSetting = new setting(req.body);
+        savedSetting.save(connection, function(err) {
+            if (err) return next(err);
+
+            var logdata = createBaseLogData(req);
+            logdata.data = req.body.setting;
+            logdata.setting = savedSetting.id;
+            logdata.action = 'ADMIN_CREATE_SETTING';
+            storelog(logdata);            
+            res.send("Create OK");
+
+            return next();
+        });        
+    }
 };
 
-exports.editUser = function(req, res, next) {
+exports.storeUser = function(req, res, next) {
     var newuser = req.body.user;
     var user_id = newuser.id;
-    delete newuser.id;
-    playerData.where({ id : user_id}).first(connection, function(err, result) {
-            if (err) {
-                res.send("Erreur: " + err);
-                next();
+    if (user_id) {
+        delete newuser.id;
+        playerData.where({ id : user_id}).first(connection, function(err, result) {
+            if (err) return next(err);
+
+            if (result == null) {
+                return next('Utilisateur ' + user_id + ' introuvable');
             }
-            else {
-                if (result == null) {
-                    res.send('Utilisateur introuvable');
-                    next();
-                }
-                else {
-                    var oldname = result.name;
-                    playerData.update(connection, user_id, newuser, function(err) {
-                        if (err) {
-                            res.send("Error: " + err);
-                            next();
-                        }
-                        else if (oldname != newuser.name) {
-                            security.clearAllApiKeys(oldname);
-                            var replaceParams = [ newuser.name, oldname];
-                            connection.chain([
-                                    persist.runSql("UPDATE apikey SET username = $1 where username = $2", replaceParams),
-                                    persist.runSql("UPDATE comment SET player = $1 where player = $2", replaceParams),
-                                    persist.runSql("UPDATE schedule SET player = $1 where player = $2", replaceParams)
-                                ], function(err, results) {
-                                var logdata = createBaseLogData(req);
-                                logdata.action = 'ADMIN_EDIT_USER';
-                                logdata.data = req.body.user;
-                                storelog(logdata);            
-                                res.send("Edit OK");
-                                next();
-                            });
-                        }
-                        else {
-                            res.send("Edit OK");
-                            next();
-                        }
+
+            var oldname = result.name;
+            playerData.update(connection, user_id, newuser, function(err) {
+                var logdata = createBaseLogData(req);
+                logdata.action = 'ADMIN_EDIT_USER';
+                logdata.data = req.body.user;
+                if (err) return next(err);
+                if (oldname != newuser.name) {
+                    security.clearAllApiKeys(oldname);
+                    var replaceParams = [ newuser.name, oldname];
+                    connection.chain([
+                        persist.runSql("UPDATE apikey SET username = $1 where username = $2", replaceParams),
+                        persist.runSql("UPDATE comment SET player = $1 where player = $2", replaceParams),
+                        persist.runSql("UPDATE schedule SET player = $1 where player = $2", replaceParams)
+                    ], function(err, results) {
+                        if (err) return next(err);
+                        storelog(logdata);   
+                        res.send("Edit OK");
+                        return next();
                     });
                 }
+                else {
+                    storelog(logdata);   
+                    res.send("Edit OK");
+                    return next();
+                }
+            });
+        });    
+    }
+    else {
+        playerData.where({ name : newuser.name}).first(connection, function(err, result) {
+            if (err) return next(err);
+
+            if (result != null) {
+                return next(new restify.InvalidArgumentError('L\'utilisateur ' + newuser.name + ' existe déjà'));
             }
-    });    
+
+            var savedPlayer = new playerData(newuser);
+            var newpass = security.genPassword();
+            savedPlayer.password = security.hashPassword(newpass);
+            savedPlayer.save(connection, function(err) {
+                if (err) return next(err);
+
+                var logdata = createBaseLogData(req);
+                logdata.data = newuser;
+                logdata.action = 'ADMIN_CREATE_USER';
+                storelog(logdata);            
+
+                logdata = createBaseLogData(req);
+                logdata.action = 'RES_PW';
+                logdata.data = { player : savedPlayer.name, password : newpass };
+                storelog(logdata);            
+
+                res.send("Create OK");
+                return next();
+            });
+        });               
+    }
 };
 
-exports.resetPassword = function(req, res, next) {
-    var targetuser = req.user;
-    if (req.admin) targetuser = req.params.user;
+function resetUserPassword(req, res, next, targetuser) {
     var newpass = security.genPassword();
     var hashpass = security.hashPassword(newpass);
     
-    playerData.where({ name : req.params.name}).first(connection, function(err, result) {
-            if (err) {
-                res.send("Erreur: " + err);
-                next();
+    playerData.where({ name : targetuser}).first(connection, function(err, result) {
+            if (err) return next(err);
+
+            if (result == null) {
+                return next(new restify.InvalidArgumentError('Utilisateur introuvable'));
             }
-            else {
-                if (result == null) {
-                    res.send('Utilisateur introuvable');
-                    next();
-                }
-                else {
-                    var oldname = result.name;
-                    playerData.update(connection, result.id, { password : hashpass }, function(err) {
-                        if (err) {
-                            res.send("Error: " + err);
-                            next();
-                        }
-                        else {
-                            security.clearAllApiKeys(req.params.name);
-                            var logdata = createBaseLogData(req);
-                            logdata.action = 'RES_PW';
-                            logdata.data.player = targetuser;
-                            logdata.data.password = newpass;
-                            storelog(logdata);            
-                            res.send("Reset PW OK");
-                            next();
-                        }
-                    });
-                }
-            }
+
+            playerData.update(connection, result.id, { password : hashpass }, function(err) {
+                if (err) return next(err);
+                
+                security.clearAllApiKeys(req.params.name);
+                var logdata = createBaseLogData(req);
+                logdata.action = 'RES_PW';
+                logdata.data = { player : targetuser, password : newpass };
+                storelog(logdata);            
+                res.send("Reset PW OK");
+                return next();
+            });
     });        
 };
-/*
+
+exports.resetPassword = function(req, res, next) {
+    return resetUserPassword(req, res, next, req.user);
+};
+
+exports.adminResetPassword = function(req, res, next) {
+    return resetUserPassword(req, res, next, req.params.user);
+};
+
 exports.fetchPlayerData = function(players, callback) {
     var basequery = "SELECT * FROM player WHERE name IN ('" + players.join("','") + "')";
     connection.runSqlAll(basequery, [], callback);
 };
-*/

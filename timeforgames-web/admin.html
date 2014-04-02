@@ -222,9 +222,9 @@
                     </thead>
                     <tbody>
                       <tr bindonce ng-repeat="history in historyList">
-                        <td><span bo-text="history.tstamp | date:'dd/MM/yyyy'"/></span></td>
+                        <td><span bo-text="history.tstamp | date:'dd/MM/yyyy'"></span></td>
                         <td><span bo-text="history.tstamp | date:'H:mm'"></span></td>
-                        <td bo-if="showHistorySetting"><span bo-text="history.setting.name"/></span></td>
+                        <td bo-if="showHistorySetting"><span bo-text="history.setting.name"></span></td>
                         <td><span bo-text="getTfName(history.dayid, history.timeframe)"></span></td>
                         <td>
                           <gg-history row="history"/>
@@ -263,7 +263,7 @@
 	  </div>
 
 
-	  <table class="table table-hover table-condensed"">
+	  <table class="table table-hover table-condensed">
               <thead>
                 <tr>
                   <th>Nom</th>
@@ -287,12 +287,6 @@
                   </td>
                   <td>
                     <div class="btn-group">
-<!--
-                      <button type="button" class="btn btn-success btn-sm functButton" data-title="Activer l'utilisateur" bo-show="user.status == 1"><span class="glyphicon glyphicon-ok"></span></button>
-                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Désactiver l'utilisateur" bo-show="user.status == 0"><span class="glyphicon glyphicon-remove"></span></button>
-                      <button type="button" class="btn btn-success btn-sm functButton" data-title="Donner les droits d'Admin" bo-show="!user.isadmin"><span class="glyphicon glyphicon-star"></span></button>
-                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Révoquer les droits d'Admin" bo-show="user.isadmin"><span class="glyphicon glyphicon-star-empty"></span></button>
--->
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Modifier l'utilisateur" ng-click="editUser(user)"><span class="glyphicon glyphicon-edit"></span></button>
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Envoyer un nouveau mot de passe" ng-click="resetPassword(user)"><span class="glyphicon glyphicon-envelope"></span></button>
                       <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showUserHistory(user)"><span class="glyphicon glyphicon-calendar"></span></button>

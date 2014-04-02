@@ -48,7 +48,7 @@ function buildGenericMailData(templatename, dest, mailsubject, settingname, dayi
 
 var msgBuilders = {
     "RES_PW" : function(eventData) {
-        return { template : 'res_pw', recipient : { name : eventData.data.player }, subject : 'Initialisation du mot de passe', password : eventData.data.password };
+        return [{ template : 'res_pw', recipient : { name : eventData.data.player }, subject : 'Initialisation du mot de passe', password : eventData.data.password }];
     },
     "ADD_GAME" : function(eventData) {
         var player, results = [], playersTab = [];
@@ -120,16 +120,8 @@ var msgBuilders = {
      */
 };
 
-function processMessages(builder, eventData, msgHandler) {
+function processRichMessages(builder, eventData, msgHandler) {
 
-    var idsetting = eventData.setting;
-
-    services.fetchSettingById(eventData.setting, function(err, setting) {
-        if (err) {
-            console.log("Impossible d'identifier la chronique " + eventData.setting);
-            return;
-        }
-        eventData.setting = setting;
         var msgDataArray = builder(eventData);
         var recipients = [];
         msgDataArray.forEach(function(msgData) {
@@ -148,13 +140,30 @@ function processMessages(builder, eventData, msgHandler) {
 
             msgDataArray.forEach(function(msgData) {
                 msgData.recipient.address = emails[msgData.recipient.name];
-                ;
                 msgHandler(msgData);
             });
 
         });
+}
 
-    });
+function processMessages(builder, eventData, msgHandler) {
+
+    var idsetting = eventData.setting;
+
+    if (idsetting) {
+        services.fetchSettingById(eventData.setting, function(err, setting) {
+                if (err) {
+                    console.log("Impossible d'identifier la chronique " + eventData.setting);
+                    return;
+                }
+                else {
+                    processRichMessages(builder, eventData, msgHandler);                            
+                }
+        });
+    }
+    else {
+        processRichMessages(builder, eventData, msgHandler);        
+    }
 
 }
 

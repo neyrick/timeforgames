@@ -20,13 +20,13 @@ server.use( restify.fullResponse() );
 
 server.get('/tfg/relogin', serv.relogin);
 server.get('/tfg/expireToken', serv.expireToken);
-server.get('/tfg/resetPassword/:user', serv.resetPassword);
+server.get('/tfg/resetPassword', serv.resetPassword);
 server.get('/tfg/expireAllTokens/:user', serv.expireToken);
 server.post('/tfg/login', serv.login);
 
 server.get('/tfg/setting', serv.fetchAllSettings);
 server.get('/tfg/setting/:code', serv.findSettingByCode);
-server.put('/tfg/setting', serv.createSetting);
+server.put('/tfg/setting', serv.storeSetting);
 
 server.get('/tfg/schedule', serv.fetchSchedule);
 server.get('/tfg/schedule/:player', serv.fetchSchedule);
@@ -48,13 +48,14 @@ server.get('/tfg/history', serv.fetchHistory);
 server.get('/tfg/history/user/:user', serv.fetchUserHistory);
 server.get('/tfg/history/setting/:setting', serv.fetchSettingHistory);
 
-server.post('/tfg/admin/setting', serv.editSetting);
 server.del('/tfg/admin/setting/:id', serv.deleteSetting);
 
 server.get('/tfg/admin/user', serv.fetchAllUsers);
-server.post('/tfg/admin/user', serv.editUser);
+server.put('/tfg/admin/user', serv.storeUser);
 server.del('/tfg/admin/user/:name', serv.deleteUser);
+server.get('/tfg/admin/resetPassword/:user', serv.adminResetPassword);
 
+server.get('/tfg/admin/spoof/:user', serv.spoofLogin);
 
 server.listen(5000, function() {
     console.log('Démarrage de l\'écoute de', server.name, server.url);

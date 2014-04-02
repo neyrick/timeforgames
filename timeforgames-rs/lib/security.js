@@ -44,6 +44,7 @@ exports.authParser = function(req, res, next) {
                 req.admin = authdata.admin;
 
                 if (!isKeyValid(req.user, req.apikey)) {
+                    console.log("Clé invalide: " + JSON.stringify(authdata));
                     return next(new restify.NotAuthorizedError('Token expiré'));
                 }
                 if (isAdminRestricted(req.url) && (typeof authdata.admin == "undefined")) {
@@ -71,8 +72,10 @@ exports.authParser = function(req, res, next) {
     next();
 };
 
-exports.createApiKey = function() {
-    return crypto.randomBytes(20).toString('hex');
+exports.createApiKey = function(username) {
+    var newkey = crypto.randomBytes(20).toString('hex');
+    apikeys[newkey] = username;
+    return newkey;
 };
 
 exports.updateApiKey = function(username, newkey, oldkey) {
@@ -81,7 +84,7 @@ exports.updateApiKey = function(username, newkey, oldkey) {
     apikeys[newkey] = username;
 };
 
-exports.clearApiKey = function(username, key) {
+exports.clearApiKey = function(key) {
     delete apikeys[key];
 };
 
