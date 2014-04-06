@@ -6,10 +6,12 @@ var restify = require('restify');
 
 var apikeys = {};
 
-var publicResources = ['/tfg/login', '/tfg/expireToken'];
+var publicResources = ['/tfg/login', '/tfg/expireToken', '/tfg/viewSettingPic'];
 
 function isRestricted(url) {
-    return (publicResources.indexOf(url) == -1);
+    return !publicResources.some(function (item) {
+        return (url.indexOf(item) == 0);
+    });
 }
 
 function isAdminRestricted(url) {

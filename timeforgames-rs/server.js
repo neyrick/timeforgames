@@ -27,6 +27,8 @@ server.post('/tfg/login', serv.login);
 server.get('/tfg/setting', serv.fetchAllSettings);
 server.get('/tfg/setting/:code', serv.findSettingByCode);
 server.put('/tfg/setting', serv.storeSetting);
+server.get('/tfg/viewSettingPic/:settingid', serv.getSettingPicture);
+server.put('/tfg/setting/pic/:settingid', serv.storeSettingPicture);
 
 server.get('/tfg/schedule', serv.fetchSchedule);
 server.get('/tfg/schedule/:player', serv.fetchSchedule);
@@ -56,6 +58,8 @@ server.del('/tfg/admin/user/:name', serv.deleteUser);
 server.get('/tfg/admin/resetPassword/:user', serv.adminResetPassword);
 
 server.get('/tfg/admin/spoof/:user', serv.spoofLogin);
+
+server.del('/tfg/admin/setting/pic/:settingid', serv.deleteSettingPicture);
 
 server.listen(5000, function() {
     console.log('Démarrage de l\'écoute de', server.name, server.url);

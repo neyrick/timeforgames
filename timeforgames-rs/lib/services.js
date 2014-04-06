@@ -2,6 +2,8 @@ var entities = require("./entities");
 var mailer = require("./mailer");
 var security = require("./security");
 var restify = require('restify');
+var fileSystem = require('fs');
+var path = require('path');
 
 var persist = require("persist");
 
@@ -17,6 +19,16 @@ var connection;
 persist.connect(function(err, conn) {
     connection = conn;
     loadAPIKeys();
+});
+
+var blankImage = {};
+
+var blankImagePath = path.join(__dirname, 'no_image.gif');
+var blankImageStat = fileSystem.statSync(blankImagePath);
+fileSystem.readFile(blankImagePath, function(error, content) {
+    blankImage.content = content;
+    blankImage.size = blankImageStat.size;
+    blankImage.type = 'image/gif';
 });
 
 function loadAPIKeys() {
@@ -673,12 +685,13 @@ exports.storeSetting = function(req, res, next) {
             logdata.setting = setting_id;
             logdata.action = 'ADMIN_EDIT_SETTING';
             storelog(logdata);            
-            res.send("Edit OK");
+            newsetting.id = setting_id;
+            res.send(newsetting);
             return next();
         });
     }
     else {
-        var savedSetting = new setting(req.body);
+        var savedSetting = new setting(req.body.setting);
         savedSetting.save(connection, function(err) {
             if (err) return next(err);
 
@@ -687,8 +700,7 @@ exports.storeSetting = function(req, res, next) {
             logdata.setting = savedSetting.id;
             logdata.action = 'ADMIN_CREATE_SETTING';
             storelog(logdata);            
-            res.send("Create OK");
-
+            res.send(savedSetting);
             return next();
         });        
     }
@@ -802,3 +814,58 @@ exports.fetchPlayerData = function(players, callback) {
     var basequery = "SELECT * FROM player WHERE name IN ('" + players.join("','") + "')";
     connection.runSqlAll(basequery, [], callback);
 };
+
+exports.getSettingPicture = function(req, res, next) {
+    connection.runSqlAll("SELECT * FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, pics) {
+        if (err) return next(err);
+        if ((pics == null) || (pics.length == 0)) {
+
+            res.writeHead(200, {
+                'Content-Type': blankImage.type,
+                'Content-Length': blankImage.size
+            });
+        
+            res.end(blankImage.content);
+            return next();
+        }
+        if (pics.length > 1) {
+            return next(new restify.InvalidArgumentError('Plusieurs images, les données sont en vrac !'));
+        }
+        var pic = pics[0];
+        res.writeHead(200, {
+          'Content-Type': pic.mimetype
+        });
+        res.write(pic.image);
+        res.end();
+        return next();
+    });
+};
+
+exports.storeSettingPicture = function(req, res, next) {
+    connection.runSql("DELETE FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, result) {
+      if (err) return next(err);
+      if (!req.files) return next(new restify.InvalidArgumentError('Fichier image absent'));
+      if (!req.files.imageFile) return next(new restify.InvalidArgumentError('Fichier image absent'));
+      var file = req.files.imageFile;
+      if (file.type.indexOf('image') != 0) return next(new restify.InvalidArgumentError('Avec une image c\'est mieux!'));
+      fileSystem.readFile(file.path, 'hex', function(err, imgData) {
+        imgData = '\\x' + imgData;
+        connection.runSql("INSERT INTO settingpics (id, mimetype, image) values (?, ?, ?)",
+                           [req.params.settingid, file.type,  imgData],
+                           function(err, writeResult) {
+          if (err) return next(err);
+          res.send("Store Setting Picture ok");
+          return next();
+        });
+      });
+    });
+};
+
+exports.deleteSettingPicture = function(req, res, next) {
+    connection.runSql("DELETE FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, result) {
+        if (err) return next(err);
+        res.send("Delete Setting Picture ok");
+        return next();
+    });
+};
+

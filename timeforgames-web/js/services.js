@@ -170,8 +170,8 @@ function($http, config) {
     };
 }]);
 
-timeForGamesApp.factory('settingsService', ['$http', 'config',
-function($http, config) {
+timeForGamesApp.factory('settingsService', ['$http', 'config', '$upload',
+function($http, config, $upload) {
 /*
     var settings = {
         ready : false
@@ -180,6 +180,29 @@ function($http, config) {
     };
 */
     return {
+
+        storePicture : function(pm_settingid, pm_file, progresscallback, callback, errorcallback) {
+            $upload.upload({
+                url : config.urlbase + '/setting/pic/' + pm_settingid,
+                method: 'PUT',
+                // headers: {'header-key': 'header-value'},
+                // withCredentials: true,
+                data : {},
+                file : pm_file, // or list of files: $files for html5 only
+                /* set the file formData name ('Content-Desposition'). Default is 'file' */
+                fileFormDataName: 'imageFile', //or a list of names for multiple files (html5).
+                /* customize how data is added to formData. See #40#issuecomment-28612000 for sample code */
+                //formDataAppender: function(formData, key, val){}
+            }).progress(progresscallback).success(callback).error(callback);
+        },
+
+        deletePicture : function(pm_settingid, callback, errorcallback) {
+            $http.delete(config.urlbase + '/admin/setting/pic/' + pm_settingid).success(function(data, status) {
+                    callback(data);
+                }).error(function(data, status) {
+                    errorcallback(data);
+                });
+        },
 
         storeSetting : function(pm_setting, callback, errorcallback) {
 	    $http.put(config.urlbase + '/setting', { setting : pm_setting}).success(function(data, status) {

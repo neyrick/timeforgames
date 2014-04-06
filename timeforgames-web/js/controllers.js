@@ -681,19 +681,22 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
 
 }]);
 
-timeForGamesApp.controller('AdminCtrl', ['$scope', 'settingsService', 'userService', 'localStorageService', 'historyService',
-function AdminCtrl($scope, settingsService, userService, localStorageService, historyService) {
+timeForGamesApp.controller('AdminCtrl', ['$scope', '$timeout', 'settingsService', 'userService', 'localStorageService', 'historyService',
+function AdminCtrl($scope, $timeout, settingsService, userService, localStorageService, historyService) {
 
-    $scope.tab = 'users';
+    $scope.tab = 'settings';
     $scope.settingsMode = -1;
     $scope.settingsList = [];
     $scope.users = [];
 
     $scope.currentEditUser = null;
     $scope.currentEditSetting = null;
+    $scope.currentUploadFile = null;
+    $scope.currentUploadData = null;
     $scope.historyCriterion = null;
     $scope.showHistorySetting = false;
     $scope.historyList = [];
+    $scope.imagePristine = true;
 
     $scope.currentUser = 'Neyrick';
 
@@ -737,16 +740,19 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
         else {
             $scope.currentEditUser = user;
         }
-        $('#userEditModal').modal('show');
+       $('#userEditModal').modal('show');
     };
 
     $scope.editSetting = function(setting) {
         if (typeof setting == "undefined") {
             $scope.currentEditSetting = { name : null, mode : 0, status : 0 };
+            $scope.clearImage();
         }
         else {
             $scope.currentEditSetting = setting;
+            $('.fileDropZone').css('background-image', "url('/rs/tfg/viewSettingPic/" + setting.id + "')");
         }
+        $scope.imagePristine = true;
         $('#settingEditModal').modal('show');
     };
 
@@ -760,9 +766,32 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
     };
 
     $scope.storeSetting = function() {
-          settingsService.storeSetting($scope.currentEditSetting, function(data) {
-            $scope.loadSettings();
-            $('#settingEditModal').modal('hide');
+          $scope.currentEditSetting.code = "AAA";
+          settingsService.storeSetting($scope.currentEditSetting, function(newsetting) {
+            if ($scope.imagePristine) {
+                $scope.loadSettings();
+                $('#settingEditModal').modal('hide');
+            }
+            else {
+                if ($scope.currentUploadFile != null) {
+                    settingsService.storePicture(newsetting.id, $scope.currentUploadFile, function(evt) {
+                        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+                    }, function(data, status, headers, config) {
+                        $scope.loadSettings();
+                        $('#settingEditModal').modal('hide');
+                    }, function(result) {
+                        window.alert("Upload échoué");
+                    });
+                }
+                else {
+                    settingsService.deletePicture(newsetting.id, function(data) {
+                        $scope.loadSettings();
+                        $('#settingEditModal').modal('hide');
+                    }, function(result) {
+                        window.alert("Suppresion échouée");
+                    });
+                }
+            }
         }, function(error) {
             showApiError(error);
         });
@@ -841,6 +870,39 @@ function AdminCtrl($scope, settingsService, userService, localStorageService, hi
         });
     };
 
+
+    $scope.onSettingPictureSelect = function($files) {
+        var pictureFile = $files[0];
+        if (typeof pictureFile == "undefined") {
+            window.alert("Fichier impossible à récupérer");
+            return;
+        }
+        if (pictureFile.type.indexOf('image') != 0) {
+            window.alert("Avec un fichier image, ça passera mieux...");
+            return;
+        }
+        
+        if (window.FileReader) {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(pictureFile);
+            fileReader.onload = function(e) {
+                $scope.$apply(function() {
+                    $scope.imagePristine = false;
+                    $scope.currentUploadData = e.target.result;
+                $('.fileDropZone').css('background-image', "url(" + $scope.currentUploadData + ")");
+                $scope.currentUploadFile=pictureFile;
+                });
+            };
+        }
+    }; 
+  
+    $scope.clearImage = function() {
+        $scope.currentUploadFile = null;
+        $scope.currentUploadData = null;
+        $('.fileDropZone').css('background-image', "none");
+        $scope.imagePristine = false;
+    };
+  
     $scope.loadSettings();
     $scope.loadUsers();
 

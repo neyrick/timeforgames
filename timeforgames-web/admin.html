@@ -15,7 +15,9 @@
         <script src="lib/jquery-1.11.0.min.js"></script>
         <script src="lib/jquery.qtip.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	    <script src="lib/angular-file-upload-shim.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+        <script src="lib/angular-file-upload.min.js"></script>
 
         <script src="lib/angular-locale_fr-fr.js"></script>
         <script src="lib/angular-local-storage.min.js"></script>
@@ -190,6 +192,18 @@
 			</div>
 		    </div>
 		  </div>
+          <div class="form-group">
+            <label class="col-sm-4 control-label">Image</label>
+            <div class="col-sm-8">
+              <div class="fileDropZone" ng-file-drop="onSettingPictureSelect($files)" ng-file-drag-over-class="fileDropZoneDragOver"
+                    ng-show="dropSupported" >Déposer le fichier de l'image ici</div>
+              <div ng-file-drop-available="dropSupported=true" 
+                    ng-show="!dropSupported">Il est pourri ton navigateur !</div>
+              <button type="button" class="btn btn-danger" ng-click="clearImage()">Supprimer l'image</button>
+<!--              <button ng-click="upload.abort()">Annuler le téléchargement</button> -->
+             <!-- <img ng-show="currentUploadData" ng-src="{{currentUploadData}}" width="500" height="100"/> -->
+            </div>
+          </div>
 		  <div class="form-group modalButtonsBox">
 			<button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
 			<button type="submit" class="btn btn-primary" ng-disabled="settingEditForm.$invalid">Enregistrer</button>
@@ -262,7 +276,6 @@
 	     <button type="button" class="btn btn-primary btn-lg pull-right" ng-click="editUser()">Ajouter un utilisateur</button>
 	  </div>
 
-
 	  <table class="table table-hover table-condensed">
               <thead>
                 <tr>
@@ -334,7 +347,7 @@
               </thead>
               <tbody>
                 <tr bindonce ng-repeat="setting in settingsList | filter : { mode : settingsMode }">
-                  <td>Image...</td>
+                  <td><img bo-src="'/rs/tfg/viewSettingPic/' + setting.id"></img></td>
                   <td><span bo-text="setting.name"></span></td>
                   <td>
                     <div class="dummyInlineContainer text-success" bo-if="setting.status == 0"><span class="glyphicon glyphicon-ok"></span> Active</div>
