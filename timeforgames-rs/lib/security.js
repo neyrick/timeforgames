@@ -37,7 +37,7 @@ exports.hashPassword = function (password) {
 exports.crossDomainHeaders = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', config.http.allowedOrigins);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Authorization');
+    res.header('Access-Control-Allow-Headers', 'Authorization,Content-Type');
 
     next();
 };

@@ -74,7 +74,7 @@ function storelog(logdata) {
 
 function createBaseLogData(req, source) {
     var result = {
-        action : req.params['log_action'],
+        action : req.query['log_action'],
         address : req.connection.remoteAddress,
         apikey : req.apikey,
         admin : req.spoof,
@@ -107,31 +107,31 @@ function fetchCompleteSchedulesByGame(id, callback) {
 function genericFetchInterval(req, res, entity) {
     var basequery = '1=1';
     var params = Array();
-    if (req.params.player)
-        params.push(req.params.player);
-    if (req.params.minday)
-        params.push(req.params.minday);
-    if (req.params.maxday)
-        params.push(req.params.maxday);
+    if (req.query.player)
+        params.push(req.query.player);
+    if (req.query.minday)
+        params.push(req.query.minday);
+    if (req.query.maxday)
+        params.push(req.query.maxday);
 
     var paramindex = 1;
-    if (req.params.player) {
+    if (req.query.player) {
         basequery = basequery + ' and player = $' + paramindex;
         paramindex++;
     }
-    if (req.params.setting) {
+    if (req.query.setting) {
         basequery = basequery + ' and setting = $' + paramindex;
         paramindex++;
     }
-    if (req.params.minday) {
-        if (req.params.maxday) {
+    if (req.query.minday) {
+        if (req.query.maxday) {
             basequery = basequery + ' and dayid >= $' + paramindex + ' and dayid <= $' + (paramindex + 1);
             paramindex += 2;
         } else {
             basequery = basequery + ' and dayid >= $' + paramindex;
             paramindex++;
         }
-    } else if (req.params.maxday) {
+    } else if (req.query.maxday) {
         basequery = basequery + ' and dayid <= $' + paramindex;
         paramindex++;
     }
@@ -143,7 +143,6 @@ function genericFetchInterval(req, res, entity) {
 }
 
 function genericSendJson(res, data) {
-    res.charSet('UTF-8');
     res.send(data);
 }
 
@@ -181,9 +180,9 @@ exports.init = function(conn) {
 
 exports.fetchHistory = function(req, res) {
     history.include("setting").where({
-        dayid : req.params.dayid,
-        timeframe : req.params.timeframe,
-        setting : req.params.setting
+        dayid : req.query.dayid,
+        timeframe : req.query.timeframe,
+        setting : req.query.setting
     }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
         genericSendJson(res, result);
     });
@@ -494,32 +493,32 @@ exports.fetchGame = function(req, res) {
 exports.fetchPlanning = function(req, res) {
     var basequery = "SELECT s.id AS idschedule, COALESCE(s.dayid, c.dayid) AS dayid, COALESCE(s.timeframe, c.timeframe) AS timeframe, COALESCE(s.setting, c.setting) AS setting, s.game , COALESCE(s.player, c.player) AS player, s.role, c.id AS idcomment,  c.message FROM schedule s FULL OUTER JOIN comment c USING (dayid, timeframe, setting, player) WHERE ((s.dayid >= $1) OR (c.dayid >= $1)) AND ((s.dayid <= $2) OR (c.dayid <= $2))";
 
-    var minday = req.params.minday;
+    var minday = req.query.minday;
     if ( typeof minday == "undefined")
         minday = 0;
-    var maxday = req.params.maxday;
+    var maxday = req.query.maxday;
     if ( typeof maxday == "undefined")
         maxday = 99999999;
     //	var basequery = 'dayid >= $1 and dayid <= $2';
     var params = [minday, maxday];
 
     var paramindex = 3;
-    if (req.params.timeframe) {
+    if (req.query.timeframe) {
         basequery = basequery + ' AND ((s.timeframe = $' + paramindex + ') OR ( c.timeframe = $' + paramindex + '))';
         paramindex++;
-        params.push(req.params.timeframe);
+        params.push(req.query.timeframe);
     }
 
-    if (req.params.setting) {
+    if (req.query.setting) {
         basequery = basequery + ' AND ((s.setting = $' + paramindex + ') OR ( c.setting = $' + paramindex + '))';
         paramindex++;
-        params.push(req.params.setting);
+        params.push(req.query.setting);
     }
 
-    if (req.params.player) {
+    if (req.query.player) {
         basequery = basequery + ' AND ((s.player = $' + paramindex + ') OR ( c.player = $' + paramindex + '))';
         paramindex++;
-        params.push(req.params.player);
+        params.push(req.query.player);
     }
 
     connection.runSqlAll(basequery, params, function(err, results) {
@@ -628,31 +627,31 @@ exports.reformGame = function(req, res) {
 exports.fetchUpdates = function(req, res) {
     var basequery = "SELECT dayid, timeframe, setting, EXTRACT(EPOCH FROM MAX(tstamp)) AS update FROM history h  WHERE (h.dayid >= $1) AND (h.dayid <= $2)";
 
-    var minday = req.params.minday;
+    var minday = req.query.minday;
     if ( typeof minday == "undefined")
         minday = 0;
-    var maxday = req.params.maxday;
+    var maxday = req.query.maxday;
     if ( typeof maxday == "undefined")
         maxday = 99999999;
     var params = [minday, maxday];
 
     var paramindex = 3;
-    if (req.params.timeframe) {
+    if (req.query.timeframe) {
         basequery = basequery + ' AND (h.timeframe = $' + paramindex + ')';
         paramindex++;
-        params.push(req.params.timeframe);
+        params.push(req.query.timeframe);
     }
 
-    if (req.params.setting) {
+    if (req.query.setting) {
         basequery = basequery + ' AND (h.setting = $' + paramindex + ')';
         paramindex++;
-        params.push(req.params.setting);
+        params.push(req.query.setting);
     }
 
-    if (req.params.user) {
+    if (req.query.user) {
         basequery = basequery + ' AND (h.player != $' + paramindex + ')';
         paramindex++;
-        params.push(req.params.user);
+        params.push(req.query.user);
     }
 
     basequery = basequery + ' GROUP BY dayid, timeframe, setting';
@@ -676,7 +675,7 @@ exports.deleteSetting = function(req, res) {
             res.send("Error: " + err);
         else {
             var logdata = createBaseLogData(req);
-            logdata.data = { id : req.params.id, name : req.params.name };
+            logdata.data = { id : req.params.id, name : req.query.name };
             logdata.action = "DEL_SETTING";
             storelog(logdata);            
             res.send("Delete OK");
