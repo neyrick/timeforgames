@@ -54,6 +54,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             visibleClosedSettings : [],
             lastUpdate : 0
         };
+        $scope.gui = 'regular';
         $scope.currentEdit = {
         };
     }
@@ -107,9 +108,11 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         userService.login($scope.tempUser, $scope.tempPassword, function(result) {
            if (result.id > -1) {
                 $scope.currentUser = $scope.tempUser;
+                localStorageService.set('tfgUser', $scope.currentUser);
                 $scope.tempUser = '';
                 $scope.tempPassword = '';
                 localStorageService.set('tfgLoginToken', result.token);
+                $scope.gui = result.gui;
                 $scope.weeks = [];
                 loadConfig();
                 $scope.refreshSettings(true);
@@ -139,6 +142,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
         if (oldtoken != null) {
 		userService.relogin(function(result) {
 		    localStorageService.set('tfgLoginToken', result.token);
+            $scope.gui = result.gui;
 		    $scope.currentUser = result.username;
 		    $scope.tempUser = '';
 		    $scope.tempPassword = '';
@@ -672,6 +676,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     $scope.editingGame = false;
     $scope.editingComment = false;
 
+    $scope.gui = 'regular';
     $scope.loginMessage = "C'est qui ?";
     $scope.currentEdit = {};
     $scope.historyList = [];
@@ -684,7 +689,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
 timeForGamesApp.controller('AdminCtrl', ['$scope', '$timeout', 'settingsService', 'userService', 'localStorageService', 'historyService',
 function AdminCtrl($scope, $timeout, settingsService, userService, localStorageService, historyService) {
 
-    $scope.tab = 'settings';
+    $scope.tab = 'users';
     $scope.settingsMode = -1;
     $scope.settingsList = [];
     $scope.users = [];
@@ -697,8 +702,10 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
     $scope.showHistorySetting = false;
     $scope.historyList = [];
     $scope.imagePristine = true;
+    $scope.picTimestamp = new Date().getTime();
 
-    $scope.currentUser = 'Neyrick';
+    $scope.currentUser = localStorageService.get('tfgUser');
+
 
     function showApiError(error) {
         if (typeof error == "object") {
@@ -750,7 +757,7 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
         }
         else {
             $scope.currentEditSetting = setting;
-            $('.fileDropZone').css('background-image', "url('/rs/tfg/viewSettingPic/" + setting.id + "')");
+            $('.fileDropZone').css('background-image', "url('/rs/tfg/viewSettingPic/" + setting.id + "?" + $scope.picTimestamp + "')");
         }
         $scope.imagePristine = true;
         $('#settingEditModal').modal('show');
@@ -778,6 +785,7 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
                         console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
                     }, function(data, status, headers, config) {
                         $scope.loadSettings();
+                        $scope.picTimestamp = new Date().getTime();
                         $('#settingEditModal').modal('hide');
                     }, function(result) {
                         window.alert("Upload échoué");
@@ -786,6 +794,7 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
                 else {
                     settingsService.deletePicture(newsetting.id, function(data) {
                         $scope.loadSettings();
+                        $scope.picTimestamp = new Date().getTime();
                         $('#settingEditModal').modal('hide');
                     }, function(result) {
                         window.alert("Suppresion échouée");
@@ -902,9 +911,18 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
         $('.fileDropZone').css('background-image', "none");
         $scope.imagePristine = false;
     };
-  
-    $scope.loadSettings();
-    $scope.loadUsers();
+    
+    userService.checkAdminStatus(function(result) {
+        if (result.admin) {
+            $scope.loadSettings();
+            $scope.loadUsers();
+        }
+        else {
+            window.location = 'index.html';
+        }        
+    }, function(error) {
+        window.location = 'index.html';
+    });
 
     $('body').on('mouseenter', '.functButton', function() {
             var helper = $( this ).nextAll('.buttonHelper');

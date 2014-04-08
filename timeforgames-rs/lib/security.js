@@ -2,11 +2,10 @@ var jwt = require('jwt-simple');
 var entities = require("./entities");
 var config = require("../config.json");
 var crypto = require("crypto");
-var restify = require('restify');
 
 var apikeys = {};
 
-var publicResources = ['/tfg/login', '/tfg/expireToken', '/tfg/viewSettingPic'];
+var publicResources = ['/tfg/login', '/tfg/expireToken', '/tfg/viewSettingPic', '/tfg/status'];
 
 function isRestricted(url) {
     return !publicResources.some(function (item) {
@@ -35,7 +34,16 @@ exports.hashPassword = function (password) {
     return crypto.createHash('sha1').update(password).digest().toString('hex');
 };
 
+exports.crossDomainHeaders = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', config.http.allowedOrigins);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Authorization');
+
+    next();
+};
+
 exports.authParser = function(req, res, next) {
+    if (req.method == 'OPTIONS') return next();
     if (req.headers && req.headers.authorization) {
         var tokenMatch = req.headers.authorization.match(/^Bearer (.*)$/);
         if (tokenMatch) {
@@ -44,34 +52,41 @@ exports.authParser = function(req, res, next) {
                 req.user = authdata.username;
                 req.apikey = authdata.apikey;
                 req.admin = authdata.admin;
+                req.spoof = authdata.spoof;
 
                 if (!isKeyValid(req.user, req.apikey)) {
                     console.log("Clé invalide: " + JSON.stringify(authdata));
-                    return next(new restify.NotAuthorizedError('Token expiré'));
+                    res.send(403, 'Token expiré');
+                    return;
                 }
-                if (isAdminRestricted(req.url) && (typeof authdata.admin == "undefined")) {
+                if (isAdminRestricted(req.url) && (!authdata.admin)) {
                     console.log("Restriction admin pour authdata: " + JSON.stringify(authdata));
-                    return next(new restify.NotAuthorizedError('Fonction réservée aux administrateurs'));
+                    res.send(403, 'Fonction réservée aux administrateurs');
+                    return;
                 }
             } catch (error) {
                 console.log("Erreur JWT:" + error);
                 if (isRestricted(req.url)) {
-                    return next(new restify.NotAuthorizedError('Format de token invalide'));
+                    res.send(403, 'Format de token invalide');
+                    return;
                 }
             }
-
+            return next();
         } else {
             console.log("Token invalide");
             if (isRestricted(req.url)) {
-                return next(new restify.NotAuthorizedError('Format de token invalide'));
+                res.send(403, 'Format de token invalide');
+                return;
             }
+            else return next();
         }
     } else {
         if (isRestricted(req.url)) {
-            return next(new restify.NotAuthorizedError('Token absent'));
+            res.send(403, 'Token absent');
+            return;
         }
+        else return next();
     }
-    next();
 };
 
 exports.createApiKey = function(username) {
@@ -100,12 +115,12 @@ exports.clearAllApiKeys = function(username) {
     });  
 };
 
-exports.createToken = function(pm_username, pm_apikey, pm_admin) {
-    console.log('Creation d\'un token avec admin: ' + pm_admin);
+exports.createToken = function(pm_username, pm_apikey, pm_admin, pm_spoof) {
     return jwt.encode({
         username : pm_username,
         apikey : pm_apikey,
-        admin : pm_admin
+        admin : pm_admin,
+        spoof : pm_spoof
     }, config.jwt.secret);
 };
 

@@ -1,12 +1,34 @@
 var serv = require("./lib/services");
 var security = require("./lib/security");
 
-var restify = require('restify');
+//var restify = require('restify');
+var express = require('express');
+var bodyparser = require('body-parser');
+var compression = require('compression');
+var responsetime = require('response-time');
 var config = require("./config.json");
 
+/*
 restify.CORS.ALLOW_HEADERS.push('authorization');
 
-var server = restify.createServer();
+function formatPicture(req, res, body) {
+     console.log('Formatteur pic pour ' + req.url);
+     return body;
+}
+
+
+var server = restify.createServer({
+    formatters: {
+        'image/gif': formatPicture,
+        'image/jpeg': formatPicture,
+        'image/png': formatPicture,
+    }
+});
+*/
+//var server = restify.createServer();
+var server = express();
+//console.log("Acceptable: " + server.acceptable);
+/*
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.authorizationParser());
 server.use(restify.dateParser());
@@ -17,7 +39,14 @@ server.use(restify.bodyParser());
 server.use(security.authParser);
 server.use( restify.CORS( {origins: config.http.allowedOrigins}) );
 server.use( restify.fullResponse() );
+*/
+server.use(security.crossDomainHeaders);
+server.use(security.authParser);
+server.use(bodyparser());
+server.use(compression());
+server.use(responsetime());
 
+server.get('/tfg/status', serv.getStatus);
 server.get('/tfg/relogin', serv.relogin);
 server.get('/tfg/expireToken', serv.expireToken);
 server.get('/tfg/resetPassword', serv.resetPassword);

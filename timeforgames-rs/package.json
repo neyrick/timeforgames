@@ -15,15 +15,23 @@
     "url": "https://github.com/neyrick/gayming.git"
   },
   "keywords": [],
-  "dependencies" : {},
+  "dependencies" : {
+      "pg" : ">=2.11.1",
+      "persist" : ">=0.2.7",
+      "express" : "4.x",
+      "jwt-simple" : ">=0.2.0",
+      "email-templates" : ">=0.1.1",
+      "ejs" : ">=0.8.5",
+      "nodemailer" : ">=0.6.0"  ,
+      "body-parser" : ">=1.0.1" ,
+      "compression" : ">=1.0.1" ,       
+      "response-time" : ">=1.0.0",
+      "busboy" : ">=0.2.3"   
+  },
   "analyze": true,
   "devDependencies": {
-    "vows"    :  "0.5.x",
-    "request" :  "2.1.x"
   },
   "bundledDependencies": [
-    "pg",
-    "persist"
   ],  
   "license": "MIT",
   "engines": {

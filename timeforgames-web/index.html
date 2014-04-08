@@ -11,7 +11,9 @@
 
         <script src="lib/jquery-1.11.0.min.js"></script>
         <script src="lib/jquery.qtip.js"></script>
+        <script src="lib/angular-file-upload-shim.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+        <script src="lib/angular-file-upload.min.js"></script>
 
         <script src="lib/angular-locale_fr-fr.js"></script>
         <script src="lib/angular-local-storage.min.js"></script>
@@ -291,6 +293,9 @@
                 </div>
                 <div class="ggpanelItem ggbuttonbox hoverDay">
                     <span class="badge buttonBadge" ng-click="logout()">Changer d'utilisateur</span>
+                </div>
+                <div class="ggpanelItem ggbuttonbox hoverDay" ng-if="gui == 'admin'">
+                    <a href="admin.html" class="badge buttonBadge" >Interface d'Administration</a>
                 </div>
             </div>
 

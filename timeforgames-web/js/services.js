@@ -19,7 +19,7 @@ timeForGamesApp.factory('config', ['$window',
 function($window) {
 
     return {
-        urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat(":5000/tfg"),
+        urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat("/rs/tfg"),
         FIRST_DAY_OF_WEEK : 1
     };
 }]);
@@ -47,6 +47,14 @@ timeForGamesApp.factory('userService', ['$http', 'config', 'localStorageService'
 function($http, config, localStorageService) {
 
     return {
+
+        checkAdminStatus : function(callback, errorcallback) {
+            $http.get(config.urlbase + '/status').success(function(data, status) {
+                    callback(data);
+            }).error(function(data, status) {
+                    errorcallback(data);
+            });
+        },
 
         storeUser : function(pm_user, callback, errorcallback) {
     	    $http.put(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
@@ -190,7 +198,7 @@ function($http, config, $upload) {
                 data : {},
                 file : pm_file, // or list of files: $files for html5 only
                 /* set the file formData name ('Content-Desposition'). Default is 'file' */
-                fileFormDataName: 'imageFile', //or a list of names for multiple files (html5).
+                fileFormDataName: 'imageFile' + (new Date().getTime()), //or a list of names for multiple files (html5).
                 /* customize how data is added to formData. See #40#issuecomment-28612000 for sample code */
                 //formDataAppender: function(formData, key, val){}
             }).progress(progresscallback).success(callback).error(callback);

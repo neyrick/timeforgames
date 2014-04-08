@@ -1,9 +1,10 @@
 var entities = require("./entities");
 var mailer = require("./mailer");
 var security = require("./security");
-var restify = require('restify');
 var fileSystem = require('fs');
+var Busboy = require('busboy');
 var path = require('path');
+var os = require('os');
 
 var persist = require("persist");
 
@@ -76,7 +77,7 @@ function createBaseLogData(req, source) {
         action : req.params['log_action'],
         address : req.connection.remoteAddress,
         apikey : req.apikey,
-        admin : req.admin,
+        admin : req.spoof,
         tstamp : new Date(),
         player : req.user
     };
@@ -103,7 +104,7 @@ function fetchCompleteSchedulesByGame(id, callback) {
     connection.runSqlAll(basequery, [id], callback);
 }
 
-function genericFetchInterval(req, res, next, entity) {
+function genericFetchInterval(req, res, entity) {
     var basequery = '1=1';
     var params = Array();
     if (req.params.player)
@@ -138,7 +139,6 @@ function genericFetchInterval(req, res, next, entity) {
         if (err)
             console.log("Erreur: " + err);
         res.send(result);
-        next();
     });
 }
 
@@ -147,17 +147,16 @@ function genericSendJson(res, data) {
     res.send(data);
 }
 
-function genericCreate(req, res, next, entity) {
+function genericCreate(req, res, entity) {
     entity.save(connection, function(err) {
         if (err)
             res.send("Error: " + err);
         else
             genericSendJson(res, entity);
-        next();
     });
 }
 
-function genericUpdate(req, res, next, entityManager) {
+function genericUpdate(req, res, entityManager) {
     var item = req.body;
     var itemid = item.id;
     delete item.id;
@@ -166,15 +165,13 @@ function genericUpdate(req, res, next, entityManager) {
             res.send("Error: " + err);
         else
             res.send("Update OK");
-        next();
     });
 }
 
-function genericDelete(req, res, next, entity) {
+function genericDelete(req, res, entity) {
     entity.delete (connection,
     function(err) {
         res.send("Delete OK");
-        next();
     });
 }
 
@@ -182,58 +179,64 @@ exports.init = function(conn) {
     connection = conn;
 };
 
-exports.fetchHistory = function(req, res, next) {
+exports.fetchHistory = function(req, res) {
     history.include("setting").where({
         dayid : req.params.dayid,
         timeframe : req.params.timeframe,
         setting : req.params.setting
     }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
         genericSendJson(res, result);
-        next();
     });
 };
 
-exports.fetchUserHistory = function(req, res, next) {
+exports.fetchUserHistory = function(req, res) {
     history.include("setting").where({
         player : req.params.user
     }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
-        genericSendJson(res, result);
-        next();
+        if (err)
+            res.send("Erreur: " + err);
+        else {
+            genericSendJson(res, result);
+        }
     });
 };
 
-exports.fetchSettingHistory = function(req, res, next) {
+exports.fetchSettingHistory = function(req, res) {
     history.include("setting").where({
         setting : req.params.setting
     }).orderBy('tstamp', persist.Descending).all(connection, function(err, result) {
-        genericSendJson(res, result);
-        next();
+        if (err) {
+            res.send("Erreur: " + err);
+        }
+        else {
+            genericSendJson(res, result);
+        }
     });
 };
 
-exports.fetchAllSettings = function(req, res, next) {
+exports.fetchAllSettings = function(req, res) {
     setting.orderBy('name', persist.Ascending).all(connection, function(err, settings) {
-        if (err)
+        if (err) {
             res.send("Erreur: " + err);
+        }
         else {
             res.send(settings);
         }
-        next();
     });
 };
 
-exports.fetchAllUsers = function(req, res, next) {
+exports.fetchAllUsers = function(req, res) {
     playerData.orderBy('name', persist.Ascending).all(connection, function(err, users) {
-        if (err)
+        if (err) {
             res.send("Erreur: " + err);
+        }
         else {
             res.send(users);
         }
-        next();
     });
 };
 
-exports.findSettingByCode = function(req, res, next) {
+exports.findSettingByCode = function(req, res) {
     var result = new Array();
     setting.using(connection).where({
         code : req.params.code
@@ -241,11 +244,10 @@ exports.findSettingByCode = function(req, res, next) {
         result.push(setting);
     }, function() {
         genericSendJson(res, result);
-        next();
     });
 };
 
-exports.createSchedule = function(req, res, next) {
+exports.createSchedule = function(req, res) {
     // Verification que le joueur est bien disponible
     var newSchedule = req.body;
     var conflict = false;
@@ -263,113 +265,151 @@ exports.createSchedule = function(req, res, next) {
         } else {
             var newschedule = new schedule(req.body);
             newschedule.player = req.user;
-            genericCreate(req, res, next, newschedule);
+            genericCreate(req, res, newschedule);
             var logdata = createBaseLogData(req, req.body);
             logdata.data = {
                 role : req.body.role
             };
             storelog(logdata);
         }
-        next();
     });
 };
 
-exports.login = function(req, res, next) {
+exports.login = function(req, res) {
     playerData.where({ name : req.body.username}).first(connection, function(err, result) {
-        if (err) return next(err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         if (result == null) {
-            return next(new restify.InvalidCredentialsError(req.body.username + '? Connais pas!'));
+            res.send(500, req.body.username + '? Connais pas!');
+            return;
         }
 
         var passSum = security.hashPassword(req.body.password);
         if (result.password != passSum) {
-            return next(new restify.InvalidCredentialsError('Enlève tes moufles et retape ton mot de passe'));
+            res.send(403, 'Enlève tes moufles et retape ton mot de passe');
+            return;
         }
 
         var apikey = security.createApiKey(req.body.username);
         var secToken;
         var adminname;
+        var guitype;
         if (result.isadmin) {
-            secToken = security.createToken(req.body.username, apikey, req.body.username);
+            secToken = security.createToken(req.body.username, apikey, true);
             adminname = req.body.username;
+            guitype = 'admin';
         }
         else {
-            secToken = security.createToken(req.body.username, apikey);
+            secToken = security.createToken(req.body.username, apikey, false);
             adminname = null;
+            guitype = 'regular';
         }
         var keyEntity;
         if (typeof req.apikey != "undefined") {
             entities.apikey.where('key = ? and username = ?', [req.apikey, req.body.username]).updateAll(connection, { key : apikey}, function(err) {
-                if (err) return next(err);
+                if (err) {
+                    res.send(500, err);
+                    return;
+                }
                 security.clearApiKey(req.apikey);
-                res.send({ id : 0, token : secToken});
-                return next();
+                res.send({ id : 0, token : secToken, gui : guitype});
+                return;
             });
         }
         else {
             var newkey = new entities.apikey({ username : req.body.username, key : apikey, admin : adminname}).save(connection, function(err) {
-                if (err) return next(err);
-                res.send({ id : 0, token : secToken});
-                return next();
+                if (err) {
+                    res.send(500, err);
+                    return;
+                }
+                res.send({ id : 0, token : secToken, gui : guitype});
+                return;
             });
         }
     });
 };
 
-exports.spoofLogin = function(req, res, next) {
+exports.spoofLogin = function(req, res) {
     
     var apikey = security.createApiKey(req.params.user);
-    var secToken = security.createToken(req.params.user, apikey, req.user);
-    new entities.apikey({ username : req.params.user, key : apikey, admin : null}).save(connection, function(err) {
-        if (err) return next(err);
+    var secToken = security.createToken(req.params.user, apikey, false, req.user);
+    new entities.apikey({ username : req.params.user, key : apikey, admin : req.user}).save(connection, function(err) {
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         entities.apikey.where({ username : req.user, key : req.apikey}).deleteAll(connection, function(err) {
-            if (err) return next(err);
+            if (err) {
+                res.send(500, err);
+                return;
+            }
             security.clearApiKey(req.user, req.apikey);
-            res.send({ token : secToken});
-            return next();
+            res.send({ token : secToken, gui : 'regular'});
         });        
     });
 };
 
 
-exports.relogin = function(req, res, next) {
+exports.relogin = function(req, res) {
     
     var apikey = security.createApiKey(req.user);
     entities.apikey.where({ username : req.user, key : req.apikey}).updateAll(connection, { key: apikey }, function(err) {
-        if (err) return next(err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
+        var guitype;
+        if (req.admin) {
+            guitype = 'admin';
+        }
+        else {
+            guitype = 'regular';
+        }
         security.clearApiKey(req.apikey);
-        res.send({ username : req.user, token : security.createToken(req.user, apikey, req.admin)});
-        return next();
+        res.send({ username : req.user, token : security.createToken(req.user, apikey, req.admin, req.spoof), gui : guitype});
     });
 };
 
-exports.expireToken = function(req, res, next) {
+exports.getStatus = function(req, res) {
+    res.send({ admin : req.admin });
+};
+
+exports.expireToken = function(req, res) {
     
     entities.apikey.where({ username : req.user, key : req.apikey}).deleteAll(connection, function(err) {
-        if (err) return next(err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         security.clearApiKey(req.apikey);
         res.send("OK");
-        return next();
     });
 };
 
-exports.expireAllTokens = function(req, res, next) {
+exports.expireAllTokens = function(req, res) {
     var targetuser = req.user;
     if (req.admin) targetuser = req.params.user;
     entities.apikey.where({ username : targetuser}).deleteAll(connection, function(err) {
-        if (err) return next(err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         security.clearAllApiKeys(targetuser);
         res.send("OK");
-        return next();
     });
 };
 
-exports.deleteSchedule = function(req, res, next) {
+exports.deleteSchedule = function(req, res) {
     fetchCompleteScheduleById(req.params.idschedule, function(err, targetschedule) {
-        if (err)
-            res.send("Erreur: " + err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         else if (req.user != targetschedule.player) {
-            res.send("Erreur: Pas touche !");
+            res.send(403, "Erreur: Pas touche !");
+            return;
         }
         else {
             var logdata = createBaseLogData(req, targetschedule);
@@ -409,19 +449,18 @@ exports.deleteSchedule = function(req, res, next) {
                 });
             }
         }
-        next();
     });
 };
 
-exports.fetchSchedule = function(req, res, next) {
-    genericFetchInterval(req, res, next, schedule);
+exports.fetchSchedule = function(req, res) {
+    genericFetchInterval(req, res, schedule);
 };
 
-exports.fetchComment = function(req, res, next) {
-    genericFetchInterval(req, res, next, comment);
+exports.fetchComment = function(req, res) {
+    genericFetchInterval(req, res, comment);
 };
 
-exports.setComment = function(req, res, next) {
+exports.setComment = function(req, res) {
     var comm;
     var logdata = createBaseLogData(req, req.body);
     logdata.data = {
@@ -434,27 +473,25 @@ exports.setComment = function(req, res, next) {
         });
         if ((comm.message == null) || (comm.message == '')) {
             storelog(logdata);
-            genericDelete(req, res, next, comm);
+            genericDelete(req, res, comm);
         } else {
             storelog(logdata);
-            genericUpdate(req, res, next, comment);
+            genericUpdate(req, res, comment);
         }
     } else {
         comm = new comment(req.body);
-        if ((comm.message == null) || (comm.message == '')) {
-            next();
-        } else {
+        if ((comm.message != null) && (comm.message != '')) {
             storelog(logdata);
-            genericCreate(req, res, next, new comment(req.body));
+            genericCreate(req, res, new comment(req.body));
         }
     }
 };
 
-exports.fetchGame = function(req, res, next) {
-    genericFetchInterval(req, res, next, game);
+exports.fetchGame = function(req, res) {
+    genericFetchInterval(req, res, game);
 };
 
-exports.fetchPlanning = function(req, res, next) {
+exports.fetchPlanning = function(req, res) {
     var basequery = "SELECT s.id AS idschedule, COALESCE(s.dayid, c.dayid) AS dayid, COALESCE(s.timeframe, c.timeframe) AS timeframe, COALESCE(s.setting, c.setting) AS setting, s.game , COALESCE(s.player, c.player) AS player, s.role, c.id AS idcomment,  c.message FROM schedule s FULL OUTER JOIN comment c USING (dayid, timeframe, setting, player) WHERE ((s.dayid >= $1) OR (c.dayid >= $1)) AND ((s.dayid <= $2) OR (c.dayid <= $2))";
 
     var minday = req.params.minday;
@@ -489,11 +526,10 @@ exports.fetchPlanning = function(req, res, next) {
         if (err)
             console.log("Erreur: " + err);
         res.send(results);
-        next();
     });
 };
 
-exports.createGame = function(req, res, next) {
+exports.createGame = function(req, res) {
     fetchCompleteScheduleById(req.body.masterschedule, function(err, masterschedule) {
         if (err)
             res.send("Erreur: " + err);
@@ -526,10 +562,9 @@ exports.createGame = function(req, res, next) {
             });
         }
     });
-    next();
 };
 
-exports.reformGame = function(req, res, next) {
+exports.reformGame = function(req, res) {
     fetchCompleteSchedulesByGame(req.params.idgame, function(err, oldplayers) {
         if (err)
             res.send("Erreur: " + err);
@@ -541,10 +576,10 @@ exports.reformGame = function(req, res, next) {
             for (var i = 0; i < oldplayers.length; i++) {
                 if (oldplayers[i].role == 'GM') {
                     masterschedule = oldplayers.splice(i, 1)[0];
-		    if (req.user != masterschedule.player) {
-		        res.send("Erreur: Pas touche !");
-                        next();
-		    }
+        		    if (req.user != masterschedule.player) {
+        		        res.send(403, "Erreur: Pas touche !");
+                        return;
+        		    }
                 }
             }
             var playercopy;
@@ -588,10 +623,9 @@ exports.reformGame = function(req, res, next) {
             });
         }
     });
-    next();
 };
 
-exports.fetchUpdates = function(req, res, next) {
+exports.fetchUpdates = function(req, res) {
     var basequery = "SELECT dayid, timeframe, setting, EXTRACT(EPOCH FROM MAX(tstamp)) AS update FROM history h  WHERE (h.dayid >= $1) AND (h.dayid <= $2)";
 
     var minday = req.params.minday;
@@ -627,7 +661,6 @@ exports.fetchUpdates = function(req, res, next) {
         if (err)
             console.log("Erreur: " + err);
         res.send(results);
-        next();
     });
 };
 
@@ -635,7 +668,7 @@ exports.fetchSettingById = function(id, callback) {
     setting.getById(connection, id, callback);
 };
 
-exports.deleteSetting = function(req, res, next) {
+exports.deleteSetting = function(req, res) {
     var pm_setting = new setting({
             id : req.params.id
         }).delete(connection,  function(err) {
@@ -648,11 +681,10 @@ exports.deleteSetting = function(req, res, next) {
             storelog(logdata);            
             res.send("Delete OK");
         }
-        next();
     });
 };
 
-exports.deleteUser = function(req, res, next) {
+exports.deleteUser = function(req, res) {
     security.clearAllApiKeys(req.params.name);
     connection.chain([
             history.where({ player : req.params.name}).deleteAll,
@@ -669,17 +701,19 @@ exports.deleteUser = function(req, res, next) {
                 storelog(logdata);            
                 res.send("Delete OK");
             }
-            next();
         });
 };
 
-exports.storeSetting = function(req, res, next) {
+exports.storeSetting = function(req, res) {
     var newsetting = req.body.setting;
     var setting_id = newsetting.id;
     if (setting_id) {
         delete newsetting.id;
         setting.update(connection, setting_id, newsetting, function(err) {
-            if (err) return next(err);
+            if (err) {
+                res.send(500, err);
+                return;
+            }
             var logdata = createBaseLogData(req);
             logdata.data = req.body.setting;
             logdata.setting = setting_id;
@@ -687,43 +721,50 @@ exports.storeSetting = function(req, res, next) {
             storelog(logdata);            
             newsetting.id = setting_id;
             res.send(newsetting);
-            return next();
         });
     }
     else {
         var savedSetting = new setting(req.body.setting);
         savedSetting.save(connection, function(err) {
-            if (err) return next(err);
-
+            if (err) {
+                res.send(500, err);
+                return;
+            }
             var logdata = createBaseLogData(req);
             logdata.data = req.body.setting;
             logdata.setting = savedSetting.id;
             logdata.action = 'ADMIN_CREATE_SETTING';
             storelog(logdata);            
             res.send(savedSetting);
-            return next();
         });        
     }
 };
 
-exports.storeUser = function(req, res, next) {
+exports.storeUser = function(req, res) {
     var newuser = req.body.user;
     var user_id = newuser.id;
     if (user_id) {
         delete newuser.id;
         playerData.where({ id : user_id}).first(connection, function(err, result) {
-            if (err) return next(err);
+            if (err) {
+                res.send(500, err);
+                return;
+            }
 
             if (result == null) {
-                return next('Utilisateur ' + user_id + ' introuvable');
+                res.send(500, 'Utilisateur ' + user_id + ' introuvable');
+                return;
             }
 
             var oldname = result.name;
             playerData.update(connection, user_id, newuser, function(err) {
+                if (err) {
+                    res.send(500, err);
+                    return;
+                }
                 var logdata = createBaseLogData(req);
                 logdata.action = 'ADMIN_EDIT_USER';
                 logdata.data = req.body.user;
-                if (err) return next(err);
                 if (oldname != newuser.name) {
                     security.clearAllApiKeys(oldname);
                     var replaceParams = [ newuser.name, oldname];
@@ -732,33 +773,41 @@ exports.storeUser = function(req, res, next) {
                         persist.runSql("UPDATE comment SET player = $1 where player = $2", replaceParams),
                         persist.runSql("UPDATE schedule SET player = $1 where player = $2", replaceParams)
                     ], function(err, results) {
-                        if (err) return next(err);
+                        if (err) {
+                            res.send(500, err);
+                            return;
+                        }
                         storelog(logdata);   
                         res.send("Edit OK");
-                        return next();
                     });
                 }
                 else {
                     storelog(logdata);   
                     res.send("Edit OK");
-                    return next();
                 }
             });
         });    
     }
     else {
         playerData.where({ name : newuser.name}).first(connection, function(err, result) {
-            if (err) return next(err);
+            if (err) {
+                res.send(500, err);
+                return;
+            }
 
             if (result != null) {
-                return next(new restify.InvalidArgumentError('L\'utilisateur ' + newuser.name + ' existe déjà'));
+                res.send(500, 'L\'utilisateur ' + newuser.name + ' existe déjà');
+                return;
             }
 
             var savedPlayer = new playerData(newuser);
             var newpass = security.genPassword();
             savedPlayer.password = security.hashPassword(newpass);
             savedPlayer.save(connection, function(err) {
-                if (err) return next(err);
+                if (err) {
+                    res.send(500, err);
+                    return;
+                }
 
                 var logdata = createBaseLogData(req);
                 logdata.data = newuser;
@@ -771,43 +820,48 @@ exports.storeUser = function(req, res, next) {
                 storelog(logdata);            
 
                 res.send("Create OK");
-                return next();
             });
         });               
     }
 };
 
-function resetUserPassword(req, res, next, targetuser) {
+function resetUserPassword(req, res, targetuser) {
     var newpass = security.genPassword();
     var hashpass = security.hashPassword(newpass);
     
     playerData.where({ name : targetuser}).first(connection, function(err, result) {
-            if (err) return next(err);
+            if (err) {
+                res.send(500, err);
+                return;
+            }
 
             if (result == null) {
-                return next(new restify.InvalidArgumentError('Utilisateur introuvable'));
+                res.send(500, 'Utilisateur introuvable');
+                return;
             }
 
             playerData.update(connection, result.id, { password : hashpass }, function(err) {
-                if (err) return next(err);
+                if (err) {
+                    res.send(500, err);
+                    return;
+                }
                 
-                security.clearAllApiKeys(req.params.name);
+                security.clearAllApiKeys(targetuser);
                 var logdata = createBaseLogData(req);
                 logdata.action = 'RES_PW';
                 logdata.data = { player : targetuser, password : newpass };
                 storelog(logdata);            
                 res.send("Reset PW OK");
-                return next();
             });
     });        
 };
 
-exports.resetPassword = function(req, res, next) {
-    return resetUserPassword(req, res, next, req.user);
+exports.resetPassword = function(req, res) {
+    return resetUserPassword(req, res, req.user);
 };
 
-exports.adminResetPassword = function(req, res, next) {
-    return resetUserPassword(req, res, next, req.params.user);
+exports.adminResetPassword = function(req, res) {
+    return resetUserPassword(req, res, req.params.user);
 };
 
 exports.fetchPlayerData = function(players, callback) {
@@ -815,57 +869,111 @@ exports.fetchPlayerData = function(players, callback) {
     connection.runSqlAll(basequery, [], callback);
 };
 
-exports.getSettingPicture = function(req, res, next) {
+exports.getSettingPicture = function(req, res) {
     connection.runSqlAll("SELECT * FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, pics) {
-        if (err) return next(err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         if ((pics == null) || (pics.length == 0)) {
 
-            res.writeHead(200, {
-                'Content-Type': blankImage.type,
-                'Content-Length': blankImage.size
-            });
-        
-            res.end(blankImage.content);
-            return next();
+            res.type(blankImage.type);
+            res.send(blankImage.content);
+            return;
         }
         if (pics.length > 1) {
-            return next(new restify.InvalidArgumentError('Plusieurs images, les données sont en vrac !'));
+            res.send(500, 'Plusieurs images, les données sont en vrac !');
+            return;
         }
         var pic = pics[0];
-        res.writeHead(200, {
-          'Content-Type': pic.mimetype
+        var lastViewedHeader = req.header('If-Modified-Since');
+        if (typeof lastViewedHeader != "undefined") {
+            // Added 999 because milliseconds are stripped from the timestamp
+            // sent as a header
+            var lastViewed = new Date(lastViewedHeader).getTime() + 999; 
+            var lastUpdate = pic.tstamp.getTime();
+            if (lastViewed >= lastUpdate) {
+                res.send(304, 'Non modifée');
+                return;
+            }
+        }
+        
+        res.set({
+          'Content-Type': pic.mimetype,
+          'Last-Modified': pic.tstamp,
+          'Expires': -1,
+          'Cache-Control': 'must-revalidate, private'
         });
-        res.write(pic.image);
-        res.end();
-        return next();
+        
+        res.send(pic.image);
     });
 };
 
-exports.storeSettingPicture = function(req, res, next) {
-    connection.runSql("DELETE FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, result) {
-      if (err) return next(err);
-      if (!req.files) return next(new restify.InvalidArgumentError('Fichier image absent'));
-      if (!req.files.imageFile) return next(new restify.InvalidArgumentError('Fichier image absent'));
-      var file = req.files.imageFile;
-      if (file.type.indexOf('image') != 0) return next(new restify.InvalidArgumentError('Avec une image c\'est mieux!'));
-      fileSystem.readFile(file.path, 'hex', function(err, imgData) {
-        imgData = '\\x' + imgData;
-        connection.runSql("INSERT INTO settingpics (id, mimetype, image) values (?, ?, ?)",
-                           [req.params.settingid, file.type,  imgData],
-                           function(err, writeResult) {
-          if (err) return next(err);
-          res.send("Store Setting Picture ok");
-          return next();
-        });
+exports.storeSettingPicture = function(req, res) {
+      var busboy = new Busboy({ headers: req.headers , files : 1, fileSize: 1024000});
+      var error = 'Aucune image transmise';
+      busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+          if (mimetype.indexOf('image') != 0) {
+              error = 'Avec une image c\'est mieux!';
+          }
+          else if (file.truncated) {
+              error = 'Le fichier est trop gros ! (1 Mo max)';
+          }
+          else {
+              console.log("Fichier valide");
+              error = '';
+              var saveTo = path.join(os.tmpDir(), path.basename(fieldname));
+              var tmpStream = fileSystem.createWriteStream(saveTo);
+              tmpStream.on('finish', function() {
+                  console.log("Fichier sauvegardé");
+                  fileSystem.readFile(saveTo, 'hex', function(err, imgData) {
+                      console.log("Fichier parsé");
+                    fileSystem.unlinkSync(saveTo);
+                    if (err) {
+                        res.send(500, err);
+                        return;
+                    }
+                    imgData = '\\x' + imgData;
+                    connection.runSql("DELETE FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, result) {
+                        if (err) {
+                            res.send(500, err);
+                            return;
+                        }
+                        connection.runSql("INSERT INTO settingpics (id, mimetype, image) values (?, ?, ?)",
+                                           [req.params.settingid, mimetype,  imgData],
+                                           function(err, writeResult) {
+                            if (err) {
+                                res.send(500, err);
+                                return;
+                            }
+                          res.send("Store Setting Picture ok");
+                        });
+                    });
+                  });
+                  
+              });
+              file.pipe(tmpStream);
+          }        
       });
-    });
+      busboy.on('filesLimit', function() {
+          console.log('Tentative d\'upload de plusieurs fichiers !');
+      });
+      busboy.on('finish', function() {
+          if (error != '') {
+              res.set('Connection', 'close');
+              res.send(500, error);
+          }
+      });
+      req.pipe(busboy);
 };
 
-exports.deleteSettingPicture = function(req, res, next) {
+exports.deleteSettingPicture = function(req, res) {
     connection.runSql("DELETE FROM settingpics WHERE id = ?", [ req.params.settingid], function(err, result) {
-        if (err) return next(err);
+        if (err) {
+            res.send(500, err);
+            return;
+        }
         res.send("Delete Setting Picture ok");
-        return next();
     });
 };
 
