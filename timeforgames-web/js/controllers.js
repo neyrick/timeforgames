@@ -686,8 +686,8 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
 
 }]);
 
-timeForGamesApp.controller('AdminCtrl', ['$scope', '$timeout', 'settingsService', 'userService', 'localStorageService', 'historyService',
-function AdminCtrl($scope, $timeout, settingsService, userService, localStorageService, historyService) {
+timeForGamesApp.controller('AdminCtrl', ['$scope', '$timeout', 'config', 'settingsService', 'userService', 'localStorageService', 'historyService',
+function AdminCtrl($scope, $timeout, config, settingsService, userService, localStorageService, historyService) {
 
     $scope.tab = 'users';
     $scope.settingsMode = -1;
@@ -700,9 +700,12 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
     $scope.currentUploadData = null;
     $scope.historyCriterion = null;
     $scope.showHistorySetting = false;
+    $scope.uploading = false;
+    $scope.progress = 0;
     $scope.historyList = [];
     $scope.imagePristine = true;
     $scope.picTimestamp = new Date().getTime();
+    $scope.basePicUrl = config.urlbase + "/viewSettingPic/";
 
     $scope.currentUser = localStorageService.get('tfgUser');
 
@@ -757,7 +760,7 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
         }
         else {
             $scope.currentEditSetting = setting;
-            $('.fileDropZone').css('background-image', "url('/rs/tfg/viewSettingPic/" + setting.id + "?" + $scope.picTimestamp + "')");
+            $('.fileDropZone').css('background-image', "url('" + $scope.basePicUrl + setting.id + "?" + $scope.picTimestamp + "')");
         }
         $scope.imagePristine = true;
         $('#settingEditModal').modal('show');
@@ -781,13 +784,17 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
             }
             else {
                 if ($scope.currentUploadFile != null) {
+                    $scope.progress = 0;
+                    $scope.uploading = true;
                     settingsService.storePicture(newsetting.id, $scope.currentUploadFile, function(evt) {
-                        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+			$scope.progress = parseInt(100.0 * evt.loaded / evt.total);			
                     }, function(data, status, headers, config) {
+                        $scope.uploading = false;
                         $scope.loadSettings();
                         $scope.picTimestamp = new Date().getTime();
                         $('#settingEditModal').modal('hide');
                     }, function(result) {
+                        $scope.uploading = false;
                         window.alert("Upload échoué");
                     });
                 }
@@ -938,3 +945,91 @@ function AdminCtrl($scope, $timeout, settingsService, userService, localStorageS
 
 }]);
 
+timeForGamesApp.controller('TestCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService',
+function TestCtrl($scope, planningBuilderService, plannerService,settingsService) {
+
+    $scope.firstday = planningBuilderService.getDefaultMinDay();
+    $scope.dayCount = 30;
+    $scope.currentUser = 'Neyrick';
+    $scope.timeframesNames = { "AFTERNOON": "Après-midi", "EVENING": "Soirée"};
+    $scope.currentTimeframe = null;
+
+    $scope.timeframes = [];
+
+    $scope.refreshSettings = function(andPlanning) {
+        settingsService.getSettings(function(settings) {
+            $scope.settingsList = sortSettings(settings);
+/*
+            $scope.openSettings = [];
+            $scope.closedSettings = [];
+            $scope.oneShots = [];
+            $scope.clubEvents = [];
+            $scope.settingsList.forEach(function(item) {
+                if (item.status > 0)
+                    return;
+                if (item.mode == 0) {
+                    $scope.openSettings.push(item);
+                    item.visible = ($scope.config.invisibleOpenSettings.indexOf(item.id) == -1);
+                } else if (item.mode == 1) {
+                    $scope.closedSettings.push(item);
+                    item.visible = ($scope.config.visibleClosedSettings.indexOf(item.id) > -1);
+                } else if (item.mode == 2) {
+                    $scope.oneShots.push(item);
+                    item.visible = ($scope.config.invisibleOneShots.indexOf(item.id) == -1);
+                } else if (item.mode == 3) {
+                    $scope.clubEvents.push(item);
+                    item.visible = true;
+                }
+            });
+*/
+            if (andPlanning && ( typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null))
+                initPlanning();
+            $scope.settingsReady = true;
+        }, function (error) {
+                window.alert("Impossible de récupérer les chroniques: " + error);            
+        });
+    };
+
+    function initPlanning() {
+//        $scope.loading = true;
+//        setTimeout(function() {
+//            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
+                plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
+                    var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
+//                    planningBuilderService.dispatchUpdatesFlags(updatesHash, weeks, $scope.config.lastUpdate);
+//                    $scope.config.lastUpdate = new Date().getTime();
+                    $scope.timeframes = timeframes;
+//                    storeConfig();
+//                    applyFilters();
+                });
+//            });
+//            $scope.loading = false;
+//        }, 0);
+    }
+
+   $scope.refreshSettings(true);
+
+   $scope.selectSetting = function(timeframe) {
+       $scope.currentTimeframe = timeframe;
+       $('#addSettingModal').modal('show');
+   }
+
+    $scope.addSetting = function(setting) {
+        plannerService.setDispo($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, setting.id, 'GM', function() {
+            $('#addSettingModal').modal('hide');
+            $scope.refreshTimeframe();
+        });
+    };
+
+    $scope.refreshTimeframe = function() {
+        plannerService.getTimeframePlanning($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, function(result) {
+            if ($scope.currentTimeframe.collapsed) {
+                  initPlanning();
+            }
+            else {
+	            planningBuilderService.refreshTimeframeInWeeksPlanning($scope.settingsList, result, $scope.currentTimeframe, $scope.currentUser);
+	    }
+        });
+    };
+
+}]);

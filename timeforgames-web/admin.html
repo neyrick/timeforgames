@@ -199,7 +199,12 @@
                     ng-show="dropSupported" >Déposer le fichier de l'image ici</div>
               <div ng-file-drop-available="dropSupported=true" 
                     ng-show="!dropSupported">Il est pourri ton navigateur !</div>
-              <button type="button" class="btn btn-danger" ng-click="clearImage()">Supprimer l'image</button>
+              <button type="button" class="btn btn-danger" ng-click="clearImage()" ng-show="!uploading">Supprimer l'image</button>
+		<div class="progress progress-striped active" ng-show="uploading">
+		  <div class="progress-bar" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress }}%">
+		    <span class="">{{progress }}%</span>
+		  </div>
+		</div>
 <!--              <button ng-click="upload.abort()">Annuler le téléchargement</button> -->
              <!-- <img ng-show="currentUploadData" ng-src="{{currentUploadData}}" width="500" height="100"/> -->
             </div>
@@ -347,7 +352,7 @@
               </thead>
               <tbody>
                 <tr bindonce ng-repeat="setting in settingsList | filter : { mode : settingsMode }">
-                  <td><img bo-src="'/rs/tfg/viewSettingPic/' + setting.id + '?' + picTimestamp" bo-class="'settingPic-' + setting.id"></img></td>
+                  <td><img bo-src="basePicUrl + setting.id + '?' + picTimestamp" bo-class="'settingPic-' + setting.id"></img></td>
                   <td><span bo-text="setting.name"></span></td>
                   <td>
                     <div class="dummyInlineContainer text-success" bo-if="setting.status == 0"><span class="glyphicon glyphicon-ok"></span> Active</div>

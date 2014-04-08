@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="timeForGamesApp">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <title>Tests Layout</title>
+
+
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="lib/jquery.qtip.css">
+        <link rel="stylesheet" href="css/tfg.css">
+        <link rel="shortcut icon" type="image/x-icon" href="images/logo_t10.jpg" />
+
+        <script src="lib/jquery-1.11.0.min.js"></script>
+        <script src="lib/jquery.qtip.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	    <script src="lib/angular-file-upload-shim.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+        <script src="lib/angular-file-upload.min.js"></script>
+
+        <script src="lib/angular-locale_fr-fr.js"></script>
+        <script src="lib/angular-local-storage.min.js"></script>
+        <script src="lib/bindonce.js"></script>
+        <script src="js/gg.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/controllers.js"></script>
+        <script src="js/filters.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/directives.js"></script>
+
+    </head>
+    <body ng-controller="TestCtrl" style="padding: 10px" data-display="desktop">
+
+	<div id="addSettingModal" class="modal fade">
+	  <div class="modal-dialog modal-lg" style="width: 650px">
+	    <div class="modal-content">
+	      <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+
+		<h4 class="modal-title">Choisis une chronique pour le {{ currentTimeframe.date | date:'EEE dd/MM/yyyy'}} {{ timeframesNames[currentTimeframe.code] }}</h4>
+	      </div>
+	      <div class="modal-body" style="overflow: hidden">
+                <button style="min-width: 600px" class="btn btn-default pull-left" ng-click="">Créer une nouvelle chronique (inactif)</button>
+                <button style="min-width: 300px" class="btn btn-default pull-left" ng-repeat="setting in currentTimeframe.possibleNewSettings" ng-click="addSetting(setting)">{{setting.name}}</button>
+              </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div>
+
+        <div bindonce class="panel panel-default" ng-repeat="timeframe in timeframes">
+          <div class="panel-body">
+		  <div bo-if="timeframe.collapsed" class="btn-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			    Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span> - Ajouter une partie <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" role="menu">
+			    <li bindonce ng-repeat="subtf in timeframe.subs"><a href="#" ng-click="selectSetting(subtf)"><span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]"></a></li>
+			  </ul>
+		  </div>
+		  <div bo-if="!timeframe.collapsed" class="row">
+                      <div class="col-sm-2">
+                        <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span><br/><span bo-text="timeframesNames[timeframe.code]"></span>
+                      </div>
+                      <div class="col-sm-5">
+                        <div>
+                        Parties potentielles
+                        </div>
+			<div class="well well-sm" ng-repeat="schedule in timeframe.settings">
+				<span>{{schedule.name}}</span>
+			</div>
+                        <div class="btn btn-default" ng-click="selectSetting(timeframe)">
+                        Ajouter une partie
+                        </div>
+                      </div>
+                      <div class="col-sm-5">
+                        Parties validées
+                      </div>
+		  </div>
+          </div>
+        </div>
+    </body>
+</html>

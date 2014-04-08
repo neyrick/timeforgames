@@ -19,7 +19,7 @@ timeForGamesApp.factory('config', ['$window',
 function($window) {
 
     return {
-        urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat("/rs/tfg"),
+        urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat(":5000/tfg"),
         FIRST_DAY_OF_WEEK : 1
     };
 }]);
@@ -269,6 +269,66 @@ function(config) {
         'EVENING' : 1
     };
 
+    function createTimeframesBlock(timeframes, start, end) {
+	    timeframes[start].end = timeframes[end];
+            var subList = [];
+            for (var i = start; i <= end; i++) subList.push(timeframes[i]); 
+            timeframes[start].subs = subList;
+	    timeframes.splice(start + 1, end - start); 
+    }
+
+    function aggregateTimeframes(timeframes) {
+        if (timeframes.length < 2) return timeframes;
+        var timeframe;
+        var blockStart = -1;
+        for (var i = 0; i < timeframes.length; i++) {
+            timeframe = timeframes[i];
+            if (timeframe.collapsed) {
+                if (blockStart == -1) {
+                    blockStart = i;
+                }
+            }
+            else {
+                if (blockStart > -1) {
+                    if (blockStart == i-1) {
+		            // un collapsed tout seul, on l'ouvre
+		            timeframes[blockStart].collapsed = false;
+                    }
+                    else {
+		            // agreger de blockStart à i-1
+                            createTimeframesBlock(timeframes, blockStart, i-1);
+		            i = blockStart + 1;
+                    }
+                    blockStart = -1;
+                }
+            }
+         }
+         if (blockStart > -1) {
+            if (blockStart == timeframes.length -1) {
+	            timeframes[blockStart].collapsed = false;
+            }
+            else {
+                createTimeframesBlock(timeframes, blockStart, i-1);
+            }
+         }
+        return timeframes;
+    }
+
+    function isCollapsedByDefault(timeframe) {
+        if (timeframe.dow == 0) {
+            if (timeframe.code == 'EVENING') return true;
+            else return false;
+        }
+        else if (timeframe.dow < 5) {
+            return true;
+        }
+        else if (timeframe.dow == 5) {
+            if (timeframe.code == 'AFTERNOON') return true;
+            else return false;
+        }
+        else return false;
+    }
+
     var mergeSetting = function(allSettings, timeframe, settingid) {
         var i, found = -1, currentArray = timeframe.settings;
         for ( i = 0; i < currentArray.length; i++) {
@@ -395,6 +455,23 @@ function(config) {
             return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
         },
 
+        initTimeframe : function(code, daydate, settings) {
+            var result = new Object();
+            result.code = code;
+            result.dow = daydate.getDay();
+            result.dom = daydate.getDate();
+            result.month = daydate.getMonth() + 1;
+            result.year = daydate.getFullYear();
+            result.dayid = result.year * 10000 + result.month * 100 + result.dom;
+            result.date = daydate;
+            result.settings = [];
+            result.busy = false;
+            result.gaming = {};
+            result.possibleNewSettings = settings.slice();
+            result.collapsed = isCollapsedByDefault(result);
+            return result;
+        },
+
         initDay : function(daytime, settings) {
             var day = new Date(daytime);
             var result = new Object();
@@ -506,6 +583,51 @@ function(config) {
             }
             // parcourir les comment et les ajouter
             return weeks;
+        },
+
+        buildTimeframesPlanning : function(mindaytime, daycount, settings, schedules, me) {
+
+            // Initialisation
+            var activeSettings = Array();
+            settings.forEach(function(setting) {
+                if (setting.status == 0) {
+                    activeSettings.push(setting);
+                }
+            });
+
+            var timeframes = Array();
+            var currtime;
+            var currTimeframe;
+            var maxtime = mindaytime + this.MS_IN_DAY * daycount;
+            var tfMap = new Object();
+	    var dayDate;
+            for ( currtime = mindaytime; currtime < maxtime; currtime += this.MS_IN_DAY) {
+		dayDate = new Date(currtime);
+                currTimeframe = this.initTimeframe('AFTERNOON', dayDate, activeSettings);
+                timeframes.push(currTimeframe);
+                tfMap[currTimeframe.dayid + '-AFTERNOON'] = currTimeframe;
+                currTimeframe = this.initTimeframe('EVENING', dayDate, activeSettings);
+                timeframes.push(currTimeframe);
+                tfMap[currTimeframe.dayid + '-EVENING'] = currTimeframe;
+            }
+
+            // ajouter les schedule dans availablepj / available mj
+
+            var i, timeframe, rawschedule;
+            var tfSetting;
+            for ( i = 0; i < schedules.length; i++) {
+                rawschedule = schedules[i];
+                timeframe = tfMap[rawschedule.dayid + '-' + rawschedule.timeframe];
+                timeframe.collapsed = false;
+                addSchedule(rawschedule, timeframe, settings, me);
+            }
+            timeframes.forEach(function(item) {
+		    item.settings.sort(function(settinga, settingb) {
+		        return settinga.name.localeCompare(settingb.name);
+		    });
+            });
+
+            return aggregateTimeframes(timeframes);
         }
     };
 }]);
