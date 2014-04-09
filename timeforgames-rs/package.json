@@ -30,6 +30,10 @@
   },
   "analyze": true,
   "devDependencies": {
+     "should" : ">=3.3.0",
+     "assert" : ">=1.1.1",
+     "request" : ">=2.30.0",
+     "superagent" : ">=0.17"
   },
   "bundledDependencies": [
   ],  

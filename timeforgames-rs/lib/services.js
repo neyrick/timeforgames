@@ -234,7 +234,7 @@ exports.fetchAllUsers = function(req, res) {
         }
     });
 };
-
+/*
 exports.findSettingByCode = function(req, res) {
     var result = new Array();
     setting.using(connection).where({
@@ -245,7 +245,7 @@ exports.findSettingByCode = function(req, res) {
         genericSendJson(res, result);
     });
 };
-
+*/
 exports.createSchedule = function(req, res) {
     // Verification que le joueur est bien disponible
     var newSchedule = req.body;
@@ -281,7 +281,7 @@ exports.login = function(req, res) {
             return;
         }
         if (result == null) {
-            res.send(500, req.body.username + '? Connais pas!');
+            res.send(403, req.body.username + '? Connais pas!');
             return;
         }
 
@@ -389,7 +389,7 @@ exports.expireToken = function(req, res) {
 
 exports.expireAllTokens = function(req, res) {
     var targetuser = req.user;
-    if (req.admin) targetuser = req.params.user;
+    if (req.admin && req.params.user) targetuser = req.params.user;
     entities.apikey.where({ username : targetuser}).deleteAll(connection, function(err) {
         if (err) {
             res.send(500, err);

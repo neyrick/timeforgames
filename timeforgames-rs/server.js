@@ -50,17 +50,13 @@ server.get('/tfg/status', serv.getStatus);
 server.get('/tfg/relogin', serv.relogin);
 server.get('/tfg/expireToken', serv.expireToken);
 server.get('/tfg/resetPassword', serv.resetPassword);
-server.get('/tfg/expireAllTokens/:user', serv.expireToken);
 server.post('/tfg/login', serv.login);
 
 server.get('/tfg/setting', serv.fetchAllSettings);
-server.get('/tfg/setting/:code', serv.findSettingByCode);
 server.put('/tfg/setting', serv.storeSetting);
 server.get('/tfg/viewSettingPic/:settingid', serv.getSettingPicture);
 server.put('/tfg/setting/pic/:settingid', serv.storeSettingPicture);
 
-server.get('/tfg/schedule', serv.fetchSchedule);
-server.get('/tfg/schedule/:player', serv.fetchSchedule);
 server.put('/tfg/schedule', serv.createSchedule);
 server.del('/tfg/schedule/:idschedule', serv.deleteSchedule);
 
