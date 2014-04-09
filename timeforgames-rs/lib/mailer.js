@@ -186,7 +186,7 @@ exports.notify = function(eventData, successCallback, errorCallback) {
             if (err) {
                 errorCallback(err);
             } else {
-                if ( typeof msgData.recipient.address == "undefined") {
+                if (( typeof msgData.recipient.address == "undefined") || ( msgData.recipient.address == null)) {
                     return;
                 }
                 transport.sendMail({

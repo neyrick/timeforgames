@@ -57,7 +57,7 @@ function assignGame(idgame, masterschedule, players, callback) {
 function storelog(logdata) {
     
     var logclone = JSON.parse( JSON.stringify(logdata) );
-    delete logclone.data.password;
+    if (logclone.data) delete logclone.data.password;
     new history(logclone).save(connection, function(err) {
         if (err)
             console.log("Error: " + err);
@@ -663,165 +663,175 @@ exports.fetchUpdates = function(req, res) {
     });
 };
 
-exports.fetchSettingById = function(id, callback) {
-    setting.getById(connection, id, callback);
-};
-
 exports.deleteSetting = function(req, res) {
     var pm_setting = new setting({
             id : req.params.id
         }).delete(connection,  function(err) {
-        if (err)
-            res.send("Error: " + err);
-        else {
-            var logdata = createBaseLogData(req);
-            logdata.data = { id : req.params.id, name : req.query.name };
-            logdata.action = "DEL_SETTING";
-            storelog(logdata);            
-            res.send("Delete OK");
+        if (err) {
+            res.send(500, err);
+            return;
         }
+        var logdata = createBaseLogData(req);
+        logdata.data = { id : req.params.id, name : req.query.name };
+        logdata.action = "DEL_SETTING";
+        storelog(logdata);            
+        res.send("Delete OK");
     });
 };
 
 exports.deleteUser = function(req, res) {
-    security.clearAllApiKeys(req.params.name);
-    connection.chain([
-            history.where({ player : req.params.name}).deleteAll,
-            comment.where({ player : req.params.name}).deleteAll,
-            schedule.where({ player : req.params.name}).deleteAll,
-            playerData.where({ name : req.params.name}).deleteAll,
-        ], function(err, results) {
-            if (err)
-                res.send("Error: " + err);
-            else {
-                var logdata = createBaseLogData(req);
-                logdata.action = "DEL_PLAYER";
-                logdata.data = req.params.name;
-                storelog(logdata);            
-                res.send("Delete OK");
-            }
-        });
-};
-
-exports.storeSetting = function(req, res) {
-    var newsetting = req.body.setting;
-    var setting_id = newsetting.id;
-    if (setting_id) {
-        delete newsetting.id;
-        setting.update(connection, setting_id, newsetting, function(err) {
-            if (err) {
-                res.send(500, err);
-                return;
-            }
-            var logdata = createBaseLogData(req);
-            logdata.data = req.body.setting;
-            logdata.setting = setting_id;
-            logdata.action = 'ADMIN_EDIT_SETTING';
-            storelog(logdata);            
-            newsetting.id = setting_id;
-            res.send(newsetting);
-        });
-    }
-    else {
-        var savedSetting = new setting(req.body.setting);
-        savedSetting.save(connection, function(err) {
-            if (err) {
-                res.send(500, err);
-                return;
-            }
-            var logdata = createBaseLogData(req);
-            logdata.data = req.body.setting;
-            logdata.setting = savedSetting.id;
-            logdata.action = 'ADMIN_CREATE_SETTING';
-            storelog(logdata);            
-            res.send(savedSetting);
-        });        
-    }
-};
-
-exports.storeUser = function(req, res) {
-    var newuser = req.body.user;
-    var user_id = newuser.id;
-    if (user_id) {
-        delete newuser.id;
-        playerData.where({ id : user_id}).first(connection, function(err, result) {
-            if (err) {
-                res.send(500, err);
-                return;
-            }
-
-            if (result == null) {
-                res.send(500, 'Utilisateur ' + user_id + ' introuvable');
-                return;
-            }
-
-            var oldname = result.name;
-            playerData.update(connection, user_id, newuser, function(err) {
-                if (err) {
-                    res.send(500, err);
-                    return;
-                }
-                var logdata = createBaseLogData(req);
-                logdata.action = 'ADMIN_EDIT_USER';
-                logdata.data = req.body.user;
-                if (oldname != newuser.name) {
-                    security.clearAllApiKeys(oldname);
-                    var replaceParams = [ newuser.name, oldname];
-                    connection.chain([
-                        persist.runSql("UPDATE apikey SET username = $1 where username = $2", replaceParams),
-                        persist.runSql("UPDATE comment SET player = $1 where player = $2", replaceParams),
-                        persist.runSql("UPDATE schedule SET player = $1 where player = $2", replaceParams)
-                    ], function(err, results) {
-                        if (err) {
-                            res.send(500, err);
-                            return;
-                        }
-                        storelog(logdata);   
-                        res.send("Edit OK");
-                    });
-                }
+    playerData.getById(connection, req.params.id, function(err, user) {
+        if (err) {
+            res.send(500, err);
+            return;
+        }
+        if (user == null) {
+            res.send(500, 'Utilisateur inconnu');
+            return;
+        }
+        security.clearAllApiKeys(user.name);
+        connection.chain([
+                history.where({ player : user.name}).deleteAll,
+                comment.where({ player : user.name}).deleteAll,
+                schedule.where({ player : user.name}).deleteAll,
+                playerData.where({ name : user.name}).deleteAll,
+            ], function(err, results) {
+                if (err)
+                    res.send("Error: " + err);
                 else {
-                    storelog(logdata);   
-                    res.send("Edit OK");
+                    var logdata = createBaseLogData(req);
+                    logdata.action = "DEL_PLAYER";
+                    logdata.data = req.params.name;
+                    storelog(logdata);            
+                    res.send("Delete OK");
                 }
             });
-        });    
-    }
-    else {
-        playerData.where({ name : newuser.name}).first(connection, function(err, result) {
+    });  
+};
+
+exports.createSetting = function(req, res) {
+    var newsetting = req.body.setting;
+    var savedSetting = new setting(req.body.setting);
+    savedSetting.save(connection, function(err) {
+        if (err) {
+            res.send(500, err);
+            return;
+        }
+        var logdata = createBaseLogData(req);
+        logdata.data = req.body.setting;
+        logdata.setting = savedSetting.id;
+        logdata.action = 'ADMIN_CREATE_SETTING';
+        storelog(logdata);            
+        res.send(savedSetting);
+    });        
+};
+
+exports.updateSetting = function(req, res) {
+    var newsetting = req.body.setting;
+    var setting_id = req.params.settingid;
+    setting.update(connection, setting_id, newsetting, function(err) {
+        if (err) {
+            res.send(500, err);
+            return;
+        }
+        var logdata = createBaseLogData(req);
+        logdata.data = req.body.setting;
+        logdata.setting = setting_id;
+        logdata.action = 'ADMIN_EDIT_SETTING';
+        storelog(logdata);            
+        newsetting.id = setting_id;
+        res.send(newsetting);
+    });
+};
+
+exports.createUser = function(req, res) {
+    var newuser = req.body.user;
+    playerData.where({ name : newuser.name}).first(connection, function(err, result) {
+        if (err) {
+            res.send(500, err);
+            return;
+        }
+
+        if (result != null) {
+            res.send(500, 'L\'utilisateur ' + newuser.name + ' existe déjà');
+            return;
+        }
+
+        var savedPlayer = new playerData(newuser);
+        if (!newuser.password) {
+            var newpass = security.genPassword();            
+            savedPlayer.password = security.hashPassword(newpass);
+        }
+        else {
+            savedPlayer.password = security.hashPassword(newuser.password);
+            delete newuser.password;
+        }
+        savedPlayer.save(connection, function(err) {
             if (err) {
                 res.send(500, err);
                 return;
             }
+            newuser.id = savedPlayer.id;
+            var logdata = createBaseLogData(req);
+            logdata.data = newuser;
+            logdata.action = 'ADMIN_CREATE_USER';
+            storelog(logdata);            
 
-            if (result != null) {
-                res.send(500, 'L\'utilisateur ' + newuser.name + ' existe déjà');
+            logdata = createBaseLogData(req);
+            logdata.action = 'RES_PW';
+            logdata.data = { player : savedPlayer.name, password : newpass };
+            storelog(logdata);            
+
+            res.send(newuser);
+        });
+    });               
+};
+
+exports.updateUser = function(req, res) {
+    var newuser = req.body.user;
+    var user_id = req.params.id;
+    playerData.where({ id : user_id}).first(connection, function(err, result) {
+        if (err) {
+            res.send(500, err);
+            return;
+        }
+
+        if (result == null) {
+            res.send(500, 'Utilisateur ' + user_id + ' introuvable');
+            return;
+        }
+
+        var oldname = result.name;
+        playerData.update(connection, user_id, newuser, function(err) {
+            if (err) {
+                res.send(500, err);
                 return;
             }
-
-            var savedPlayer = new playerData(newuser);
-            var newpass = security.genPassword();
-            savedPlayer.password = security.hashPassword(newpass);
-            savedPlayer.save(connection, function(err) {
-                if (err) {
-                    res.send(500, err);
-                    return;
-                }
-
-                var logdata = createBaseLogData(req);
-                logdata.data = newuser;
-                logdata.action = 'ADMIN_CREATE_USER';
-                storelog(logdata);            
-
-                logdata = createBaseLogData(req);
-                logdata.action = 'RES_PW';
-                logdata.data = { player : savedPlayer.name, password : newpass };
-                storelog(logdata);            
-
-                res.send("Create OK");
-            });
-        });               
-    }
+            var logdata = createBaseLogData(req);
+            logdata.action = 'ADMIN_EDIT_USER';
+            logdata.data = req.body.user;
+            if (oldname != newuser.name) {
+                security.clearAllApiKeys(oldname);
+                var replaceParams = [ newuser.name, oldname];
+                connection.chain([
+                    persist.runSql("UPDATE apikey SET username = $1 where username = $2", replaceParams),
+                    persist.runSql("UPDATE comment SET player = $1 where player = $2", replaceParams),
+                    persist.runSql("UPDATE schedule SET player = $1 where player = $2", replaceParams)
+                ], function(err, results) {
+                    if (err) {
+                        res.send(500, err);
+                        return;
+                    }
+                    storelog(logdata);   
+                    res.send(newuser);
+                });
+            }
+            else {
+                storelog(logdata);   
+                res.send(newuser);
+            }
+        });
+    });    
 };
 
 function resetUserPassword(req, res, targetuser) {

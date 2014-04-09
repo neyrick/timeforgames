@@ -53,7 +53,7 @@ server.get('/tfg/resetPassword', serv.resetPassword);
 server.post('/tfg/login', serv.login);
 
 server.get('/tfg/setting', serv.fetchAllSettings);
-server.put('/tfg/setting', serv.storeSetting);
+server.post('/tfg/setting', serv.createSetting);
 server.get('/tfg/viewSettingPic/:settingid', serv.getSettingPicture);
 server.put('/tfg/setting/pic/:settingid', serv.storeSettingPicture);
 
@@ -78,14 +78,17 @@ server.get('/tfg/history/setting/:setting', serv.fetchSettingHistory);
 server.del('/tfg/admin/setting/:id', serv.deleteSetting);
 
 server.get('/tfg/admin/user', serv.fetchAllUsers);
-server.put('/tfg/admin/user', serv.storeUser);
-server.del('/tfg/admin/user/:name', serv.deleteUser);
+server.post('/tfg/admin/user', serv.createUser);
+server.put('/tfg/admin/user/:id', serv.updateUser);
+server.del('/tfg/admin/user/:id', serv.deleteUser);
 server.get('/tfg/admin/resetPassword/:user', serv.adminResetPassword);
+
+server.put('/tfg/admin/setting/:settingid', serv.updateSetting);
 
 server.get('/tfg/admin/spoof/:user', serv.spoofLogin);
 
 server.del('/tfg/admin/setting/pic/:settingid', serv.deleteSettingPicture);
 
 server.listen(5000, function() {
-    console.log('Démarrage de l\'écoute de', server.name, server.url);
+    console.log('Démarrage de l\'écoute');
 });

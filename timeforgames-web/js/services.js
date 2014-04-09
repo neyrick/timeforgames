@@ -57,11 +57,20 @@ function($http, config, localStorageService) {
         },
 
         storeUser : function(pm_user, callback, errorcallback) {
-    	    $http.put(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
-                    callback(data);
-                }).error(function(data, status) {
-                    errorcallback(data);
-                });
+            if (pm_user.id) {
+                $http.put(config.urlbase + '/admin/user/' + pm_user.id, { user : pm_user}).success(function(data, status) {
+                        callback(data);
+                    }).error(function(data, status) {
+                        errorcallback(data);
+                    });
+            }
+            else {
+                $http.post(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
+                        callback(data);
+                    }).error(function(data, status) {
+                        errorcallback(data);
+                    });
+                }
         },
 
         deleteUser : function(username, callback, errorcallback) {
@@ -180,13 +189,7 @@ function($http, config) {
 
 timeForGamesApp.factory('settingsService', ['$http', 'config', '$upload',
 function($http, config, $upload) {
-/*
-    var settings = {
-        ready : false
-    }, updateSettings = function(callback, callback2) {
-        $http.get(config.urlbase + '/setting').success(callback).error(callback2);
-    };
-*/
+
     return {
 
         storePicture : function(pm_settingid, pm_file, progresscallback, callback, errorcallback) {
@@ -213,11 +216,20 @@ function($http, config, $upload) {
         },
 
         storeSetting : function(pm_setting, callback, errorcallback) {
-	    $http.put(config.urlbase + '/setting', { setting : pm_setting}).success(function(data, status) {
-                callback(data);
-            }).error(function(data, status) {
-                errorcallback(data);
-            });
+            if (pm_setting.id) {
+                $http.put(config.urlbase + '/setting/' + pm_setting.id, { setting : pm_setting}).success(function(data, status) {
+                        callback(data);
+                    }).error(function(data, status) {
+                        errorcallback(data);
+                    });
+            }
+            else {
+                $http.post(config.urlbase + '/setting', { setting : pm_setting}).success(function(data, status) {
+                        callback(data);
+                    }).error(function(data, status) {
+                        errorcallback(data);
+                    });
+            }
         },
 
         deleteSetting : function(setting, callback, errorcallback) {
@@ -235,29 +247,6 @@ function($http, config, $upload) {
                 errorcallback(data);
             });
         },
-
-/*
-        getSettings : function(callback) {
-            if (!settings.ready) {
-                updateSettings(function(result) {
-                    settings = result;
-                    settings.ready = true;
-                    callback(settings);
-                }, function(error) {
-                    window.alert("Impossible de récupérer les chroniques: " + error);
-                });
-            } else
-                callback(settings);
-        },
-*/
-        createSetting : function(setting, callback, errorcallback) {
-            $http.put(config.urlbase + '/setting', setting).success(function(data, status) {
-                callback(data);
-            }).error(function(data, status) {
-                window.alert("Impossible de créer la chronique: " + data);
-                errorcallback(data);
-            });
-        }
     };
 }]);
 

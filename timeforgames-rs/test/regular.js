@@ -5,7 +5,11 @@ var config = require('./config-test.json');
 
 describe('RegularUser', function() {
   var baseurl = 'localhost:5000/tfg';
-  var loginToken = null;
+  var adminLoginToken = null;
+  var loginToken1 = null;
+  var testlogin1 = 'test1', password1 = 'pass1';
+  var testlogin2 = 'test2', password2 = 'pass2';
+  var testlogin3 = 'test3', password3 = 'pass3';
 
 // before: se logger en tant qu'admin, recuperer le token, creer l'utilisateur de test
 
@@ -53,14 +57,81 @@ describe('RegularUser', function() {
 // after: detruire le setting, detruire l'utilisateur de test, expirer le token d'admin
 
   before(function(done) {
-
-    done();
+        request.post(baseurl + '/login')
+        .send({username : config.testAdmin.login, password : config.testAdmin.password})
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          adminLoginToken = res.body.token;
+          request.post(baseurl + '/admin/user')
+            .set('Authorization', 'Bearer ' + adminLoginToken)
+            .send({ user : { name : testlogin1, email : null, password : password1, isadmin : false, status : 0}})
+            .end(function(err, res) {
+              if (err) {
+                throw err;
+              }
+              userid1 = res.body.id;
+              request.post(baseurl + '/admin/user')
+                .set('Authorization', 'Bearer ' + adminLoginToken)
+                .send({ user : { name : testlogin2, email : null, password : password2, isadmin : false, status : 0}})
+                .end(function(err, res) {
+                  if (err) {
+                    throw err;
+                  }
+                  userid2 = res.body.id;
+                  request.post(baseurl + '/admin/user')
+                    .set('Authorization', 'Bearer ' + adminLoginToken)
+                    .send({ user : { name : testlogin3, email : null, password : password3, isadmin : false, status : 0}})
+                    .end(function(err, res) {
+                      if (err) {
+                        throw err;
+                      }
+                      userid3 = res.body.id;
+                      done();
+                    });
+                });
+            });
+        });
   });
+
+  after(function(done) {
+      request.del(baseurl + '/admin/user/' + userid1)
+        .set('Authorization', 'Bearer ' + adminLoginToken)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          request.del(baseurl + '/admin/user/' + userid2)
+            .set('Authorization', 'Bearer ' + adminLoginToken)
+            .end(function(err, res) {
+              if (err) {
+                throw err;
+              }
+              request.del(baseurl + '/admin/user/' + userid3)
+                .set('Authorization', 'Bearer ' + adminLoginToken)
+                .end(function(err, res) {
+                  if (err) {
+                    throw err;
+                  }
+                  request.get(baseurl + '/expireToken')
+                    .set('Authorization', 'Bearer ' + adminLoginToken)
+                    .end(function(err, res) {
+                      if (err) {
+                        throw err;
+                      }
+                      done();
+                    });
+                });
+            });
+        });
+    });
+
 
   describe('Login', function() {
     it('should return a valid token', function(done) {
 	    request.post(baseurl + '/login')
-		.send({username : 'Test', password : 'test'})
+		.send({username : testlogin1, password : password1})
 		.end(function(err, res) {
 		  if (err) {
 		    throw err;
@@ -70,7 +141,7 @@ describe('RegularUser', function() {
                   res.body.should.have.property('token');
                   res.body.should.have.property('gui');
                   res.body.gui.should.equal('regular');
-                  loginToken = res.body.token;
+                  loginToken1 = res.body.token;
 		  done();
                 });
     });
@@ -81,7 +152,7 @@ describe('RegularUser', function() {
 
     it('should show the default gif', function(done) {
     request.get(baseurl + '/viewSettingPic/0')
-        .set('Authorization', 'Bearer ' + loginToken)
+        .set('Authorization', 'Bearer ' + loginToken1)
 	.end(function(err, res) {
           if (err) {
             throw err;
@@ -129,7 +200,7 @@ describe('RegularUser', function() {
 
     it('should return a list of settings', function(done) {
     request.get(baseurl + '/setting')
-        .set('Authorization', 'Bearer ' + loginToken)
+        .set('Authorization', 'Bearer ' + loginToken1)
 	.end(function(err, res) {
           if (err) {
             throw err;
@@ -175,7 +246,7 @@ describe('RegularUser', function() {
  	 adminFeatures.forEach(function (feature) {
 	    it('should not be possible for anonymous to use ' + feature.url, function(done) {
 		    feature.method(baseurl + '/admin' + feature.url)
-		        .set('Authorization', 'Bearer ' + loginToken)
+		        .set('Authorization', 'Bearer ' + loginToken1)
 			.end(function(err, res) {
 			  if (err) {
 			    throw err;
