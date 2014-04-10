@@ -19,7 +19,7 @@ timeForGamesApp.factory('config', ['$window',
 function($window) {
 
     return {
-        urlbase : $window.location.protocol.concat("//").concat($window.location.hostname).concat(":5000/tfg"),
+        urlbase : "/api",
         FIRST_DAY_OF_WEEK : 1
     };
 }]);
@@ -58,14 +58,14 @@ function($http, config, localStorageService) {
 
         storeUser : function(pm_user, callback, errorcallback) {
             if (pm_user.id) {
-                $http.put(config.urlbase + '/admin/user/' + pm_user.id, { user : pm_user}).success(function(data, status) {
+                $http.put(config.urlbase + '/user/' + pm_user.id, { user : pm_user}).success(function(data, status) {
                         callback(data);
                     }).error(function(data, status) {
                         errorcallback(data);
                     });
             }
             else {
-                $http.post(config.urlbase + '/admin/user', { user : pm_user}).success(function(data, status) {
+                $http.post(config.urlbase + '/user', { user : pm_user}).success(function(data, status) {
                         callback(data);
                     }).error(function(data, status) {
                         errorcallback(data);
@@ -74,7 +74,7 @@ function($http, config, localStorageService) {
         },
 
         deleteUser : function(username, callback, errorcallback) {
-	    $http.delete(config.urlbase + '/admin/user/' + username).success(function(data, status) {
+	    $http.delete(config.urlbase + '/user/' + username).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
@@ -82,7 +82,7 @@ function($http, config, localStorageService) {
         },
 
         getUsers : function(callback, errorcallback) {
-	    $http.get(config.urlbase + '/admin/user').success(function(data, status) {
+	    $http.get(config.urlbase + '/user').success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
@@ -101,7 +101,7 @@ function($http, config, localStorageService) {
         },
 
         spoofLogin : function(pm_username, callback, errorcallback) {
-            $http.get(config.urlbase + '/admin/spoof/' + pm_username).success(function(data, status) {
+            $http.get(config.urlbase + '/spoof/' + pm_username).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
@@ -145,7 +145,7 @@ function($http, config, localStorageService) {
         },
 
         adminResetPassword : function(pm_user, callback, errorcallback) {
-            $http.get(config.urlbase + '/admin/resetPassword/' + pm_user.name).success(function(data, status) {
+            $http.get(config.urlbase + '/resetPassword/' + pm_user.name).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
@@ -208,7 +208,7 @@ function($http, config, $upload) {
         },
 
         deletePicture : function(pm_settingid, callback, errorcallback) {
-            $http.delete(config.urlbase + '/admin/setting/pic/' + pm_settingid).success(function(data, status) {
+            $http.delete(config.urlbase + '/setting/pic/' + pm_settingid).success(function(data, status) {
                     callback(data);
                 }).error(function(data, status) {
                     errorcallback(data);
@@ -233,7 +233,7 @@ function($http, config, $upload) {
         },
 
         deleteSetting : function(setting, callback, errorcallback) {
-	    $http.delete(config.urlbase + '/admin/setting/' + setting.id + '?name=' + setting.name).success(function(data, status) {
+	    $http.delete(config.urlbase + '/setting/' + setting.id + '?name=' + setting.name).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);

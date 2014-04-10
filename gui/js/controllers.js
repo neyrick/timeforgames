@@ -704,8 +704,8 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
     $scope.progress = 0;
     $scope.historyList = [];
     $scope.imagePristine = true;
-    $scope.picTimestamp = new Date().getTime();
-    $scope.basePicUrl = config.urlbase + "/viewSettingPic/";
+    $scope.picTimestamp = {};
+    $scope.basePicUrl = config.urlbase + "/setting/pic/";
 
     $scope.currentUser = localStorageService.get('tfgUser');
 
@@ -760,7 +760,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
         }
         else {
             $scope.currentEditSetting = setting;
-            $('.fileDropZone').css('background-image', "url('" + $scope.basePicUrl + setting.id + "?" + $scope.picTimestamp + "')");
+            $('.fileDropZone').css('background-image', "url('" + $scope.basePicUrl + setting.id + "?" + $scope.picTimestamp[setting.id] + "')");
         }
         $scope.imagePristine = true;
         $('#settingEditModal').modal('show');
@@ -773,6 +773,12 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
         }, function(error) {
             showApiError(error);
         });
+    };
+
+    $scope.getSettingPicUrl = function(settingid) {
+        var base = $scope.basePicUrl + settingid + '?';
+        if (typeof $scope.picTimestamp[settingid] == "undefined") return base;
+        else return base + $scope.picTimestamp[settingid];
     };
 
     $scope.storeSetting = function() {
@@ -791,7 +797,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
                     }, function(data, status, headers, config) {
                         $scope.uploading = false;
                         $scope.loadSettings();
-                        $scope.picTimestamp = new Date().getTime();
+                        $scope.picTimestamp[newsetting.id] = new Date().getTime();
                         $('#settingEditModal').modal('hide');
                     }, function(result) {
                         $scope.uploading = false;
@@ -801,7 +807,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
                 else {
                     settingsService.deletePicture(newsetting.id, function(data) {
                         $scope.loadSettings();
-                        $scope.picTimestamp = new Date().getTime();
+                        $scope.picTimestamp[newsetting.id] = new Date().getTime();
                         $('#settingEditModal').modal('hide');
                     }, function(result) {
                         window.alert("Suppresion échouée");

@@ -1,9 +1,9 @@
 {
-  "name": "gamegrinder-rs",
+  "name": "timeforgames",
   "preferGlobal": true,
   "version": "0.1.0",
   "author": "Neyrick <neyrick@gmail.com>",
-  "description": "Serveur REST pour la planification des parties de Reves et Legendes",
+  "description": "Application de planification des parties de Reves et Legendes",
   "contributors": [ ],
   "bin": { },
   "scripts": {

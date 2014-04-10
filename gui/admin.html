@@ -8,14 +8,12 @@
 
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="lib/jquery.qtip.css">
         <link rel="stylesheet" href="css/tfg.css">
         <link rel="shortcut icon" type="image/x-icon" href="images/logo_t10.jpg" />
 
-        <script src="lib/jquery-1.11.0.min.js"></script>
-        <script src="lib/jquery.qtip.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-	    <script src="lib/angular-file-upload-shim.min.js"></script>
+        <script src="lib/angular-file-upload-shim.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
         <script src="lib/angular-file-upload.min.js"></script>
 
@@ -352,7 +350,7 @@
               </thead>
               <tbody>
                 <tr bindonce ng-repeat="setting in settingsList | filter : { mode : settingsMode }">
-                  <td><img bo-src="basePicUrl + setting.id + '?' + picTimestamp" bo-class="'settingPic-' + setting.id"></img></td>
+                  <td><img ng-src="{{ getSettingPicUrl(setting.id) }}" bo-class="'settingPic-' + setting.id"></img></td>
                   <td><span bo-text="setting.name"></span></td>
                   <td>
                     <div class="dummyInlineContainer text-success" bo-if="setting.status == 0"><span class="glyphicon glyphicon-ok"></span> Active</div>
