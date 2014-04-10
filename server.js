@@ -64,7 +64,7 @@ server.get('/api/setting', security.requireLoggedIn, serv.fetchAllSettings);
 server.post('/api/setting', security.requireLoggedIn, serv.createSetting);
 server.put('/api/setting/pic/:settingid', security.requireLoggedIn, serv.storeSettingPicture);
 
-server.put('/api/schedule', security.requireLoggedIn, serv.createSchedule);
+server.post('/api/schedule', security.requireLoggedIn, serv.createSchedule);
 server.del('/api/schedule/:idschedule', security.requireLoggedIn, serv.deleteSchedule);
 
 server.post('/api/comment', security.requireLoggedIn, serv.setComment);

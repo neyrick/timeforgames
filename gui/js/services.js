@@ -648,7 +648,7 @@ function($http, config, planningBuilderService) {
                 role : pm_role,
                 setting : pm_setting
             };
-            $http.put(config.urlbase + '/schedule?log_action=ADD_DISPO', schedule).success(callback).error(genericError);
+            $http.post(config.urlbase + '/schedule?log_action=ADD_DISPO', schedule).success(callback).error(genericError);
         },
 
         clearDispo : function(idschedule, callback) {

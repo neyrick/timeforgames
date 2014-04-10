@@ -4,29 +4,33 @@ var request = require('superagent');
 var config = require('./config-test.json');
 
 describe('RegularUser', function() {
-  var baseurl = 'localhost:5000/tfg';
+  var baseurl = 'localhost:5000/api';
+  var dummyImage = "test/ashrag.png";
   var adminLoginToken = null;
-  var loginToken1 = null;
+  var loginToken1 = null, loginToken2 = null, loginToken3 = null;
   var testlogin1 = 'test1', password1 = 'pass1';
   var testlogin2 = 'test2', password2 = 'pass2';
   var testlogin3 = 'test3', password3 = 'pass3';
+  var settingid = 0;
+  var today = new Date();
+  var todayid = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 
 // before: se logger en tant qu'admin, recuperer le token, creer l'utilisateur de test
 
 // LOGIN
-// login
+// login OK
 
 // SETTINGS
-// creer un setting (recuperer l'id), lister les settings, modifier un setting
-// ajouter une image de setting, voir une image de setting, supprimer une image de setting
+// creer un setting (recuperer l'id), lister les settings OK
+// ajouter une image de setting, voir une image de setting OK
 
 // DISPOS
-// BEFORE: admin se met dispo en tant que MJ au jour J, l'AM
-// BEFORE: admin se met dispo en tant que PJ au jour J, le soir
-// enregister une dispo sur le setting en tant que PJ au jour J, l'AM
-// enregister une dispo sur le setting en tant que MJ au jour J, le soir
-// tenter de supprimer la dispo
-// tenter de valider la partie de l'aprem
+//  USER1 se met dispo en tant que MJ au jour J, l'AM OK
+//  USER1 se met dispo en tant que PJ au jour J, le soir OK
+//  USER2 enregister une dispo sur le setting en tant que PJ au jour J, l'AM OK
+//  USER2 enregister une dispo sur le setting en tant que MJ au jour J, le soir OK
+//  USER3 se met dispo en tant que PJ au jour J, l'AM OK
+// tenter de supprimer la dispo de user2
 
 // PLANNING
 // consulter son planning (verifier taille ?)
@@ -36,7 +40,8 @@ describe('RegularUser', function() {
 
 // GAMES
 // BEFORE: MJ valide la partie du soir
-// valider la partie du soir
+// valider la partie de l'AM
+// tenter de valider la partie du soir
 // tenter de supprimer la partie de l'AM
 // tenter de reformer la partie de l'AM
 // reformer la partie du soir
@@ -96,31 +101,38 @@ describe('RegularUser', function() {
   });
 
   after(function(done) {
-      request.del(baseurl + '/user/' + userid1)
+      request.del(baseurl + '/setting/' + settingid)
         .set('Authorization', 'Bearer ' + adminLoginToken)
         .end(function(err, res) {
           if (err) {
-            throw err;
+            throw err;p
           }
-          request.del(baseurl + '/user/' + userid2)
+          request.del(baseurl + '/user/' + userid1)
             .set('Authorization', 'Bearer ' + adminLoginToken)
             .end(function(err, res) {
               if (err) {
                 throw err;
               }
-              request.del(baseurl + '/user/' + userid3)
+              request.del(baseurl + '/user/' + userid2)
                 .set('Authorization', 'Bearer ' + adminLoginToken)
                 .end(function(err, res) {
                   if (err) {
                     throw err;
                   }
-                  request.get(baseurl + '/expireToken')
+                  request.del(baseurl + '/user/' + userid3)
                     .set('Authorization', 'Bearer ' + adminLoginToken)
                     .end(function(err, res) {
                       if (err) {
                         throw err;
                       }
-                      done();
+                      request.get(baseurl + '/expireToken')
+                        .set('Authorization', 'Bearer ' + adminLoginToken)
+                        .end(function(err, res) {
+                          if (err) {
+                            throw err;
+                          }
+                          done();
+                        });
                     });
                 });
             });
@@ -128,22 +140,156 @@ describe('RegularUser', function() {
     });
 
 
-  describe('Login', function() {
-    it('should return a valid token', function(done) {
-	    request.post(baseurl + '/login')
-		.send({username : testlogin1, password : password1})
-		.end(function(err, res) {
-		  if (err) {
-		    throw err;
-		  }
-                  res.should.have.status(200);
-                  res.should.be.json;
-                  res.body.should.have.property('token');
-                  res.body.should.have.property('gui');
-                  res.body.gui.should.equal('regular');
-                  loginToken1 = res.body.token;
-		  done();
+
+    describe('Login', function() {
+        it('should return a valid token', function(done) {
+            request.post(baseurl + '/login').send({
+                username : testlogin1,
+                password : password1
+            }).end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.have.property('token');
+                res.body.should.have.property('gui');
+                res.body.gui.should.equal('regular');
+                loginToken1 = res.body.token;
+                request.post(baseurl + '/login').send({
+                    username : testlogin2,
+                    password : password2
+                }).end(function(err, res) {
+                    if (err) {
+                        throw err;
+                    }
+                    loginToken2 = res.body.token;
+                    request.post(baseurl + '/login').send({
+                        username : testlogin3,
+                        password : password3
+                    }).end(function(err, res) {
+                        if (err) {
+                            throw err;
+                        }
+                        loginToken3 = res.body.token;
+                        done();
+                    });
                 });
+            });
+        });
+    }); 
+
+  describe('SettingsManagement', function() {
+
+    it('should return a new setting', function(done) {
+    request.post(baseurl + '/setting')
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .send({ setting: { name : 'Chronique Test Auto', mode : 0, status : 0}})
+    .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+
+          res.should.have.status(200);
+          res.should.be.json;
+          res.body.should.have.property('id');
+          settingid = res.body.id;
+          done();
+        });
+    });
+
+    it('should show all settings including the new one', function(done) {
+    request.get(baseurl + '/setting')
+        .set('Authorization', 'Bearer ' + loginToken1)
+    .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.should.be.json;
+          res.body.should.be.an.Array;
+          res.body.should.containEql({ id: settingid, name : 'Chronique Test Auto', mode : 0, status : 0, code : null});
+          done();
+        });
+    });
+
+    it('should post a new setting picture', function(done) {
+        request.put(baseurl + '/setting/pic/' + settingid)
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .attach('image', dummyImage)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.text.should.equal('Store Setting Picture ok');
+          done();
+        });
+    });
+
+    it('should show the uploaded picture', function(done) {
+    request.get(baseurl + '/setting/pic/' + settingid)
+        .set('Authorization', 'Bearer ' + loginToken1)
+    .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+
+          res.should.have.status(200);
+          res.should.have.header('Content-Type', 'image/png');
+          done();
+        });
+    });
+  });
+
+  describe('ScheduleManagement', function() {
+
+    it('should allow to post a new schedule', function(done) {
+    request.post(baseurl + '/schedule')
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .send({ dayid : todayid, timeframe : 'AFTERNOON', role : 'GM', setting : settingid})
+    .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(200);
+          res.should.be.json;
+          res.body.should.have.property('id');
+          res.body.player.should.equal(testlogin1);
+          request.post(baseurl + '/schedule')
+            .set('Authorization', 'Bearer ' + loginToken1)
+            .send({ dayid : todayid, timeframe : 'EVENING', role : 'PLAYER', setting : settingid})
+            .end(function(err, res) {
+                if (err) {
+                    throw err;
+                }
+              request.post(baseurl + '/schedule')
+                .set('Authorization', 'Bearer ' + loginToken2)
+                .send({ dayid : todayid, timeframe : 'AFTERNOON', role : 'PLAYER', setting : settingid})
+                .end(function(err, res) {
+                    if (err) {
+                        throw err;
+                    }
+                  request.post(baseurl + '/schedule')
+                    .set('Authorization', 'Bearer ' + loginToken2)
+                    .send({ dayid : todayid, timeframe : 'EVENING', role : 'GM', setting : settingid})
+                    .end(function(err, res) {
+                        if (err) {
+                            throw err;
+                        }
+                      request.post(baseurl + '/schedule')
+                        .set('Authorization', 'Bearer ' + loginToken3)
+                        .send({ dayid : todayid, timeframe : 'AFTERNOON', role : 'PLAYER', setting : settingid})
+                        .end(function(err, res) {
+                            if (err) {
+                                throw err;
+                            }
+                        done();
+                    });
+                });
+            });
+          });
+        });
     });
   });
 
@@ -195,43 +341,6 @@ describe('RegularUser', function() {
     });
   });
 
-
-  describe('ListSettings', function() {
-
-    it('should return a list of settings', function(done) {
-    request.get(baseurl + '/setting')
-        .set('Authorization', 'Bearer ' + loginToken1)
-	.end(function(err, res) {
-          if (err) {
-            throw err;
-          }
-          res.should.have.status(200);
-          res.should.be.json;
-          res.body.should.be.an.Array;
-          done();
-        });
-    });
-  });
-
-
-  var loginFeatures = [
-    -{ method : request.get, url : '/relogin' },
-    -{ method : request.get, url : '/resetPassword' },
-    { method : request.get, url : '/setting' },
-    { method : request.post, url : '/setting' },
-    { method : request.put, url : '/setting/pic/0' },
-    { method : request.put, url : '/schedule' },
-    { method : request.del, url : '/schedule/0' },
-    { method : request.post, url : '/comment' },
-    { method : request.put, url : '/game' },
-    { method : request.post, url : '/game/0' },
-    { method : request.get, url : '/planning' },
-    { method : request.get, url : '/updates' },
-    { method : request.get, url : '/history' },
-    { method : request.get, url : '/history/user/a' },
-    { method : request.get, url : '/history/setting/0' },
-  ];
-
   var adminFeatures = [
     { method : request.get, url : '/user' },
     { method : request.post, url : '/user' },
@@ -263,43 +372,6 @@ describe('RegularUser', function() {
 
 
 
-/*
-    request(url)
-	.post('/tfg/login')
-	.send(body)
-	.end(function(err, res) {
-          if (err) {
-            throw err;
-          }
 
-          res.should.have.status(400);
-          done();
-        });
-    });
-*/
-/*
-    it('should correctly update an existing account', function(done){
-	var body = {
-		firstName: 'JP',
-		lastName: 'Berd'
-	};
-	request(url)
-		.put('/api/profiles/vgheri')
-		.send(body)
-		.expect('Content-Type', /json/)
-		.expect(200) //Status code
-		.end(function(err,res) {
-			if (err) {
-				throw err;
-			}
-			// Should.js fluent syntax applied
-			res.body.should.have.property('_id');
-	                res.body.firstName.should.equal('JP');
-	                res.body.lastName.should.equal('Berd');                    
-	                res.body.creationDate.should.not.equal(null);
-			done();
-		});
-	});
-*/
 });
 

@@ -3,7 +3,7 @@ var assert = require('assert');
 var request = require('superagent');  
 
 describe('Anonymous', function() {
-  var baseurl = 'localhost:5000/tfg';
+  var baseurl = 'localhost:5000/api';
 
   before(function(done) {
 
@@ -77,7 +77,7 @@ describe('Anonymous', function() {
     { method : request.get, url : '/setting' },
     { method : request.post, url : '/setting' },
     { method : request.put, url : '/setting/pic/0' },
-    { method : request.put, url : '/schedule' },
+    { method : request.post, url : '/schedule' },
     { method : request.del, url : '/schedule/0' },
     { method : request.post, url : '/comment' },
     { method : request.put, url : '/game' },
