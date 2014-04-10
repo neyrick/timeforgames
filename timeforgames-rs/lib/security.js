@@ -42,27 +42,43 @@ exports.crossDomainHeaders = function(req, res, next) {
     next();
 };
 
+exports.requireLoggedIn = function(req, res, next) {
+	if ((typeof req.user == "undefined") || (req.user == null) || (req.user == '')) {
+	    console.log("Restriction logged-in");
+	    res.send(403, 'Fonction réservée aux utilisateurs connectés');
+	    return;
+	}
+        return next();
+}
+
+exports.requireAdmin = function(req, res, next) {
+	if ((typeof req.admin == "undefined") || (req.admin == null) || (req.admin == '')) {
+	    console.log("Restriction admin");
+	    res.send(403, 'Fonction réservée aux administrateurs');
+	    return;
+	}
+        return next();
+}
+
 exports.authParser = function(req, res, next) {
-    if (req.method == 'OPTIONS') return next();
+//    if (req.method == 'OPTIONS') return next();
     if (req.headers && req.headers.authorization) {
         var tokenMatch = req.headers.authorization.match(/^Bearer (.*)$/);
         if (tokenMatch) {
             try {
                 authdata = jwt.decode(tokenMatch[1], config.jwt.secret);
-                req.user = authdata.username;
-                req.apikey = authdata.apikey;
-                req.admin = authdata.admin;
-                req.spoof = authdata.spoof;
 
-                if (!isKeyValid(req.user, req.apikey)) {
+                if (!isKeyValid(authdata.username, authdata.apikey)) {
                     console.log("Clé invalide: " + JSON.stringify(authdata));
                     res.send(403, 'Token expiré');
                     return;
                 }
-                if (isAdminRestricted(req.url) && (!authdata.admin)) {
-                    console.log("Restriction admin pour authdata: " + JSON.stringify(authdata));
-                    res.send(403, 'Fonction réservée aux administrateurs');
-                    return;
+                else {
+		        req.user = authdata.username;
+		        req.apikey = authdata.apikey;
+		        req.admin = authdata.admin;
+		        req.spoof = authdata.spoof;
+                        return next();
                 }
             } catch (error) {
                 console.log("Erreur JWT:" + error);
@@ -71,22 +87,13 @@ exports.authParser = function(req, res, next) {
                     return;
                 }
             }
-            return next();
         } else {
             console.log("Token invalide");
-            if (isRestricted(req.url)) {
-                res.send(403, 'Format de token invalide');
-                return;
-            }
-            else return next();
-        }
-    } else {
-        if (isRestricted(req.url)) {
-            res.send(403, 'Token absent');
+            res.send(403, 'Format de token invalide');
             return;
         }
-        else return next();
     }
+    else return next();
 };
 
 exports.createApiKey = function(username) {

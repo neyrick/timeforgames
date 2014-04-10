@@ -1,7 +1,7 @@
 {
 	"testAdmin" : {
 		"login": "testAdmin",
-		"password": "*****"
+		"password": "thisisatest"
 	}
 }
 

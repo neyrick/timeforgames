@@ -64,7 +64,7 @@ describe('RegularUser', function() {
             throw err;
           }
           adminLoginToken = res.body.token;
-          request.post(baseurl + '/admin/user')
+          request.post(baseurl + '/user')
             .set('Authorization', 'Bearer ' + adminLoginToken)
             .send({ user : { name : testlogin1, email : null, password : password1, isadmin : false, status : 0}})
             .end(function(err, res) {
@@ -72,7 +72,7 @@ describe('RegularUser', function() {
                 throw err;
               }
               userid1 = res.body.id;
-              request.post(baseurl + '/admin/user')
+              request.post(baseurl + '/user')
                 .set('Authorization', 'Bearer ' + adminLoginToken)
                 .send({ user : { name : testlogin2, email : null, password : password2, isadmin : false, status : 0}})
                 .end(function(err, res) {
@@ -80,7 +80,7 @@ describe('RegularUser', function() {
                     throw err;
                   }
                   userid2 = res.body.id;
-                  request.post(baseurl + '/admin/user')
+                  request.post(baseurl + '/user')
                     .set('Authorization', 'Bearer ' + adminLoginToken)
                     .send({ user : { name : testlogin3, email : null, password : password3, isadmin : false, status : 0}})
                     .end(function(err, res) {
@@ -96,19 +96,19 @@ describe('RegularUser', function() {
   });
 
   after(function(done) {
-      request.del(baseurl + '/admin/user/' + userid1)
+      request.del(baseurl + '/user/' + userid1)
         .set('Authorization', 'Bearer ' + adminLoginToken)
         .end(function(err, res) {
           if (err) {
             throw err;
           }
-          request.del(baseurl + '/admin/user/' + userid2)
+          request.del(baseurl + '/user/' + userid2)
             .set('Authorization', 'Bearer ' + adminLoginToken)
             .end(function(err, res) {
               if (err) {
                 throw err;
               }
-              request.del(baseurl + '/admin/user/' + userid3)
+              request.del(baseurl + '/user/' + userid3)
                 .set('Authorization', 'Bearer ' + adminLoginToken)
                 .end(function(err, res) {
                   if (err) {
@@ -151,7 +151,7 @@ describe('RegularUser', function() {
   describe('DefaultPicture', function() {
 
     it('should show the default gif', function(done) {
-    request.get(baseurl + '/viewSettingPic/0')
+    request.get(baseurl + '/setting/pic/0')
         .set('Authorization', 'Bearer ' + loginToken1)
 	.end(function(err, res) {
           if (err) {
@@ -218,7 +218,7 @@ describe('RegularUser', function() {
     -{ method : request.get, url : '/relogin' },
     -{ method : request.get, url : '/resetPassword' },
     { method : request.get, url : '/setting' },
-    { method : request.put, url : '/setting' },
+    { method : request.post, url : '/setting' },
     { method : request.put, url : '/setting/pic/0' },
     { method : request.put, url : '/schedule' },
     { method : request.del, url : '/schedule/0' },
@@ -234,8 +234,10 @@ describe('RegularUser', function() {
 
   var adminFeatures = [
     { method : request.get, url : '/user' },
-    { method : request.put, url : '/user' },
+    { method : request.post, url : '/user' },
+    { method : request.put, url : '/user/0' },
     { method : request.del, url : '/user/a' },
+    { method : request.put, url : '/setting/0' },
     { method : request.del, url : '/setting/0' },
     { method : request.get, url : '/resetPassword/a' },
     { method : request.get, url : '/spoof/a' },
@@ -245,7 +247,7 @@ describe('RegularUser', function() {
   describe('RequiresAdmin', function() {
  	 adminFeatures.forEach(function (feature) {
 	    it('should not be possible for anonymous to use ' + feature.url, function(done) {
-		    feature.method(baseurl + '/admin' + feature.url)
+		    feature.method(baseurl + feature.url)
 		        .set('Authorization', 'Bearer ' + loginToken1)
 			.end(function(err, res) {
 			  if (err) {

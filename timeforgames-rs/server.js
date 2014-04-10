@@ -46,48 +46,55 @@ server.use(bodyparser());
 server.use(compression());
 server.use(responsetime());
 
-server.get('/tfg/status', serv.getStatus);
-server.get('/tfg/relogin', serv.relogin);
-server.get('/tfg/expireToken', serv.expireToken);
-server.get('/tfg/resetPassword', serv.resetPassword);
+// Methodes en acces libre
 server.post('/tfg/login', serv.login);
+server.get('/tfg/status', serv.getStatus);
+server.get('/tfg/expireToken', serv.expireToken);
+server.get('/tfg/setting/pic/:settingid', serv.getSettingPicture);
 
-server.get('/tfg/setting', serv.fetchAllSettings);
-server.post('/tfg/setting', serv.createSetting);
-server.get('/tfg/viewSettingPic/:settingid', serv.getSettingPicture);
-server.put('/tfg/setting/pic/:settingid', serv.storeSettingPicture);
+// Methodes necessitant un compte standard
 
-server.put('/tfg/schedule', serv.createSchedule);
-server.del('/tfg/schedule/:idschedule', serv.deleteSchedule);
+server.get('/tfg/relogin', security.requireLoggedIn, serv.relogin);
+server.get('/tfg/resetPassword', security.requireLoggedIn, serv.resetPassword);
 
-server.post('/tfg/comment', serv.setComment);
+server.get('/tfg/setting', security.requireLoggedIn, serv.fetchAllSettings);
+server.post('/tfg/setting', security.requireLoggedIn, serv.createSetting);
+server.put('/tfg/setting/pic/:settingid', security.requireLoggedIn, serv.storeSettingPicture);
 
-server.put('/tfg/game', serv.createGame);
+server.put('/tfg/schedule', security.requireLoggedIn, serv.createSchedule);
+server.del('/tfg/schedule/:idschedule', security.requireLoggedIn, serv.deleteSchedule);
+
+server.post('/tfg/comment', security.requireLoggedIn, serv.setComment);
+
+server.put('/tfg/game', security.requireLoggedIn, serv.createGame);
 
 
-server.post('/tfg/game/:idgame', serv.reformGame);
+server.post('/tfg/game/:idgame', security.requireLoggedIn, serv.reformGame);
 
-server.get('/tfg/planning', serv.fetchPlanning);
+server.get('/tfg/planning', security.requireLoggedIn, serv.fetchPlanning);
 
-server.get('/tfg/updates', serv.fetchUpdates);
+server.get('/tfg/updates', security.requireLoggedIn, serv.fetchUpdates);
 
-server.get('/tfg/history', serv.fetchHistory);
-server.get('/tfg/history/user/:user', serv.fetchUserHistory);
-server.get('/tfg/history/setting/:setting', serv.fetchSettingHistory);
+server.get('/tfg/history', security.requireLoggedIn, serv.fetchHistory);
+server.get('/tfg/history/user/:user', security.requireLoggedIn, serv.fetchUserHistory);
+server.get('/tfg/history/setting/:setting', security.requireLoggedIn, serv.fetchSettingHistory);
 
-server.del('/tfg/admin/setting/:id', serv.deleteSetting);
+// Methodes necessitant un compte admin
 
-server.get('/tfg/admin/user', serv.fetchAllUsers);
-server.post('/tfg/admin/user', serv.createUser);
-server.put('/tfg/admin/user/:id', serv.updateUser);
-server.del('/tfg/admin/user/:id', serv.deleteUser);
-server.get('/tfg/admin/resetPassword/:user', serv.adminResetPassword);
 
-server.put('/tfg/admin/setting/:settingid', serv.updateSetting);
+server.del('/tfg/setting/:id', security.requireAdmin, serv.deleteSetting);
 
-server.get('/tfg/admin/spoof/:user', serv.spoofLogin);
+server.get('/tfg/user', security.requireAdmin, serv.fetchAllUsers);
+server.post('/tfg/user', security.requireAdmin, serv.createUser);
+server.put('/tfg/user/:id', security.requireAdmin, serv.updateUser);
+server.del('/tfg/user/:id', security.requireAdmin, serv.deleteUser);
+server.get('/tfg/resetPassword/:user', security.requireAdmin, serv.adminResetPassword);
 
-server.del('/tfg/admin/setting/pic/:settingid', serv.deleteSettingPicture);
+server.put('/tfg/setting/:settingid', security.requireAdmin, serv.updateSetting);
+
+server.get('/tfg/spoof/:user', security.requireAdmin, serv.spoofLogin);
+
+server.del('/tfg/setting/pic/:settingid', security.requireAdmin, serv.deleteSettingPicture);
 
 server.listen(5000, function() {
     console.log('Démarrage de l\'écoute');

@@ -13,7 +13,7 @@ describe('Anonymous', function() {
   describe('DefaultPicture', function() {
 
     it('should show the default gif', function(done) {
-    request.get(baseurl + '/viewSettingPic/0')
+    request.get(baseurl + '/setting/pic/0')
 	.end(function(err, res) {
           if (err) {
             throw err;
@@ -75,7 +75,7 @@ describe('Anonymous', function() {
     { method : request.get, url : '/relogin' },
     { method : request.get, url : '/resetPassword' },
     { method : request.get, url : '/setting' },
-    { method : request.put, url : '/setting' },
+    { method : request.post, url : '/setting' },
     { method : request.put, url : '/setting/pic/0' },
     { method : request.put, url : '/schedule' },
     { method : request.del, url : '/schedule/0' },
@@ -91,8 +91,10 @@ describe('Anonymous', function() {
 
   var adminFeatures = [
     { method : request.get, url : '/user' },
-    { method : request.put, url : '/user' },
+    { method : request.post, url : '/user' },
+    { method : request.put, url : '/user/0' },
     { method : request.del, url : '/user/a' },
+    { method : request.put, url : '/setting/0' },
     { method : request.del, url : '/setting/0' },
     { method : request.get, url : '/resetPassword/a' },
     { method : request.get, url : '/spoof/a' },
@@ -108,7 +110,7 @@ describe('Anonymous', function() {
 			    throw err;
 			  }
 		          res.should.have.status(403);
-			  res.text.should.equal('Token absent');
+			  res.text.should.equal('Fonction réservée aux utilisateurs connectés');
 			  done();
 		        });
 	    });
@@ -118,13 +120,13 @@ describe('Anonymous', function() {
   describe('RequiresAdmin', function() {
  	 adminFeatures.forEach(function (feature) {
 	    it('should not be possible for anonymous to use ' + feature.url, function(done) {
-		    feature.method(baseurl + '/admin' + feature.url)
+		    feature.method(baseurl + feature.url)
 			.end(function(err, res) {
 			  if (err) {
 			    throw err;
 			  }
 		          res.should.have.status(403);
-			  res.text.should.equal('Token absent');
+			  res.text.should.equal('Fonction réservée aux administrateurs');
 			  done();
 		        });
 	    });

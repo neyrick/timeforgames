@@ -63,6 +63,7 @@ function storelog(logdata) {
             console.log("Error: " + err);
     });
 //    console.log("Logdata: %j", logdata);
+/*
     setTimeout(function() {
         mailer.notify(logdata, function(msgData) {
             console.log("Message envoyé à " + msgData.recipient.name + ' (' + msgData.recipient.address + ')');
@@ -70,6 +71,7 @@ function storelog(logdata) {
             console.log(err);
         });
     }, 0);
+*/
 }
 
 function createBaseLogData(req, source) {
