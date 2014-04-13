@@ -18,50 +18,6 @@ describe('RegularUser', function() {
   var userid1, userid2, userid3;
   var gameschedule1, gameschedule2, gameschedule3, gameschedule4, gameschedule5, gameschedule6;
   var gameid, gameid2;
-// before: se logger en tant qu'admin, recuperer le token, creer l'utilisateur de test
-
-// LOGIN
-// login OK
-
-// SETTINGS
-// creer un setting (recuperer l'id), lister les settings OK
-// ajouter une image de setting, voir une image de setting OK
-
-// DISPOS
-//  USER1 se met dispo en tant que MJ au jour J, l'AM OK
-//  USER1 se met dispo en tant que PJ au jour J, le soir OK
-//  USER2 enregister une dispo sur le setting en tant que PJ au jour J, l'AM OK
-//  USER2 enregister une dispo sur le setting en tant que MJ au jour J, le soir OK
-//  USER3 se met dispo en tant que PJ au jour J, l'AM OK
-// tenter de supprimer la dispo de user2 OK
-
-// PLANNING
-// consulter son planning (verifier taille ?) OK
-// consulter ses updates (verifier taille ?) OK
-
-// Commentaires: TODO !
-
-// GAMES
-// valider la partie de l'AM OK
-// tenter de valider la partie du soir OK 
-// tenter de supprimer la partie de l'AM
-// tenter de reformer la partie de l'AM OK
-// reformer la partie du soir OK
-// annuler la partie du soir OK
-// quitter la partie de l'AM OK
-
-// HISTORY
-// consulter historique de la timeframe/setting OK
-// consulter historique de soi-meme OK
-// consulter historique du setting OK
-
-
-// LOGIN
-// relogin
-// expirer son token
-// se relogger et reinitialiser son mot de passe
-
-// after: detruire le setting, detruire l'utilisateur de test, expirer le token d'admin
 
   before(function(done) {
         request.post(baseurl + '/login')
@@ -210,6 +166,7 @@ describe('RegularUser', function() {
           res.should.have.status(200);
           res.should.be.json;
           res.body.should.be.an.Array;
+          res.body.length.should.be.above(0);
           res.body.should.containEql({ id: settingid, name : 'Chronique Test Auto', mode : 0, status : 0, code : null});
           done();
         });
