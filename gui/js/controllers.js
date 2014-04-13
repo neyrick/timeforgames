@@ -2,12 +2,11 @@
 
 /* Controllers */
 
-    function sortSettings(settings) {
-        return settings.sort(function(settinga, settingb) {
-            return settinga.name.localeCompare(settingb.name);
-        });
-    }
-
+function sortSettings(settings) {
+    return settings.sort(function(settinga, settingb) {
+        return settinga.name.localeCompare(settingb.name);
+    });
+}
 
 timeForGamesApp.controller('CalendarCtrl', ['$scope', 'settingsService', 'userService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
 function CalendarCtrl($scope, settingsService, userService, plannerService, planningBuilderService, config, localStorageService, historyService) {
@@ -95,18 +94,18 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     }
 
     function loginPrompt() {
-	if ($scope.display == 'desktop') {
-	    $("#logindialogcontainer").qtip("toggle", true);
-	}
-	else if ($scope.display == 'mobile') {
-// TODO: fenetre de login mobile
-	}
+        if ($scope.display == 'desktop') {
+            $("#logindialogcontainer").qtip("toggle", true);
+        } else if ($scope.display == 'mobile') {
+            // TODO: fenetre de login mobile
+        }
     }
 
+
     $scope.login = function() {
-        
+
         userService.login($scope.tempUser, $scope.tempPassword, function(result) {
-           if (result.id > -1) {
+            if (result.id > -1) {
                 $scope.currentUser = $scope.tempUser;
                 localStorageService.set('tfgUser', $scope.currentUser);
                 $scope.tempUser = '';
@@ -118,20 +117,17 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
                 $scope.refreshSettings(true);
 
                 if ($scope.display == 'desktop') {
-                    $("#logindialogcontainer").qtip("toggle", false);               
+                    $("#logindialogcontainer").qtip("toggle", false);
+                } else if ($scope.display == 'mobile') {
+                    $("#loginModal").modal('hide');
                 }
-                else if ($scope.display == 'mobile') {
-                    $( "#loginModal" ).modal('hide');                    
-                }                              
-           } 
-           else {
-               $scope.loginMessage = result.error;
-           }
-        }, function(error) {
-            if (typeof error == "object") {
-                $scope.loginMessage = error.message;
+            } else {
+                $scope.loginMessage = result.error;
             }
-            else {
+        }, function(error) {
+            if ( typeof error == "object") {
+                $scope.loginMessage = error.message;
+            } else {
                 $scope.loginMessage = error;
             }
         });
@@ -140,25 +136,24 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     $scope.relogin = function() {
         var oldtoken = localStorageService.get('tfgLoginToken');
         if (oldtoken != null) {
-		userService.relogin(function(result) {
-		    localStorageService.set('tfgLoginToken', result.token);
-            $scope.gui = result.gui;
-		    $scope.currentUser = result.username;
-		    $scope.tempUser = '';
-		    $scope.tempPassword = '';
-		    $scope.weeks = [];
-		    loadConfig();
-		    $scope.refreshSettings(true);
-		},function(denialmsg) {
-		    localStorageService.remove('tfgLoginToken');
-		    window.alert("Identification invalide: " + denialmsg);
-                    loginPrompt();
-		},function(errormsg) {
-		    window.alert("Impossible de te reconnecter: " + errormsg);
-                    loginPrompt();
-		});
-	}
-        else {
+            userService.relogin(function(result) {
+                localStorageService.set('tfgLoginToken', result.token);
+                $scope.gui = result.gui;
+                $scope.currentUser = result.username;
+                $scope.tempUser = '';
+                $scope.tempPassword = '';
+                $scope.weeks = [];
+                loadConfig();
+                $scope.refreshSettings(true);
+            }, function(denialmsg) {
+                localStorageService.remove('tfgLoginToken');
+                window.alert("Identification invalide: " + denialmsg);
+                loginPrompt();
+            }, function(errormsg) {
+                window.alert("Impossible de te reconnecter: " + errormsg);
+                loginPrompt();
+            });
+        } else {
             loginPrompt();
         }
     };
@@ -203,22 +198,22 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             if (andPlanning && ( typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null))
                 initPlanning();
             $scope.settingsReady = true;
-        }, function (error) {
-                window.alert("Impossible de récupérer les chroniques: " + error);            
+        }, function(error) {
+            window.alert("Impossible de récupérer les chroniques: " + error);
         });
     };
-/*
-    $scope.toggleStatusVisibility = function(status) {
-        if ($scope.statusDesc[status].visible) {
-            $('.' + $scope.statusDesc[status].style).addClass('ggHidden');
-            $scope.statusDesc[status].visible = false;
-        } else {
-            $('.' + $scope.statusDesc[status].style).removeClass('ggHidden');
-            $scope.statusDesc[status].visible = true;
-        }
-        storeConfig();
-    };
-*/
+    /*
+     $scope.toggleStatusVisibility = function(status) {
+     if ($scope.statusDesc[status].visible) {
+     $('.' + $scope.statusDesc[status].style).addClass('ggHidden');
+     $scope.statusDesc[status].visible = false;
+     } else {
+     $('.' + $scope.statusDesc[status].style).removeClass('ggHidden');
+     $scope.statusDesc[status].visible = true;
+     }
+     storeConfig();
+     };
+     */
     $scope.toggleSettingVisibility = function(settingid, force) {
         var setting;
         for (var i = 0; i < $scope.settingsList.length; i++) {
@@ -660,10 +655,9 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     };
 
     if ($scope.display == 'desktop') {
-        $scope.dayCount = 42;        
-    }
-    else if ($scope.display == 'mobile') {
-        $scope.dayCount = 42;        
+        $scope.dayCount = 42;
+    } else if ($scope.display == 'mobile') {
+        $scope.dayCount = 42;
     }
 
     $scope.firstday = planningBuilderService.getDefaultMinDay();
@@ -682,7 +676,7 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
     $scope.historyList = [];
     $scope.history = {};
     reset();
-//    relogin();
+    //    relogin();
 
 }]);
 
@@ -709,15 +703,14 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
     $scope.currentUser = localStorageService.get('tfgUser');
 
-
     function showApiError(error) {
-        if (typeof error == "object") {
+        if ( typeof error == "object") {
             window.alert(error.message);
-        }
-        else {
+        } else {
             window.alert(error);
-        }        
+        }
     }
+
 
     $scope.loadUsers = function() {
         userService.getUsers(function(users) {
@@ -729,7 +722,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
     $scope.loadSettings = function() {
         settingsService.getSettings(function(settings) {
-//            $scope.settingsList = sortSettings(settings);
+            //            $scope.settingsList = sortSettings(settings);
             $scope.settingsList = settings;
         }, function(error) {
             showApiError(error);
@@ -744,21 +737,28 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
     };
 
     $scope.editUser = function(user) {
-        if (typeof user == "undefined") {
-            $scope.currentEditUser = { name : null, email : null, status : 0, isadmin : false };
-        }
-        else {
+        if ( typeof user == "undefined") {
+            $scope.currentEditUser = {
+                name : null,
+                email : null,
+                status : 0,
+                isadmin : false
+            };
+        } else {
             $scope.currentEditUser = user;
         }
-       $('#userEditModal').modal('show');
+        $('#userEditModal').modal('show');
     };
 
     $scope.editSetting = function(setting) {
-        if (typeof setting == "undefined") {
-            $scope.currentEditSetting = { name : null, mode : 0, status : 0 };
+        if ( typeof setting == "undefined") {
+            $scope.currentEditSetting = {
+                name : null,
+                mode : 0,
+                status : 0
+            };
             $scope.clearImage();
-        }
-        else {
+        } else {
             $scope.currentEditSetting = setting;
             $('.fileDropZone').css('background-image', "url('" + $scope.basePicUrl + setting.id + "?" + $scope.picTimestamp[setting.id] + "')");
         }
@@ -777,23 +777,24 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
     $scope.getSettingPicUrl = function(settingid) {
         var base = $scope.basePicUrl + settingid + '?';
-        if (typeof $scope.picTimestamp[settingid] == "undefined") return base;
-        else return base + $scope.picTimestamp[settingid];
+        if ( typeof $scope.picTimestamp[settingid] == "undefined")
+            return base;
+        else
+            return base + $scope.picTimestamp[settingid];
     };
 
     $scope.storeSetting = function() {
-          $scope.currentEditSetting.code = "AAA";
-          settingsService.storeSetting($scope.currentEditSetting, function(newsetting) {
+        $scope.currentEditSetting.code = "AAA";
+        settingsService.storeSetting($scope.currentEditSetting, function(newsetting) {
             if ($scope.imagePristine) {
                 $scope.loadSettings();
                 $('#settingEditModal').modal('hide');
-            }
-            else {
+            } else {
                 if ($scope.currentUploadFile != null) {
                     $scope.progress = 0;
                     $scope.uploading = true;
                     settingsService.storePicture(newsetting.id, $scope.currentUploadFile, function(evt) {
-			$scope.progress = parseInt(100.0 * evt.loaded / evt.total);			
+                        $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
                     }, function(data, status, headers, config) {
                         $scope.uploading = false;
                         $scope.loadSettings();
@@ -803,8 +804,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
                         $scope.uploading = false;
                         window.alert("Upload échoué");
                     });
-                }
-                else {
+                } else {
                     settingsService.deletePicture(newsetting.id, function(data) {
                         $scope.loadSettings();
                         $scope.picTimestamp[newsetting.id] = new Date().getTime();
@@ -830,8 +830,8 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
     $scope.spoofLogin = function(user) {
         userService.spoofLogin(user.name, function(result) {
             localStorageService.set('tfgLoginToken', result.token);
-             window.location = 'index.html';           
-        }, function (error) {
+            window.location = 'index.html';
+        }, function(error) {
             showApiError(error);
         });
     };
@@ -864,12 +864,16 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
         });
     };
 
-    var timeframesNames = { "AFTERNOON": "Après-midi", "EVENING": "Soirée"};
+    var timeframesNames = {
+        "AFTERNOON" : "Après-midi",
+        "EVENING" : "Soirée"
+    };
     $scope.getTfName = function(dayid, timeframe) {
-        if ((!dayid) || (!timeframe)) return '';
+        if ((!dayid) || (!timeframe))
+            return '';
         var datestr = '' + dayid;
-        var year = datestr.slice(0,4);
-        var month = datestr.slice(4,6);
+        var year = datestr.slice(0, 4);
+        var month = datestr.slice(4, 6);
         var day = datestr.slice(6);
         return day + '/' + month + '/' + year + ' ' + timeframesNames[timeframe];
     };
@@ -892,10 +896,9 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
         });
     };
 
-
     $scope.onSettingPictureSelect = function($files) {
         var pictureFile = $files[0];
-        if (typeof pictureFile == "undefined") {
+        if ( typeof pictureFile == "undefined") {
             window.alert("Fichier impossible à récupérer");
             return;
         }
@@ -903,7 +906,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
             window.alert("Avec un fichier image, ça passera mieux...");
             return;
         }
-        
+
         if (window.FileReader) {
             var fileReader = new FileReader();
             fileReader.readAsDataURL(pictureFile);
@@ -911,53 +914,55 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
                 $scope.$apply(function() {
                     $scope.imagePristine = false;
                     $scope.currentUploadData = e.target.result;
-                $('.fileDropZone').css('background-image', "url(" + $scope.currentUploadData + ")");
-                $scope.currentUploadFile=pictureFile;
+                    $('.fileDropZone').css('background-image', "url(" + $scope.currentUploadData + ")");
+                    $scope.currentUploadFile = pictureFile;
                 });
             };
         }
-    }; 
-  
+    };
+
     $scope.clearImage = function() {
         $scope.currentUploadFile = null;
         $scope.currentUploadData = null;
         $('.fileDropZone').css('background-image', "none");
         $scope.imagePristine = false;
     };
-    
+
     userService.checkAdminStatus(function(result) {
         if (result.admin) {
             $scope.loadSettings();
             $scope.loadUsers();
-        }
-        else {
+        } else {
             window.location = 'index.html';
-        }        
+        }
     }, function(error) {
         window.location = 'index.html';
     });
 
     $('body').on('mouseenter', '.functButton', function() {
-            var helper = $( this ).nextAll('.buttonHelper');
-            helper.text(this.dataset['title']);
-            helper.show();
-        });
+        var helper = $(this).nextAll('.buttonHelper');
+        helper.text(this.dataset['title']);
+        helper.show();
+    });
 
     $('body').on('mouseleave', '.functButton', function() {
-            var helper = $( this ).nextAll('.buttonHelper');
-            helper.text("");
-            helper.hide();
-        });
+        var helper = $(this).nextAll('.buttonHelper');
+        helper.text("");
+        helper.hide();
+    });
 
 }]);
 
 timeForGamesApp.controller('TestCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService',
-function TestCtrl($scope, planningBuilderService, plannerService,settingsService) {
+function TestCtrl($scope, planningBuilderService, plannerService, settingsService) {
 
     $scope.firstday = planningBuilderService.getDefaultMinDay();
     $scope.dayCount = 30;
     $scope.currentUser = 'Neyrick';
-    $scope.timeframesNames = { "AFTERNOON": "Après-midi", "EVENING": "Soirée"};
+    $scope.timeframesNames = {
+        "AFTERNOON" : "Après-midi",
+        "EVENING" : "Soirée"
+    };
     $scope.currentTimeframe = null;
 
     $scope.timeframes = [];
@@ -965,60 +970,61 @@ function TestCtrl($scope, planningBuilderService, plannerService,settingsService
     $scope.refreshSettings = function(andPlanning) {
         settingsService.getSettings(function(settings) {
             $scope.settingsList = sortSettings(settings);
-/*
-            $scope.openSettings = [];
-            $scope.closedSettings = [];
-            $scope.oneShots = [];
-            $scope.clubEvents = [];
-            $scope.settingsList.forEach(function(item) {
-                if (item.status > 0)
-                    return;
-                if (item.mode == 0) {
-                    $scope.openSettings.push(item);
-                    item.visible = ($scope.config.invisibleOpenSettings.indexOf(item.id) == -1);
-                } else if (item.mode == 1) {
-                    $scope.closedSettings.push(item);
-                    item.visible = ($scope.config.visibleClosedSettings.indexOf(item.id) > -1);
-                } else if (item.mode == 2) {
-                    $scope.oneShots.push(item);
-                    item.visible = ($scope.config.invisibleOneShots.indexOf(item.id) == -1);
-                } else if (item.mode == 3) {
-                    $scope.clubEvents.push(item);
-                    item.visible = true;
-                }
-            });
-*/
+            /*
+             $scope.openSettings = [];
+             $scope.closedSettings = [];
+             $scope.oneShots = [];
+             $scope.clubEvents = [];
+             $scope.settingsList.forEach(function(item) {
+             if (item.status > 0)
+             return;
+             if (item.mode == 0) {
+             $scope.openSettings.push(item);
+             item.visible = ($scope.config.invisibleOpenSettings.indexOf(item.id) == -1);
+             } else if (item.mode == 1) {
+             $scope.closedSettings.push(item);
+             item.visible = ($scope.config.visibleClosedSettings.indexOf(item.id) > -1);
+             } else if (item.mode == 2) {
+             $scope.oneShots.push(item);
+             item.visible = ($scope.config.invisibleOneShots.indexOf(item.id) == -1);
+             } else if (item.mode == 3) {
+             $scope.clubEvents.push(item);
+             item.visible = true;
+             }
+             });
+             */
             if (andPlanning && ( typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null))
                 initPlanning();
             $scope.settingsReady = true;
-        }, function (error) {
-                window.alert("Impossible de récupérer les chroniques: " + error);            
+        }, function(error) {
+            window.alert("Impossible de récupérer les chroniques: " + error);
         });
     };
 
     function initPlanning() {
-//        $scope.loading = true;
-//        setTimeout(function() {
-//            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
-                plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
-                    var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
-//                    planningBuilderService.dispatchUpdatesFlags(updatesHash, weeks, $scope.config.lastUpdate);
-//                    $scope.config.lastUpdate = new Date().getTime();
-                    $scope.timeframes = timeframes;
-//                    storeConfig();
-//                    applyFilters();
-                });
-//            });
-//            $scope.loading = false;
-//        }, 0);
+        //        $scope.loading = true;
+        //        setTimeout(function() {
+        //            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
+        plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
+            var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
+            //                    planningBuilderService.dispatchUpdatesFlags(updatesHash, weeks, $scope.config.lastUpdate);
+            //                    $scope.config.lastUpdate = new Date().getTime();
+            $scope.timeframes = timeframes;
+            //                    storeConfig();
+            //                    applyFilters();
+        });
+        //            });
+        //            $scope.loading = false;
+        //        }, 0);
     }
 
-   $scope.refreshSettings(true);
 
-   $scope.selectSetting = function(timeframe) {
-       $scope.currentTimeframe = timeframe;
-       $('#addSettingModal').modal('show');
-   }
+    $scope.refreshSettings(true);
+
+    $scope.selectSetting = function(timeframe) {
+        $scope.currentTimeframe = timeframe;
+        $('#addSettingModal').modal('show');
+    };
 
     $scope.addSetting = function(setting) {
         plannerService.setDispo($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, setting.id, 'GM', function() {
@@ -1030,11 +1036,10 @@ function TestCtrl($scope, planningBuilderService, plannerService,settingsService
     $scope.refreshTimeframe = function() {
         plannerService.getTimeframePlanning($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, function(result) {
             if ($scope.currentTimeframe.collapsed) {
-                  initPlanning();
+                initPlanning();
+            } else {
+                planningBuilderService.refreshTimeframeInWeeksPlanning($scope.settingsList, result, $scope.currentTimeframe, $scope.currentUser);
             }
-            else {
-	            planningBuilderService.refreshTimeframeInWeeksPlanning($scope.settingsList, result, $scope.currentTimeframe, $scope.currentUser);
-	    }
         });
     };
 

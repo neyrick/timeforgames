@@ -1,55 +1,18 @@
 var serv = require("./lib/services");
 var security = require("./lib/security");
 
-//var restify = require('restify');
 var express = require('express');
 var bodyparser = require('body-parser');
 var compression = require('compression');
 var responsetime = require('response-time');
 var config = require("./config.json");
 
-/*
-restify.CORS.ALLOW_HEADERS.push('authorization');
-
-function formatPicture(req, res, body) {
-     console.log('Formatteur pic pour ' + req.url);
-     return body;
-}
-
-
-var server = restify.createServer({
-    formatters: {
-        'image/gif': formatPicture,
-        'image/jpeg': formatPicture,
-        'image/png': formatPicture,
-    }
-});
-*/
-//var server = restify.createServer();
 var server = express();
-//console.log("Acceptable: " + server.acceptable);
-/*
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.authorizationParser());
-server.use(restify.dateParser());
-server.use(restify.queryParser());
-server.use(restify.jsonp());
-server.use(restify.gzipResponse());
-server.use(restify.bodyParser());
-server.use(security.authParser);
-server.use( restify.CORS( {origins: config.http.allowedOrigins}) );
-server.use( restify.fullResponse() );
-*/
-/*
-function dummyHandler(req, res, next) {
-    console.log('Debug Handler: ' + new Date().getTime());
-    next();
-}
-server.set('env', 'test');
-*/
+server.enable('trust proxy');
+
 function indexHandler(req, res, next) {
     if (req.url == "/") {
-        res.redirect("gui/index.html");
+        res.redirect("/gui/index.html");
     }
     next();
 }
@@ -58,9 +21,8 @@ server.use(indexHandler);
 server.use(security.crossDomainHeaders);
 server.use(bodyparser());
 server.use(compression());
-//server.use(responsetime());
 
-server.use(security.authParser);
+server.use('/api', security.authParser);
 server.use('/gui', express.static('gui'));
 
 
