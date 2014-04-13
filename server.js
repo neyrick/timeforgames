@@ -40,14 +40,29 @@ server.use(security.authParser);
 server.use( restify.CORS( {origins: config.http.allowedOrigins}) );
 server.use( restify.fullResponse() );
 */
+/*
+function dummyHandler(req, res, next) {
+    console.log('Debug Handler: ' + new Date().getTime());
+    next();
+}
+server.set('env', 'test');
+*/
+function indexHandler(req, res, next) {
+    if (req.url == "/") {
+        res.redirect("gui/index.html");
+    }
+    next();
+}
+
+server.use(indexHandler);
 server.use(security.crossDomainHeaders);
 server.use(bodyparser());
 server.use(compression());
-server.use(responsetime());
-
-server.use(express.static('gui'));
+//server.use(responsetime());
 
 server.use(security.authParser);
+server.use('/gui', express.static('gui'));
+
 
 // Methodes en acces libre
 server.post('/api/login', serv.login);
@@ -69,10 +84,8 @@ server.del('/api/schedule/:idschedule', security.requireLoggedIn, serv.deleteSch
 
 server.post('/api/comment', security.requireLoggedIn, serv.setComment);
 
-server.put('/api/game', security.requireLoggedIn, serv.createGame);
-
-
-server.post('/api/game/:idgame', security.requireLoggedIn, serv.reformGame);
+server.post('/api/game', security.requireLoggedIn, serv.createGame);
+server.put('/api/game/:idgame', security.requireLoggedIn, serv.reformGame);
 
 server.get('/api/planning', security.requireLoggedIn, serv.fetchPlanning);
 

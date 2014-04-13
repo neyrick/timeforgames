@@ -831,7 +831,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
         userService.spoofLogin(user.name, function(result) {
             localStorageService.set('tfgLoginToken', result.token);
              window.location = 'index.html';           
-        }, function (result) {
+        }, function (error) {
             showApiError(error);
         });
     };
@@ -847,10 +847,10 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
     };
 
     $scope.destroyUser = function() {
-        userService.deleteUser($scope.currentEditUser.name, function(data) {
+        userService.deleteUser($scope.currentEditUser, function(data) {
             $scope.loadUsers();
             $('#userDeleteAlert').modal('hide');
-        }, function(data) {
+        }, function(error) {
             showApiError(error);
         });
     };
@@ -859,7 +859,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
         settingsService.deleteSetting($scope.currentEditSetting, function(data) {
             $scope.loadSettings();
             $('#settingDeleteAlert').modal('hide');
-        }, function(data) {
+        }, function(error) {
             showApiError(error);
         });
     };

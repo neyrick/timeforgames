@@ -73,8 +73,8 @@ function($http, config, localStorageService) {
                 }
         },
 
-        deleteUser : function(username, callback, errorcallback) {
-	    $http.delete(config.urlbase + '/user/' + username).success(function(data, status) {
+        deleteUser : function(user, callback, errorcallback) {
+	    $http.delete(config.urlbase + '/user/' + user.id).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
@@ -667,7 +667,7 @@ function($http, config, planningBuilderService) {
         },
 
         reformGame : function(pm_idgame, pm_newplayers, callback) {
-            $http.post(config.urlbase + '/game/' + pm_idgame + '?log_action=RFM_GAME', {
+            $http.put(config.urlbase + '/game/' + pm_idgame + '?log_action=RFM_GAME', {
                 players : pm_newplayers
             }).success(callback).error(genericError);
         },
@@ -685,7 +685,7 @@ function($http, config, planningBuilderService) {
                 masterschedule : schedule_id,
                 players : players
             };
-            $http.put(config.urlbase + '/game?log_action=ADD_GAME', game).success(callback).error(genericError);
+            $http.post(config.urlbase + '/game?log_action=ADD_GAME', game).success(callback).error(genericError);
         },
 
         setComment : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_idcomment, pm_message, callback) {
