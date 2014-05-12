@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr" ng-app="timeForGamesApp">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <title>Rêves et Légendes - Planification des Parties</title>
+
+        <link rel="stylesheet" href="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css">
+        <link rel="stylesheet" href="css/tfg.css">
+        <link rel="shortcut icon" type="image/x-icon" href="images/logo_t10.jpg" />
+
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
+        <script src="lib/angular-file-upload-shim.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+        <script src="lib/angular-file-upload.min.js"></script>
+
+        <script src="lib/angular-locale_fr-fr.js"></script>
+        <script src="lib/angular-local-storage.min.js"></script>
+        <script src="lib/bindonce.js"></script>
+        <script src="js/gg.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/controllers.js"></script>
+        <script src="js/filters.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/directives.js"></script>
+
+    </head>
+    <body ng-controller="CalendarCtrl" data-display="desktop">
+        <script type="text/javascript">
+            $(function() {
+                $('[ttip-low!=""]').qtip({
+                    style : {
+                        classes : 'infoTooltip'
+                    },
+                    content : {
+                        attr : 'ttip-low'
+                    },
+                    position : {
+                        my : 'top right',
+                        at : 'bottom left'
+                    },
+                    show : {
+                        event : 'mouseenter click',
+                    },
+                    hide : {
+                        delay : 10,
+                        event : 'mouseleave',
+                    }
+                });
+                $('[ttip!=""]').qtip({
+                    style : {
+                        classes : 'infoTooltip'
+                    },
+                    content : {
+                        attr : 'ttip'
+                    },
+                    position : {
+                        my : 'bottom left',
+                        at : 'top right'
+                    },
+                    show : {
+                        event : 'mouseenter click',
+                    },
+                    hide : {
+                        delay : 10,
+                        event : 'mouseleave',
+                    }
+                });
+
+                // ELements du tfSetting
+
+                $("[alt-text]").each(function() {
+                    $(this).hover(function(event) {
+                        $(this).text($(this).attr("alt-text"));
+                    }, function(event) {
+                        $(this).text($(this).attr("norm-text"));
+                    });
+                });
+                $("[alt-text]").show(function() {
+                    $(this).text($(this).attr("norm-text"));
+                });
+                $('.histButton').qtip({
+                    style : {
+                        classes : 'ggpanel'
+                    },
+                    content : {
+                        text : $('.historydialog')
+                    },
+                    position : {
+                        my : 'center',
+                        at : 'center',
+                        target : $(window),
+                        viewport : $(window),
+                        adjust : {
+                            scroll : false
+                        }
+                    },
+                    show : {
+                        modal : {
+                            on : true,
+                        },
+                        event : false
+                    },
+                    hide : 'unfocus',
+                });
+
+		angular.element('body').scope().relogin();
+            });
+        </script>
+        <div id="ggoverlay" ng-class="{ active :  tooltipLock.mainlock == true }">
+            <div></div>
+        </div>
+        <div id="ggloading" ng-class="{ active :  loading === true }">
+            <div></div>
+        </div>
+
+        <div id="tfSettingTooltipContainer" style="display:none">
+            <div class="ggdropdown tfSettingDropdown">
+                <div class="ggpanelItem ggpanelHeader glossyHeader hoverDay">
+                    {{currentEdit.schedule.name}}
+                </div>
+                <div class="ggpanelItem ggclickablelistitem dispoDiv tfSettingAction" ng-show="currentEdit.status.dispoPJ && (!currentEdit.timeframe.busy)" alt-text="Pas dispo pour jouer ?" ng-click="clearDispo('PLAYER')" norm-text="Je suis dispo pour jouer"></div>
+                <div class="ggpanelItem ggclickablelistitem pasDispoDiv tfSettingAction" ng-show="(!currentEdit.status.dispoPJ) && (!currentEdit.timeframe.busy)" alt-text="Dispo pour jouer ?" ng-click="setDispo('PLAYER')" norm-text="Je ne suis pas dispo pour jouer"></div>
+                <div class="ggpanelItem ggclickablelistitem dispoDiv tfSettingAction" ng-show="currentEdit.status.dispoMJ && (!currentEdit.timeframe.busy)" alt-text="Pas dispo pour maîtriser ?" ng-click="clearDispo('GM')" norm-text="Je suis dispo pour maîtriser"></div>
+                <div class="ggpanelItem ggclickablelistitem validateDiv tfSettingAction collapsible" ng-show="((!editingGame) && (currentEdit.status.dispoMJ) && (!currentEdit.timeframe.busy) && (currentEdit.potentialPlayers.length > 0))" ng-click="openGameEditor()">
+                    <span>Valider une partie...</span>
+                </div>
+                <div class="ggpanelItem ggclickablelistitem validateDiv tfSettingAction collapsible" ng-show="((!editingGame) && (currentEdit.status.mj))" ng-click="openGameEditor()">
+                    <span>Modifier ma partie...</span>
+                </div>
+                <div class="ggpanelItem ggclickablelistitem pasDispoDiv tfSettingAction" ng-show="!currentEdit.status.dispoMJ && (!currentEdit.timeframe.busy)" alt-text="Dispo pour maîtriser ?" ng-click="setDispo('GM')" norm-text="Je ne suis pas dispo pour maîtriser"></div>
+                <div class="ggpanelItem warningDiv tfSettingAction" ng-show="currentEdit.timeframe.busy && (currentEdit.timeframe.gaming[currentUser] != currentEdit.schedule.settingid)">
+                    Je suis déjà sur une autre partie !
+                </div>
+                <div class="ggpanelItem ggclickablelistitem cancelDiv tfSettingAction" ng-show="currentEdit.status.pj" ng-click="dropGame()">
+                    Quitter la partie
+                </div>
+                <div class="ggpanelItem ggclickablelistitem cancelDiv tfSettingAction" ng-show="currentEdit.status.mj" ng-click="disbandGame()">
+                    Annuler la partie
+                </div>
+                <div class="gameEditor ggpanelItem dummyContainer" ng-show="editingGame">
+                    <div class="ggpanelSubheader hoverDay">
+                        Choisis tes joueurs... <span class="rightbutton badge buttonBadge" ng-show="currentEdit.numPlayers > 0" ng-click="validateGame(day.id, timeframe.code, schedule.id, $event)">... Puis clique ici !</span>
+                    </div>
+                    <div class="ggclickablelistitem ggpanelSubitem tfSettingAction" ng-repeat="playerSchedule in currentEdit.potentialPlayers" ng-class="{validateDiv : currentEdit.gamePlayers[playerSchedule.player]}" ng-click="toggleGamePlayer(playerSchedule)">
+                        {{ playerSchedule.player }}
+                    </div>
+                </div>
+                <div class="ggpanelItem ggclickablelistitem noteDiv commentTrigger tfSettingAction collapsible" ng-click="openCommentEditor()" ng-show="!editingComment">
+                    <span ng-show="!(currentEdit.schedule.idcomment>0)">Ajouter un commentaire...</span><span ng-show="currentEdit.schedule.idcomment>0">Modifier mon commentaire...</span>
+                </div>
+                <div class="ggpanelItem commentEdit" ng-show="editingComment">
+                    <form id="commentForm" role="form" name="commentForm" ng-submit="setComment()" novalidate>
+                        <button class="commentButton rightbutton" ng-disabled="commentForm.$invalid" type="submit">
+                            Valider
+                        </button>
+                        <span class="inputContainer">
+                            <textarea class="inputComment expand" rows="5" name="comment" placeholder="Tape ton commentaire" wrap="soft" ng-model="currentEdit.schedule.message"></textarea>
+                        </span>
+
+                    </form>
+                </div>
+                <div class="ggpanelItem" ng-repeat="game in currentEdit.schedule.games">
+                    <span class="confirmedgame tfSettingSubbox">Partie confirmée:</span>
+                    <ul class="gameRoster">
+                        <li class="nomMJ">
+                            {{ game.gm.player }}<span class="commentDisplay" ng-show="game.gm.comment"> - {{ game.gm.comment }}</span>
+                        </li>
+                        <li ng-repeat="playerSchedule in game.players" class="nomPJ">
+                            {{ playerSchedule.player }}<span class="commentDisplay" ng-show="playerSchedule.comment"> - {{ playerSchedule.comment }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ggpanelItem">
+                    <span class="tfSettingSubbox">MJ Disponible(s):</span>
+                    <ul class="gameRoster">
+                        <li ng-repeat="playerSchedule in currentEdit.schedule.availablegms" class="nomMJ">
+                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> {{ playerSchedule.comment }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ggpanelItem">
+                    <span class="tfSettingSubbox">Joueur(s) Disponible(s):</span>
+                    <ul class="gameRoster">
+                        <li ng-repeat="playerSchedule in currentEdit.schedule.availableplayers" class="nomPJ">
+                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> {{ playerSchedule.comment }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ggpanelItem">
+                    <span class="tfSettingSubbox">Ne sont pas disponible(s):</span>
+                    <ul class="gameRoster">
+                        <li ng-repeat="playerSchedule in currentEdit.schedule.unavailable">
+                            <span ng-class="{busyplayer : currentEdit.timeframe.gaming[playerSchedule.player]}">{{ playerSchedule.player }}</span><span class="commentDisplay" ng-show="playerSchedule.comment"> {{ playerSchedule.comment }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ggpanelItem ggbuttonbox ggclickableitem hoverDay">
+                    <span class="badge buttonBadge histButton" ng-click="showHistory($event)">Voir l'historique</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="historydialogcontainer" style="display: none">
+            <table class="historydialog" cellspacing="0">
+                <tr class="ggpanelItem ggpanelHeader hoverDay historyHeader">
+                    <td colspan="3">{{ history.setting }} - {{ history.date }} - {{ history.timeframe }}</td>
+                </tr>
+                <tr class="ggpanelItem ggpanelBorderItem historyLine" ng-class-even="'evenline'" ng-class-odd="'oddline'" ng-repeat="history in historyList">
+                    <td class="dateCell ggpanelCell" ng-class-even="'evenline'" ng-class-odd="'oddline'"><span>{{ history.tstamp | date:'dd/MM/yyyy'}}</span></td>
+                    <td class="dateCell ggpanelCell" ng-class-even="'evenline'" ng-class-odd="'oddline'"><span>{{ history.tstamp | date:'H:mm'}}</span></td>
+                    <td class="historyDetailCell ggpanelCell">
+                    <gg-history row="history"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="addSettingTooltipContainer" style="display:none">
+            <div class="ggdropdown addSettingDropdown">
+                <div class="ggpanelItem ggpanelHeader glossyHeader hoverDay">
+                    Je propose une partie de...
+                </div>
+
+                <div class="ggpanelItem ggclickablelistitem dropdownItem settingTrigger hoverDay collapsible" ng-click="openSettingEditor()">
+                    Créer une Chronique / One-Shot ...
+                </div>
+
+                <div class="ggpanelItem dropdownItem settingEditor collapsed dummyContainer" >
+                    <form class="form-inline" role="form" name="createSettingForm" ng-submit="createAndAddSetting()" novalidate>
+                        <div class="ggpanelSubheader hoverDay">
+                            Nouvelle Chronique / One-Shot
+                        </div>
+                        <div class="ggpanelSubitem">
+                            <input type="text" class="inputSettingName expand" name="settingName" placeholder="Nom de la chronique" ng-model="newsetting.name" required maxlength="32"/>
+                        </div>
+                        <div class="ggpanelSubitem centered">
+                            <span class="badge selector" ng-click="newsetting.mode=0" ng-class="{ noPlayBadge : newsetting.mode == 0 }">Ouverte</span>
+                            <span class="badge selector" ng-click="newsetting.mode=1" ng-class="{ noPlayBadge : newsetting.mode == 1 }">Fermée</span>
+                            <span class="badge selector" ng-click="newsetting.mode=2" ng-class="{ noPlayBadge : newsetting.mode == 2 }">One-Shot</span>
+                        </div>
+                        <div class="ggpanelSubitem">
+                            Code (3 lettres max)
+                            <input type="text" class="inputSettingCode" name="settingCode" placeholder="XXX" ng-model="newsetting.code" required size="3" maxlength="3"/>
+                            <button class="settingButton rightbutton badge buttonBadge" ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">
+                                Valider
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="ggpanelItem ggclickablelistitem dropdownItem" ng-repeat="setting in currentEdit.timeframe.possibleNewSettings" ng-click="addSetting(setting)">
+                    {{setting.name}}
+                </div>
+            </div>
+        </div>
+
+        <div id="logindialogcontainer" style="display: none">
+            <div id="logindialog">
+                <form class="form-inline" id="loginForm" role="form"
+                name="loginForm" ng-submit="login()">
+                    <div class="ggpanelHeader ggpanelItem glossyHeader hoverDay">
+                        {{ loginMessage }}
+                    </div>
+                    <div class="ggpanelItem">
+                        <label for="inputName">Tape ton
+                            pseudo:</label>
+                        <input type="text" id="inputName"
+                        name="userinput" placeholder="Ton pseudo sur le forum"
+                        ng-model="tempUser" required />
+                    </div>
+                    <div class="ggpanelItem">
+                        <label for="inputPassword">Tape ton
+                            mot de passe:</label>
+                         <input type="password" id="inputPassword"
+                        name="passwordinput" placeholder="Ton mot de passe"
+                        ng-model="tempPassword" required />
+                    </div>
+                    <div class="ggpanelItem centered">
+                        <button id="nameButton" ng-disabled="loginForm.$invalid" type="submit">
+                            Valider
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="toolbar" class="pageColumn">
+            <div id="greetingsDiv" class="ggpanel" ng-show="currentUser">
+                <div class="ggpanelItem ggpanelHeader glossyHeader">
+                    Salut {{ currentUser }} !
+                </div>
+                <div class="ggpanelItem ggbuttonbox hoverDay">
+                    <span class="badge buttonBadge" ng-click="logout()">Changer d'utilisateur</span>
+                </div>
+                <div class="ggpanelItem ggbuttonbox hoverDay" ng-if="gui == 'admin'">
+                    <a href="admin.html" class="badge buttonBadge" >Interface d'Administration</a>
+                </div>
+            </div>
+
+            <div id="legendContainer" class="ggpanel">
+                <div class="ggpanelItem ggpanelHeader glossyHeader">
+                    Légende
+                </div>
+                <div class="ggpanelItem">
+                    <div class="legendBadge settingCell ggpanelCell">
+                        <span class="badge notAvailableBadge">--</span>
+                    </div>
+                    <div class="settingCell ggpanelCell legendCell">
+                        <span>Pas dispo / intéressé</span>
+                    </div>
+                </div>
+                <div class="ggpanelItem">
+                    <div class="legendBadge settingCell ggpanelCell">
+                        <span class="badge noPlayBadge">--</span>
+                    </div>
+                    <div class="settingCell ggpanelCell legendCell">
+                        <span>Partie sans moi</span>
+                    </div>
+                </div>
+                <div class="ggpanelItem">
+                    <div class="legendBadge settingCell ggpanelCell">
+                        <span class="badge availableBadge">--</span>
+                    </div>
+                    <div class="settingCell ggpanelCell legendCell">
+                        <span>Je suis dispo</span>
+                    </div>
+                </div>
+                <div class="ggpanelItem">
+                    <div class="legendBadge settingCell ggpanelCell">
+                        <span class="badge playBadge">--</span>
+                    </div>
+                    <div class="settingCell ggpanelCell legendCell">
+                        <span>Je joue !</span>
+                    </div>
+                </div>
+                <div class="ggpanelItem">
+                    <div class="legendBadge settingCell ggpanelCell">
+                        <span class="badge newStuff">--</span>
+                    </div>
+                    <div class="settingCell ggpanelCell legendCell">
+                        <span>Y'a du neuf !</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="campaignsContainer" class="dummyContainer" ng-if="settingsReady">
+                <div class="ggpanel" >
+                    <div class="ggpanelItem ggpanelHeader glossyHeader">
+                        Événements
+                    </div>
+
+                    <div bindonce class="ggpanelItem" ng-repeat="setting in clubEvents">
+                        <div class="legendBadge settingCell ggpanelCell">
+                            <span class="badge" bo-text="setting.code"></span>
+                        </div>
+                        <div class="settingCell ggpanelCell legendCell">
+                            <span bo-text="setting.name"></span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="ggpanel" ttip="Clique sur un one-shot pour le rendre visible/invisible dans ton planning">
+                    <div class="ggpanelItem ggpanelHeader glossyHeader">
+                        One-Shots
+                    </div>
+
+                    <div bindonce class="ggpanelItem ggclickablelistitem" ng-repeat="setting in oneShots" ng-click="toggleSettingVisibility(setting.id)" ng-class="{ggDisabledItem : !setting.visible}">
+                        <div class="legendBadge settingCell ggpanelCell">
+                            <span class="badge" bo-text="setting.code"></span>
+                        </div>
+                        <div class="settingCell ggpanelCell legendCell">
+                            <span bo-text="setting.name"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="ggpanel" ttip="Clique sur une chronique pour la rendre visible/invisible dans ton planning">
+                    <div class="ggpanelItem ggpanelHeader glossyHeader">
+                        Chroniques Ouvertes
+                    </div>
+
+                    <div bindonce class="ggpanelItem ggclickablelistitem" ng-repeat="setting in openSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{ggDisabledItem : !setting.visible}">
+                        <div class="legendBadge settingCell ggpanelCell">
+                            <span class="badge" bo-text="setting.code"></span>
+                        </div>
+                        <div class="settingCell ggpanelCell legendCell">
+                            <span bo-text="setting.name"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="ggpanel" ttip="Clique sur une chronique pour la rendre visible/invisible dans ton planning">
+                    <div class="ggpanelItem ggpanelHeader glossyHeader">
+                        Chroniques Fermées
+                    </div>
+
+                    <div bindonce class="ggpanelItem ggclickablelistitem" ng-repeat="setting in closedSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{ggDisabledItem : !setting.visible}">
+                        <div class="legendBadge settingCell ggpanelCell">
+                            <span class="badge" bo-text="setting.code"></span>
+                        </div>
+                        <div class="settingCell ggpanelCell legendCell">
+                            <span bo-text="setting.name"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="pageColumn" ng-if="settingsReady">
+            <div id="#titleBox">
+                <div class="previousArrow" ng-click="showPrevious()" ttip-low="Revenir dans le passé (parce que c'était mieux avant)"><img src="images/previous.png">
+                </div>
+                <div class="nextArrow" ng-click="showNext()" ttip-low="Voir le futur, c'est possible !"><img src="images/next.png">
+                </div>
+                <div class="title">
+                    Rêves et Légendes
+                </div>
+            </div>
+
+            <div class="dummyContainer">
+                <div bindonce class="weekPanel" ng-repeat="week in weeks">
+
+                    <div bindonce class="dayPanel" bo-class="'day' + (1+$index)" ng-repeat="day in week.days">
+                        <gg-day-tab day="day" display="desktop">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </body>
+</html>
+
