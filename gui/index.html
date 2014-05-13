@@ -55,16 +55,47 @@
             });
         </script>
  
+     <div id="logindialogcontainer" style="display: none">
+        <div id="logindialog">
+            <form id="loginForm" role="form"
+            name="loginForm" ng-submit="login()">
+                <div>
+                    {{ loginMessage }}
+                </div>
+                <div>
+                    <label for="inputName">Tape ton
+                        pseudo:</label>
+                    <input type="text" id="inputName"
+                    name="userinput" placeholder="Ton pseudo sur le forum"
+                    ng-model="tempUser" required />
+                </div>
+                <div>
+                    <label for="inputPassword">Tape ton
+                        mot de passe:</label>
+                     <input type="password" id="inputPassword"
+                    name="passwordinput" placeholder="Ton mot de passe"
+                    ng-model="tempPassword" required />
+                </div>
+                <div>
+                    <button id="nameButton" ng-disabled="loginForm.$invalid" type="submit">
+                        Valider
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <div id="userBox" ng-show="currentUser">
         <div id="welcomeText">
             Bienvenue {{ currentUser }}
         </div>
-        <div ng-click="logout()">Se déconnecter</>
+        <div ng-click="logout()">Se déconnecter</div>
     </div>
     
     <div id="filtersSuperbox">
         <div id="filtersToggle">
-            
+            Filtres <span ng-if="!filtersOpen" ng-click="openFilters()">Ouvrir</span><span ng-if="filtersOpen" ng-click="closeFilters()">Fermer</span>
         </div>
         <div id="filtersBox">
             <div id="openSettingsFiltersBox">
@@ -91,13 +122,14 @@
         </div>
     </div>
     
- 
+    <div id="planning">
          <div bindonce ng-repeat="timeframe in timeframes">
 
           <div bo-if="timeframe.collapsed">
                      
-                Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span> - Ajouter une partie 
-              <ul class="tfdropdown">
+                Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span>
+                 - <span class="selectDayToggle">Ajouter une partie</span> 
+              <ul class="selectDayDropdown dropdown">
                 <li bindonce ng-repeat="subtf in timeframe.subs"><a href="#" ng-click="selectSetting(subtf)"><span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]"></a></li>
               </ul>
           </div>
@@ -122,6 +154,7 @@
                       </div>
           </div>
         </div>
+      </div>
     </body>
 </html>
 

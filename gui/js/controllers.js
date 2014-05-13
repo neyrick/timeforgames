@@ -953,46 +953,42 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
 }]);
 
-timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService',
-function TestCtrl($scope, planningBuilderService, plannerService, settingsService) {
-
+timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService',
+'userService',  
+function TestCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService) {
+/*
     $scope.firstday = planningBuilderService.getDefaultMinDay();
     $scope.dayCount = 30;
     $scope.currentUser = 'Neyrick';
-    $scope.timeframesNames = {
-        "AFTERNOON" : "Après-midi",
-        "EVENING" : "Soirée"
-    };
-    $scope.currentTimeframe = null;
 
     $scope.timeframes = [];
+*/
 
     $scope.refreshSettings = function(andPlanning) {
         settingsService.getSettings(function(settings) {
             $scope.settingsList = sortSettings(settings);
-            /*
              $scope.openSettings = [];
              $scope.closedSettings = [];
              $scope.oneShots = [];
              $scope.clubEvents = [];
              $scope.settingsList.forEach(function(item) {
              if (item.status > 0)
-             return;
+                 return;
              if (item.mode == 0) {
-             $scope.openSettings.push(item);
-             item.visible = ($scope.config.invisibleOpenSettings.indexOf(item.id) == -1);
+                 $scope.openSettings.push(item);
+                 item.visible = ($scope.config.invisibleOpenSettings.indexOf(item.id) == -1);
              } else if (item.mode == 1) {
-             $scope.closedSettings.push(item);
-             item.visible = ($scope.config.visibleClosedSettings.indexOf(item.id) > -1);
+                 $scope.closedSettings.push(item);
+                item.visible = ($scope.config.visibleClosedSettings.indexOf(item.id) > -1);
              } else if (item.mode == 2) {
-             $scope.oneShots.push(item);
-             item.visible = ($scope.config.invisibleOneShots.indexOf(item.id) == -1);
+                $scope.oneShots.push(item);
+                item.visible = true; 
+                //($scope.config.invisibleOneShots.indexOf(item.id) == -1);
              } else if (item.mode == 3) {
-             $scope.clubEvents.push(item);
-             item.visible = true;
+                $scope.clubEvents.push(item);
+                item.visible = true;
              }
-             });
-             */
+           });
             if (andPlanning && ( typeof $scope.currentUser != "undefined") && ($scope.currentUser != '') && ($scope.currentUser != null))
                 initPlanning();
             $scope.settingsReady = true;
@@ -1001,7 +997,7 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         });
     };
 
-    function initPlanning() {
+    var initPlanning = function() {
         //        $scope.loading = true;
         //        setTimeout(function() {
         //            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
@@ -1016,10 +1012,17 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         //            });
         //            $scope.loading = false;
         //        }, 0);
-    }
+    };
 
 
-    $scope.refreshSettings(true);
+    var loginPrompt = function() {
+        if ($scope.display == 'desktop') {
+            $("#logindialogcontainer").qtip("toggle", true);
+        } else if ($scope.display == 'mobile') {
+            // TODO: fenetre de login mobile
+        }
+    };
+
 
     $scope.selectSetting = function(timeframe) {
         $scope.currentTimeframe = timeframe;
@@ -1042,5 +1045,233 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
             }
         });
     };
+
+    $scope.login = function() {
+
+        userService.login($scope.tempUser, $scope.tempPassword, function(result) {
+            if (result.id > -1) {
+                $scope.currentUser = $scope.tempUser;
+                localStorageService.set('tfgUser', $scope.currentUser);
+                $scope.tempUser = '';
+                $scope.tempPassword = '';
+                localStorageService.set('tfgLoginToken', result.token);
+                $scope.gui = result.gui;
+                $scope.weeks = [];
+                loadConfig();
+                $scope.refreshSettings(true);
+
+                if ($scope.display == 'desktop') {
+                    $("#logindialogcontainer").qtip("toggle", false);
+                } else if ($scope.display == 'mobile') {
+                    $("#loginModal").modal('hide');
+                }
+            } else {
+                $scope.loginMessage = result.error;
+            }
+        }, function(error) {
+            if ( typeof error == "object") {
+                $scope.loginMessage = error.message;
+            } else {
+                $scope.loginMessage = error;
+            }
+        });
+    };
+
+    $scope.relogin = function() {
+        var oldtoken = localStorageService.get('tfgLoginToken');
+        if (oldtoken != null) {
+            userService.relogin(function(result) {
+                localStorageService.set('tfgLoginToken', result.token);
+                $scope.gui = result.gui;
+                $scope.currentUser = result.username;
+                $scope.tempUser = '';
+                $scope.tempPassword = '';
+                $scope.weeks = [];
+                loadConfig();
+                $scope.refreshSettings(true);
+            }, function(denialmsg) {
+                localStorageService.remove('tfgLoginToken');
+                window.alert("Identification invalide: " + denialmsg);
+                loginPrompt();
+            }, function(errormsg) {
+                window.alert("Impossible de te reconnecter: " + errormsg);
+                loginPrompt();
+            });
+        } else {
+            loginPrompt();
+        }
+    };
+
+    $scope.logout = function() {
+        userService.expireToken(function() {
+            reset();
+            delete $scope.currentUser;
+            localStorageService.remove('tfgLoginToken');
+            if ($scope.display == 'mobile') {
+                $("#loginModal").modal('show');
+            } else if ($scope.display == 'desktop') {
+                $("#logindialogcontainer").qtip("toggle", true);
+            }
+        });
+    };
+
+    $scope.openFilters = function() {
+        $scope.filtersOpen = true;
+        $('#filtersBox').slideDown(200);
+    };
+
+    $scope.closeFilters = function() {
+        $scope.filtersOpen = false;
+        $('#filtersBox').slideUp();
+    };
+
+    function loadConfig() {
+        if (( typeof $scope.currentUser == "undefined") || ($scope.currentUser == null))
+            return;
+        var config = localStorageService.get('tfgconfig-' + $scope.currentUser);
+        if (( typeof config == "undefined") || (config === '') || (config == null))
+            return;
+        $scope.config = config;
+    }
+
+    function storeConfig() {
+        if ( typeof $scope.currentUser == "undefined")
+            return;
+        $scope.config.invisibleOpenSettings = [];
+        $scope.config.visibleClosedSettings = [];
+        $scope.config.invisibleOneShots = [];
+        $scope.config.invisibleStatus = [];
+        $scope.openSettings.forEach(function(item) {
+            if (!item.visible)
+                $scope.config.invisibleOpenSettings.push(item.id);
+        });
+        $scope.closedSettings.forEach(function(item) {
+            if (item.visible)
+                $scope.config.visibleClosedSettings.push(item.id);
+        });
+        /*
+        $scope.oneShots.forEach(function(item) {
+            if (!item.visible)
+                $scope.config.invisibleOneShots.push(item.id);
+        });        
+        for (var i = 0; i < $scope.statusDesc.length; i++) {
+            if (!$scope.statusDesc[i].visible)
+                $scope.config.invisibleStatus.push(i);
+        }
+        */
+        localStorageService.add('tfgconfig-' + $scope.currentUser, JSON.stringify($scope.config));
+    }
+
+    function reset() {
+        $scope.tempUser = '';
+        $scope.tempPassword = '';
+        $scope.currentTimeframe = null;
+        $scope.filtersOpen = false;
+        $scope.timeframes = [];
+        $scope.config = {
+//            invisibleStatus : [],
+            invisibleOpenSettings : [],
+//            invisibleOneShots : [],
+            visibleClosedSettings : [],
+            lastUpdate : 0
+        };
+        $scope.gui = 'regular';
+        $scope.currentEdit = {
+        };
+    }
+
+    $scope.display = $('body').data('display');
+    if ( typeof $scope.display == "undefined")
+        $scope.display = "desktop";
+
+    if ($scope.display == 'desktop') {
+
+        $.fn.qtip.modal_zindex = 16000;
+        $('#logindialogcontainer').qtip({
+            style : {
+                classes : ''
+            },
+            content : {
+                text : $('#logindialog')
+            },
+            position : {
+                my : 'center',
+                at : 'center',
+                target : $(window)
+            },
+            show : {
+                autofocus : '#inputName',
+                event : false,
+                modal : {
+                    on : true,
+                    blur : false,
+                    escape : false
+                }
+            },
+            hide : false
+        });
+
+        $('#planning').on('click', '.selectDayToggle', function(event) {
+            $(this).qtip({
+                style : {
+                    classes : ''
+                },
+                content : {
+                    text : $(this).parent().find('.selectDayDropdown')
+                },
+                position : {
+                    my : 'top center',
+                    at : 'bottom center',
+                    target : $(this)
+                },
+                overwrite: false,
+                show : {
+                    event : event.type,
+                    ready: true
+                },
+                hide :  {
+                    event : 'mouseleave',
+                    fixed : true,
+                    delay : 100
+                }
+        }); });
+    }
+
+    $scope.loading = false;
+
+    $scope.newsetting = {
+        name : '',
+        mode : -1,
+        status : 0,
+        code : ''
+    };
+
+    if ($scope.display == 'desktop') {
+        $scope.dayCount = 42;
+    } else if ($scope.display == 'mobile') {
+        $scope.dayCount = 42;
+    }
+
+    $scope.firstday = planningBuilderService.getDefaultMinDay();
+    $scope.timeframesNames = {
+        "AFTERNOON" : "Après-midi",
+        "EVENING" : "Soirée"
+    };
+
+/*
+    $scope.settingsReady = false;
+
+    $scope.tooltipLock = {
+        mainlock : false
+    };
+    $scope.editingGame = false;
+    $scope.editingComment = false;
+
+*/
+    $scope.loginMessage = "C'est qui ?";
+//    $scope.currentEdit = {};
+    reset();
+
+//    $scope.refreshSettings(true);
 
 }]);

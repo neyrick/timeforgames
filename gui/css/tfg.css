@@ -1,3 +1,12 @@
 .filterDisabled {
 	text-decoration: line-through;
 }
+.dropdown {
+	display: none;
+}
+#filtersBox {
+	display: none;
+}
+div {
+	border: 1px solid black;
+}

@@ -17,8 +17,8 @@ function indexHandler(req, res, next) {
     next();
 }
 
-server.use(indexHandler);
 server.use(security.crossDomainHeaders);
+server.use(indexHandler);
 server.use(bodyparser());
 server.use(compression());
 
