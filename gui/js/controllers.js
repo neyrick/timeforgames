@@ -8,7 +8,7 @@ function sortSettings(settings) {
     });
 }
 
-timeForGamesApp.controller('CalendarCtrl', ['$scope', 'settingsService', 'userService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
+timeForGamesApp.controller('CalendarCtrlOld', ['$scope', 'settingsService', 'userService', 'plannerService', 'planningBuilderService', 'config', 'localStorageService', 'historyService',
 function CalendarCtrl($scope, settingsService, userService, plannerService, planningBuilderService, config, localStorageService, historyService) {
 
     function timeSlide(days) {
@@ -953,7 +953,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
 }]);
 
-timeForGamesApp.controller('TestCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService',
+timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService',
 function TestCtrl($scope, planningBuilderService, plannerService, settingsService) {
 
     $scope.firstday = planningBuilderService.getDefaultMinDay();

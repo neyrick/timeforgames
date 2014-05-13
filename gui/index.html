@@ -92,38 +92,36 @@
     </div>
     
  
-         <div bindonce class="panel panel-default" ng-repeat="timeframe in timeframes">
-          <div class="panel-body">
-          <div bo-if="timeframe.collapsed" class="btn-group">
-                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span> - Ajouter une partie <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
+         <div bindonce ng-repeat="timeframe in timeframes">
+
+          <div bo-if="timeframe.collapsed">
+                     
+                Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span> - Ajouter une partie 
+              <ul class="tfdropdown">
                 <li bindonce ng-repeat="subtf in timeframe.subs"><a href="#" ng-click="selectSetting(subtf)"><span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]"></a></li>
               </ul>
           </div>
+
           <div bo-if="!timeframe.collapsed" class="row">
-                      <div class="col-sm-2">
+                      <div>
                         <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span><br/><span bo-text="timeframesNames[timeframe.code]"></span>
                       </div>
-                      <div class="col-sm-5">
+                      <div>
                         <div>
                         Parties potentielles
                         </div>
-            <div class="well well-sm" ng-repeat="schedule in timeframe.settings">
+            <div ng-repeat="schedule in timeframe.settings">
                 <span>{{schedule.name}}</span>
             </div>
-                        <div class="btn btn-default" ng-click="selectSetting(timeframe)">
+                        <div ng-click="selectSetting(timeframe)">
                         Ajouter une partie
                         </div>
                       </div>
-                      <div class="col-sm-5">
+                      <div>
                         Parties validées
                       </div>
           </div>
-          </div>
         </div>
-
     </body>
 </html>
 
