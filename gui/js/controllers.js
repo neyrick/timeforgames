@@ -1026,12 +1026,12 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 
     $scope.selectSetting = function(timeframe) {
         $scope.currentTimeframe = timeframe;
-        $('#addSettingModal').modal('show');
+        $('#addsettingdialogcontainer').qtip('show');
     };
 
     $scope.addSetting = function(setting) {
         plannerService.setDispo($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, setting.id, 'GM', function() {
-            $('#addSettingModal').modal('hide');
+            $('#addsettingdialogcontainer').qtip('hide');
             $scope.refreshTimeframe();
         });
     };
@@ -1206,6 +1206,29 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
                     on : true,
                     blur : false,
                     escape : false
+                }
+            },
+            hide : false
+        });
+
+        $('#addsettingdialogcontainer').qtip({
+            style : {
+                classes : ''
+            },
+            content : {
+                text : $('#addsettingdialog')
+            },
+            position : {
+                my : 'center',
+                at : 'center',
+                target : $(window)
+            },
+            show : {
+                event : false,
+                modal : {
+                    on : true,
+                    blur : true,
+                    escape : true
                 }
             },
             hide : false

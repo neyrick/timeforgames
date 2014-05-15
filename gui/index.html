@@ -85,6 +85,34 @@
         </div>
     </div>
 
+     <div id="addsettingdialogcontainer" style="display: none">
+        <div id="addsettingdialog">
+            <div onclick="$('#createSettingForm').slideDown(200)">
+                Ajouter une nouvelle chronique                
+            </div>
+            <div id="createSettingForm"  style="display: none">
+                <form role="form" name="createSettingForm" ng-submit="createAndAddSetting()" novalidate>
+                    <div>
+                        Nom: <input type="text" name="settingName" placeholder="Nom de la chronique" ng-model="newsetting.name" required maxlength="32"/>
+                    </div>
+                    <div>
+                        <span ng-click="newsetting.mode=0" ng-class="{ noPlayBadge : newsetting.mode == 0 }">Ouverte</span>
+                        <span ng-click="newsetting.mode=1" ng-class="{ noPlayBadge : newsetting.mode == 1 }">Fermée</span>
+                        <span ng-click="newsetting.mode=2" ng-class="{ noPlayBadge : newsetting.mode == 2 }">One-Shot</span>
+                    </div>
+                    <button ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">
+                        Valider
+                    </button>
+                </form>
+            </div>
+            <div>
+                 <div ng-repeat="setting in currentTimeframe.possibleNewSettings" ng-click="addSetting(setting)">
+                    {{setting.name}}
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="userBox" ng-show="currentUser">
         <div id="welcomeText">
