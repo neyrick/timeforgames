@@ -14,7 +14,9 @@ function indexHandler(req, res, next) {
     if (req.url == "/") {
         res.redirect("/gui/index.html");
     }
-    next();
+    else {
+        next();
+    }
 }
 
 server.use(security.crossDomainHeaders);

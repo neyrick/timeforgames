@@ -348,6 +348,7 @@ function(config) {
                     availablegms : [],
                     unavailable : [],
                     mystatus : new tfSettingStatus(),
+                    open : false,
                     hasgame : false
                 };
                 currentArray.push(newsetting);

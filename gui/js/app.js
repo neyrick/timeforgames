@@ -2,7 +2,7 @@
 
 /* App Module */
 
-var timeForGamesApp = angular.module('timeForGamesApp', ['LocalStorageModule', 'pasvaz.bindonce', 'angularFileUpload']);
+var timeForGamesApp = angular.module('timeForGamesApp', ['LocalStorageModule', 'pasvaz.bindonce', 'angularFileUpload', 'ngAnimate']);
 
 timeForGamesApp.config(function ($httpProvider) {
         $httpProvider.interceptors.push('authInterceptor');

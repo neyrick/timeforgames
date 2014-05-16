@@ -13,7 +13,8 @@
         <script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
         
         <script src="lib/angular-file-upload-shim.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-animate.js"></script>
         <script src="lib/angular-file-upload.min.js"></script>
 
         <script src="lib/angular-locale_fr-fr.js"></script>
@@ -170,8 +171,16 @@
                         <div>
                         Parties potentielles
                         </div>
-            <div ng-repeat="schedule in timeframe.settings">
-                <span>{{schedule.name}}</span>
+            <div ng-repeat="tfsetting in timeframe.settings" ng-switch="tfsetting.open">
+		<div ng-switch-when="false">
+	                <span>{{tfsetting.name}} (Fermé)</span>
+                        <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
+                </div>
+		<div ng-switch-when="true">
+	                <span>{{tfsetting.name}} (Ouvert)</span>
+                        <a href="#" ng-click="closeTfSetting(tfsetting)"/>Fermer</a>
+                </div>
+		</div>
             </div>
                         <div ng-click="selectSetting(timeframe)">
                         Ajouter une partie

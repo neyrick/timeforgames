@@ -1125,6 +1125,14 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         $('#filtersBox').slideUp();
     };
 
+    $scope.openTfSetting = function(tfsetting) {
+        tfsetting.open = true;
+    }
+
+    $scope.closeTfSetting = function(tfsetting) {
+        tfsetting.open = false;
+    }
+
     function loadConfig() {
         if (( typeof $scope.currentUser == "undefined") || ($scope.currentUser == null))
             return;
@@ -1298,3 +1306,6 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 //    $scope.refreshSettings(true);
 
 }]);
+
+
+
