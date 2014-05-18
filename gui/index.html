@@ -11,7 +11,7 @@
 
         <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
         <script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
-        
+
         <script src="lib/angular-file-upload-shim.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-animate.js"></script>
@@ -52,146 +52,195 @@
                     }
                 });
 
-		angular.element('body').scope().relogin();
+                angular.element('body').scope().relogin();
             });
         </script>
- 
-     <div id="logindialogcontainer" style="display: none">
-        <div id="logindialog">
-            <form id="loginForm" role="form"
-            name="loginForm" ng-submit="login()">
-                <div>
-                    {{ loginMessage }}
-                </div>
-                <div>
-                    <label for="inputName">Tape ton
-                        pseudo:</label>
-                    <input type="text" id="inputName"
-                    name="userinput" placeholder="Ton pseudo sur le forum"
-                    ng-model="tempUser" required />
-                </div>
-                <div>
-                    <label for="inputPassword">Tape ton
-                        mot de passe:</label>
-                     <input type="password" id="inputPassword"
-                    name="passwordinput" placeholder="Ton mot de passe"
-                    ng-model="tempPassword" required />
-                </div>
-                <div>
-                    <button id="nameButton" ng-disabled="loginForm.$invalid" type="submit">
-                        Valider
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
-     <div id="addsettingdialogcontainer" style="display: none">
-        <div id="addsettingdialog">
-            <div onclick="$('#createSettingForm').slideDown(200)">
-                Ajouter une nouvelle chronique                
-            </div>
-            <div id="createSettingForm"  style="display: none">
-                <form role="form" name="createSettingForm" ng-submit="createAndAddSetting()" novalidate>
+        <!-- Pop-up de login -->
+
+        <div id="logindialogcontainer" style="display: none">
+            <div id="logindialog">
+                <form id="loginForm" role="form"
+                name="loginForm" ng-submit="login()">
                     <div>
-                        Nom: <input type="text" name="settingName" placeholder="Nom de la chronique" ng-model="newsetting.name" required maxlength="32"/>
+                        {{ loginMessage }}
                     </div>
                     <div>
-                        <span ng-click="newsetting.mode=0" ng-class="{ noPlayBadge : newsetting.mode == 0 }">Ouverte</span>
-                        <span ng-click="newsetting.mode=1" ng-class="{ noPlayBadge : newsetting.mode == 1 }">Fermée</span>
-                        <span ng-click="newsetting.mode=2" ng-class="{ noPlayBadge : newsetting.mode == 2 }">One-Shot</span>
+                        <label for="inputName">Tape ton
+                            pseudo:</label>
+                        <input type="text" id="inputName"
+                        name="userinput" placeholder="Ton pseudo sur le forum"
+                        ng-model="tempUser" required />
                     </div>
-                    <button ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">
-                        Valider
-                    </button>
+                    <div>
+                        <label for="inputPassword">Tape ton
+                            mot de passe:</label>
+                        <input type="password" id="inputPassword"
+                        name="passwordinput" placeholder="Ton mot de passe"
+                        ng-model="tempPassword" required />
+                    </div>
+                    <div>
+                        <button id="nameButton" ng-disabled="loginForm.$invalid" type="submit">
+                            Valider
+                        </button>
+                    </div>
                 </form>
             </div>
-            <div>
-                 <div ng-repeat="setting in currentTimeframe.possibleNewSettings" ng-click="addSetting(setting)">
-                    {{setting.name}}
+        </div>
+
+        <!-- Pop-up d'ajout d'une chronique -->
+
+        <div id="addsettingdialogcontainer" style="display: none">
+            <div id="addsettingdialog">
+                <div onclick="$('#createSettingForm').slideDown(200)">
+                    Ajouter une nouvelle chronique
+                </div>
+                <div id="createSettingForm"  style="display: none">
+                    <form role="form" name="createSettingForm" ng-submit="createAndAddSetting()" novalidate>
+                        <div>
+                            Nom:
+                            <input type="text" name="settingName" placeholder="Nom de la chronique" ng-model="newsetting.name" required maxlength="32"/>
+                        </div>
+                        <div>
+                            <span ng-click="newsetting.mode=0" ng-class="{ noPlayBadge : newsetting.mode == 0 }">Ouverte</span>
+                            <span ng-click="newsetting.mode=1" ng-class="{ noPlayBadge : newsetting.mode == 1 }">Fermée</span>
+                            <span ng-click="newsetting.mode=2" ng-class="{ noPlayBadge : newsetting.mode == 2 }">One-Shot</span>
+                        </div>
+                        <button ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">
+                            Valider
+                        </button>
+                    </form>
+                </div>
+                <div>
+                    <div ng-repeat="setting in currentTimeframe.possibleNewSettings" ng-click="addSetting(setting)">
+                        {{setting.name}}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- Boutons utilisateur -->
 
-    <div id="userBox" ng-show="currentUser">
-        <div id="welcomeText">
-            Bienvenue {{ currentUser }}
+        <div id="userBox" ng-show="currentUser">
+            <div id="welcomeText">
+                Bienvenue {{ currentUser }}
+            </div>
+            <div ng-click="logout()">
+                Se déconnecter
+            </div>
         </div>
-        <div ng-click="logout()">Se déconnecter</div>
-    </div>
-    
-    <div id="filtersSuperbox">
-        <div id="filtersToggle">
-            Filtres <span ng-if="!filtersOpen" ng-click="openFilters()">Ouvrir</span><span ng-if="filtersOpen" ng-click="closeFilters()">Fermer</span>
-        </div>
-        <div id="filtersBox">
-            <div id="openSettingsFiltersBox">
-                Chroniques ouvertes
+
+        <!-- Panneau des filtres -->
+
+        <div id="filtersSuperbox">
+
+            <div id="filtersToggle">
+                Filtres <span ng-if="!filtersOpen" ng-click="openFilters()">Ouvrir</span><span ng-if="filtersOpen" ng-click="closeFilters()">Fermer</span>
+            </div>
+            <div id="filtersBox">
+                <div id="openSettingsFiltersBox">
+                    Chroniques ouvertes
 
                     <div bindonce ng-repeat="setting in openSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
                         <div>
                             <span bo-text="setting.name"></span>
                         </div>
                     </div>
-                
-            </div>
-            <div id="closedSettingsFiltersBox">
 
-                Chroniques fermées
+                </div>
+                <div id="closedSettingsFiltersBox">
+
+                    Chroniques fermées
 
                     <div bindonce ng-repeat="setting in closedSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
                         <div>
                             <span bo-text="setting.name"></span>
                         </div>
                     </div>
-                
+
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div id="planning">
-         <div bindonce ng-repeat="timeframe in timeframes">
 
-          <div bo-if="timeframe.collapsed">
-                     
-                Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span>
-                 - <span class="selectDayToggle">Ajouter une partie</span> 
-              <ul class="selectDayDropdown dropdown">
-                <li bindonce ng-repeat="subtf in timeframe.subs"><a href="#" ng-click="selectSetting(subtf)"><span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]"></a></li>
-              </ul>
-          </div>
+        <div id="planning">
+            <div bindonce ng-repeat="timeframe in timeframes">
 
-          <div bo-if="!timeframe.collapsed" class="row">
-                      <div>
-                        <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span><br/><span bo-text="timeframesNames[timeframe.code]"></span>
-                      </div>
-                      <div>
+                <!-- Ligne d'aggrégation de plusieurs demi-journées -->
+
+                <div bo-if="timeframe.collapsed">
+
+                    Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span>
+                    - <span class="selectDayToggle">Ajouter une partie</span>
+                    <ul class="selectDayDropdown dropdown">
+                        <li bindonce ng-repeat="subtf in timeframe.subs">
+                            <a href="#" ng-click="selectSetting(subtf)"><span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]"></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Ligne relative à une demi-journée  -->
+
+                <div bo-if="!timeframe.collapsed">
+                    <div>
+                        <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>
+                        <br/>
+                        <span bo-text="timeframesNames[timeframe.code]"></span>
+                    </div>
+                    <div>
+
+                        <!-- Colonne des parties potentielles  -->
+
                         <div>
-                        Parties potentielles
+                            Parties potentielles
                         </div>
-            <div ng-repeat="tfsetting in timeframe.settings" ng-switch="tfsetting.open">
-		<div ng-switch-when="false">
-	                <span>{{tfsetting.name}} (Fermé)</span>
-                        <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
-                </div>
-		<div ng-switch-when="true">
-	                <span>{{tfsetting.name}} (Ouvert)</span>
-                        <a href="#" ng-click="closeTfSetting(tfsetting)"/>Fermer</a>
-                </div>
-		</div>
-            </div>
+                        <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : false } " ng-switch="isTfSettingOpen(tfsetting)">
+
+                            <!-- Bloc chronique fermé -->
+
+                            <div ng-switch-when="false">
+                                <span ng-show="tfsetting.mystatus.dispo">Dispo</span>
+                                <span>{{tfsetting.name}} (Fermé)</span>
+                                <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
+                            </div>
+
+                            <!-- Bloc chronique ouvert -->
+
+                            <div ng-switch-when="true">
+                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentUser="currentUser"/>
+                            </div>
+                        </div>
                         <div ng-click="selectSetting(timeframe)">
-                        Ajouter une partie
+                            Ajouter une partie
                         </div>
-                      </div>
-                      <div>
-                        Parties validées
-                      </div>
-          </div>
+                    </div>
+                    <div>
+                    
+                        <!-- Colonne des parties validées  -->
+        
+                        <div>
+                            Parties validées
+                        </div>
+                        <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : true } " ng-switch="isTfSettingOpen(tfsetting)">
+        
+                            <!-- Bloc chronique fermé -->
+        
+                            <div ng-switch-when="false">
+                                <span ng-show="(tfsetting.mystatus.pj) || (tfsetting.mystatus.mj)">Dispo</span>
+                                <span>{{tfsetting.name}} (Fermé)</span>
+                                <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
+                            </div>
+        
+                            <!-- Bloc chronique ouvert -->
+        
+                            <div ng-switch-when="true">
+                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentuser="currentUser"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>                    
+            </div>
         </div>
-      </div>
+        </div>
     </body>
 </html>
 

@@ -348,7 +348,7 @@ function(config) {
                     availablegms : [],
                     unavailable : [],
                     mystatus : new tfSettingStatus(),
-                    open : false,
+                    key : '' + timeframe.dayid + timeframe.code + settingref.id,
                     hasgame : false
                 };
                 currentArray.push(newsetting);
@@ -382,6 +382,7 @@ function(config) {
                 };
                 tfSetting.games.push(game);
             }
+            tfSetting.defgame = tfSetting.games[0];
             if (rawschedule.role == 'GM')
                 game.gm = newschedule;
             else if (rawschedule.role == 'PLAYER')
@@ -510,13 +511,14 @@ function(config) {
             return currtime;
         },
 
-        refreshTimeframeInWeeksPlanning : function(settings, schedules, timeframe, me) {
+        refreshTimeframePlanning : function(settings, schedules, timeframe, me) {
             var i;
 
             timeframe.busy = false;
             timeframe.gaming = {};
             timeframe.settings.length = 0;
             timeframe.possibleNewSettings.length = 0;
+            timeframe.collapsed = isCollapsedByDefault(timeframe);
             settings.forEach(function(setting) {
                 if (setting.status == 0) {
                     timeframe.possibleNewSettings.push(setting);
@@ -526,6 +528,11 @@ function(config) {
             for ( i = 0; i < schedules.length; i++) {
                 addSchedule(schedules[i], timeframe, settings, me);
             }
+            timeframe.settings.forEach(function(setting) {
+                setting.canplay = setting.availableplayers.some(function(playerschedule) {
+                    return ((typeof timeframe.gaming[playerschedule.player] == "undefined") && (playerschedule.player != me));
+                });
+            });
             timeframe.settings.sort(function(settinga, settingb) {
                 return settinga.name.localeCompare(settingb.name);
             });
@@ -612,9 +619,14 @@ function(config) {
                 addSchedule(rawschedule, timeframe, settings, me);
             }
             timeframes.forEach(function(item) {
-		    item.settings.sort(function(settinga, settingb) {
-		        return settinga.name.localeCompare(settingb.name);
-		    });
+                item.settings.forEach(function(setting) {
+                    setting.canplay = setting.availableplayers.some(function(playerschedule) {
+                        return ((typeof item.gaming[playerschedule.player] == "undefined") && (playerschedule.player != me));
+                    });
+                });
+    		    item.settings.sort(function(settinga, settingb) {
+    		        return settinga.name.localeCompare(settingb.name);
+    		    });
             });
 
             return aggregateTimeframes(timeframes);

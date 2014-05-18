@@ -1,7 +1,78 @@
 'use strict';
 
-/* Directives */
+timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', function(config, plannerService) {
+    
+        return {
+        controller : function ($scope, $element, $attrs) {
+            $scope.basePicUrl = config.urlbase + "/setting/pic/";
+            $scope.getSettingPicUrl = function(settingid) {
+                return $scope.basePicUrl + settingid;
+            };
 
+            $scope.setDispo = function(role) {
+                plannerService.setDispo($scope.timeframe.dayid, $scope.timeframe.code, $scope.tfsetting.settingid, role, function() {
+                    $scope.$parent.refreshTimeframe($scope.timeframe);
+//                    $scope.refresh({ timeframe : $scope.timeframe });
+                });
+            };
+            $scope.clearDispo = function(role) {
+                plannerService.clearDispo(getMyScheduleId($scope.currentuser, $scope.tfsetting, role), function() {
+                    $scope.$parent.refreshTimeframe($scope.timeframe);
+//                    $scope.refresh({ timeframe : $scope.timeframe });
+                });
+            };
+            $scope.togglePlayerSelection = function(playerschedule) {
+                if (playerschedule.player == $scope.currentuser) return;
+                if ($scope.timeframe.gaming[playerschedule.player]) return;
+                if ($scope.isPlayerSelected(playerschedule.player)) {
+                    delete $scope.gamePicks[playerschedule.player];
+                }
+                else {
+                    $scope.gamePicks[playerschedule.player] = playerschedule;
+                }
+            };
+
+            $scope.isPlayerSelected = function(player) {
+                return (typeof $scope.gamePicks[player] != "undefined");
+            };
+
+            $scope.validateGame = function() {
+                
+            };
+
+            $scope.openGMMode = function() {
+                $scope.displayMode = "validate";
+            };
+        
+            $scope.cancelGMMode = function() {
+                resetDisplayMode();
+            };
+        
+            $scope.resetDisplayMode = function() {
+                if (scope.tfsetting.hasgame) {
+                    scope.displayMode = "prepare";               
+                }
+                else {
+                    scope.displayMode = "game";               
+                }
+            };
+        },
+        restrict: 'E',
+        templateUrl: 'directives/opentfsetting.html',
+        scope: {
+             timeframe : '=',
+             tfsetting : '=',
+             currentuser : '=',
+             refresh : '&'
+        },
+        link: function(scope, element, attrs) {
+            scope.gamePicks = [];
+            resetDisplayMode();
+        }
+    };
+}]);
+/* Directives */
+/*
 timeForGamesApp.directive('ggTfSetting', function() {
 
     var templates = {
@@ -211,4 +282,4 @@ timeForGamesApp.directive('ggHistory', function() {
 		}
 	};
 });
-
+*/

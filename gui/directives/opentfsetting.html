@@ -1,0 +1,92 @@
+<a href="#" ng-click="closeTfSetting(tfsetting)"/>Fermer</a>
+<img ng-src="{{ getSettingPicUrl(tfsetting.settingid) }}"></img>
+<span>{{tfsetting.name}} (Ouvert)</span>
+
+<div ng-if="tfsetting.hasgame">{{tfsetting.defgame.name}}</div>
+
+<div ng-if="tfsetting.hasgame">{{tfsetting.defgame.start}}</div>
+
+<div ng-switch="displayMode">
+    <!-- Bloc disponibilites -->
+    <div ng-switch-when="prepare">
+        <!-- Listes de joueurs / MJ dispos -->
+
+        <div>
+            MJ :
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : playerSchedule.isca }">{{ playerSchedule.player }}</span> </span>
+            <br/>
+            PJ :
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : playerSchedule.isca }">{{ playerSchedule.player }}</span> </span>
+        </div>
+
+        <!-- Boutons ajout / suppression de dispo -->
+
+        <div>
+            <a href="#" ng-click="setDispo('GM')"  ng-show="(!tfsetting.mystatus.dispoMJ) && (!timeframe.busy)">+</a>
+            <a href="#" ng-click="clearDispo('GM')"  ng-show="tfsetting.mystatus.dispoMJ && (!timeframe.busy)">-</a>
+            <br/>
+            <a href="#" ng-click="setDispo('PLAYER')"  ng-show="(!tfsetting.mystatus.dispoPJ) && (!timeframe.busy)">+</a>
+            <a href="#" ng-click="clearDispo('PLAYER')"  ng-show="tfsetting.mystatus.dispoPJ && (!timeframe.busy)">-</a>
+        </div>
+
+        <div bo-if="(tfsetting.mystatus.dispoMJ) && (!timeframe.busy) && (tfsetting.canplay)" ng-click="openGMMode()">
+            Valider une partie
+        </div>
+    </div>
+
+    <!-- Bloc Mode MJ -->
+
+    <div ng-switch-when="validate">
+        <div>
+            Validation
+        </div>
+
+        <div>
+            MJ :
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : playerSchedule.isca, selectedPlayer: (playerSchedule.player == currentuser) }">{{ playerSchedule.player }}</span> </span>
+            <br/>
+            PJ :
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : playerSchedule.isca, selectedPlayer: isPlayerSelected(playerSchedule.player) }">{{ playerSchedule.player }}</span> </span>
+        </div>
+
+        <div ng-click="validateGame()">
+            Valider
+        </div>
+        <div ng-click="cancelGMMode()">
+            Annuler
+        </div>
+    </div>
+
+    <!-- Bloc Partie Validée -->
+
+    <div ng-switch-when="game">
+        <div>
+            Validée
+        </div>
+
+        <div>
+            MJ : <span>{{ tfsetting.defgame.gm.player }}</span>
+            <br/>
+            PJ :
+            <span bindonce ng-repeat="playerSchedule in tfsetting.defgame.players"> <span bo-if="$index > 0">, </span><span bo-class="{caplayer : playerSchedule.isca}">{{ playerSchedule.player }}</span> </span>
+        </div>
+
+        <div ng-if="tfsetting.defgame.gm.player == currentuser" ng-click="cancelGame()">
+            Annuler la Partie
+        </div>
+        <div ng-if="tfsetting.defgame.gm.player == currentuser" ng-click="editGame()">
+            Modifier la partie
+        </div>
+
+        <div ng-if="tfsetting.mystatus.pj" ng-click="dropGame()">
+            Quitter la partie
+        </div>
+    </div>
+</div>
+
+<!-- Commentaires -->
+
+<div>
+    Commentaires (à réimplémenter)
+
+</div>

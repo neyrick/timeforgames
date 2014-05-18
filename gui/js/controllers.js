@@ -954,8 +954,8 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 }]);
 
 timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService',
-'userService',  
-function TestCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService) {
+'userService', 'config',  
+function TestCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config) {
 /*
     $scope.firstday = planningBuilderService.getDefaultMinDay();
     $scope.dayCount = 30;
@@ -1031,17 +1031,17 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 
     $scope.addSetting = function(setting) {
         plannerService.setDispo($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, setting.id, 'GM', function() {
+            $scope.refreshTimeframe($scope.currentTimeframe);
             $('#addsettingdialogcontainer').qtip('hide');
-            $scope.refreshTimeframe();
         });
     };
 
-    $scope.refreshTimeframe = function() {
-        plannerService.getTimeframePlanning($scope.currentTimeframe.dayid, $scope.currentTimeframe.code, function(result) {
-            if ($scope.currentTimeframe.collapsed) {
+    $scope.refreshTimeframe = function(timeframe) {
+        plannerService.getTimeframePlanning(timeframe.dayid, timeframe.code, function(result) {
+            if (timeframe.collapsed) {
                 initPlanning();
             } else {
-                planningBuilderService.refreshTimeframeInWeeksPlanning($scope.settingsList, result, $scope.currentTimeframe, $scope.currentUser);
+                planningBuilderService.refreshTimeframePlanning($scope.settingsList, result, timeframe, $scope.currentUser);
             }
         });
     };
@@ -1125,13 +1125,21 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         $('#filtersBox').slideUp();
     };
 
+    $scope.isTfSettingOpen = function(tfsetting) {
+        return (typeof $scope.openTfSettings[tfsetting.key] != "undefined");
+    };
+
+    $scope.getTfSettingDisplayMode = function(tfsetting) {
+        return $scope.openTfSettings[tfsetting.key];
+    };
+
     $scope.openTfSetting = function(tfsetting) {
-        tfsetting.open = true;
-    }
+        $scope.openTfSettings[tfsetting.key] = "prepare";
+    };
 
     $scope.closeTfSetting = function(tfsetting) {
-        tfsetting.open = false;
-    }
+        delete $scope.openTfSettings[tfsetting.key];
+    };
 
     function loadConfig() {
         if (( typeof $scope.currentUser == "undefined") || ($scope.currentUser == null))
@@ -1184,6 +1192,8 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
             lastUpdate : 0
         };
         $scope.gui = 'regular';
+        $scope.openTfSettings = {};
+        $scope.gamePicks = {};
         $scope.currentEdit = {
         };
     }
@@ -1269,6 +1279,7 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     }
 
     $scope.loading = false;
+    $scope.basePicUrl = config.urlbase + "/setting/pic/";
 
     $scope.newsetting = {
         name : '',

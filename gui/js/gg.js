@@ -12,7 +12,9 @@ function tfSettingStatus() {
 	this.mj = false;
 	this.dispoMJ = false;
 	this.dispoPJ = false;
-
+    this.dispo = function() {
+        return (this.dispoMJ || this.dispoPJ);
+    };
 }
 
 function isLoggedIn() {

@@ -7,6 +7,9 @@
 #filtersBox {
 	display: none;
 }
+.selectedPlayer {
+	color: #FF0000;
+}
 div {
 	border: 1px solid black;
 }
