@@ -50,6 +50,7 @@ server.del('/api/schedule/:idschedule', security.requireLoggedIn, serv.deleteSch
 server.get('/api/comment', security.requireLoggedIn, serv.fetchComments);
 server.post('/api/comment', security.requireLoggedIn, serv.createComment);
 server.put('/api/comment/:idcomment', security.requireLoggedIn, serv.setComment);
+server.put('/api/comment/:idcomment', security.requireLoggedIn, serv.deleteComment);
 
 server.post('/api/game', security.requireLoggedIn, serv.createGame);
 server.put('/api/game/:idgame', security.requireLoggedIn, serv.reformGame);

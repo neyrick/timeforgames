@@ -1011,12 +1011,14 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         setTimeout(function() {
             plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
                 plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
-                    var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
-                    planningBuilderService.dispatchUpdatesFlags(updatesHash, timeframes, $scope.config.lastUpdate);
-                    $scope.config.lastUpdate = new Date().getTime();
-                    $scope.timeframes = timeframes;
-                    storeConfig();
-                    applyFilters();
+                    plannerService.fetchComments($scope.firstday, $scope.dayCount, function(comments) {
+                        var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, comments, $scope.currentUser);
+                        planningBuilderService.dispatchUpdatesFlags(updatesHash, timeframes, $scope.config.lastUpdate);
+                        $scope.config.lastUpdate = new Date().getTime();
+                        $scope.timeframes = timeframes;
+                        storeConfig();
+                        applyFilters();
+                    });
                 });
             });
             $scope.loading = false;
@@ -1108,12 +1110,14 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     };
 
     $scope.refreshTimeframe = function(timeframe) {
-        plannerService.getTimeframePlanning(timeframe.dayid, timeframe.code, function(result) {
-            if (timeframe.collapsed) {
-                initPlanning();
-            } else {
-                planningBuilderService.refreshTimeframePlanning($scope.settingsList, result, timeframe, $scope.currentUser);
-            }
+        plannerService.getTimeframePlanning(timeframe.dayid, timeframe.code, function(planning) {
+            plannerService.fetchTimeframeComments(timeframe.dayid, timeframe.code, function(comments) {
+                if (timeframe.collapsed) {
+                    initPlanning();
+                } else {
+                    planningBuilderService.refreshTimeframePlanning($scope.settingsList, planning, comments, timeframe, $scope.currentUser);
+                }
+            });
         });
     };
 

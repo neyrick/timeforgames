@@ -356,6 +356,7 @@ function(config) {
                     unavailable : [],
                     mystatus : new tfSettingStatus(),
                     key : '' + timeframe.dayid + timeframe.code + settingref.id,
+                    comments : [],
                     hasgame : false
                 };
                 currentArray.push(newsetting);
@@ -365,6 +366,11 @@ function(config) {
         return undefined;
     };
 
+    var addComment = function(comment, timeframe, allSettings, me) {
+        var tfSetting = mergeSetting(allSettings, timeframe, comment.setting);
+        tfSetting.comments.push(comment);
+    };
+    
     var addSchedule = function(rawschedule, timeframe, allSettings, me) {
         var g, game;
         var tfSetting = mergeSetting(allSettings, timeframe, rawschedule.setting);
@@ -506,7 +512,7 @@ function(config) {
             return currtime;
         },
 
-        refreshTimeframePlanning : function(settings, schedules, timeframe, me) {
+        refreshTimeframePlanning : function(settings, schedules, comments, timeframe, me) {
             var i;
 
             timeframe.busy = false;
@@ -522,6 +528,9 @@ function(config) {
             delete timeframe.mygame;
             for ( i = 0; i < schedules.length; i++) {
                 addSchedule(schedules[i], timeframe, settings, me);
+            }
+            for ( i = 0; i < comments.length; i++) {
+                addComment(comments[i], timeframe, settings, me);
             }
             timeframe.settings.forEach(function(setting) {
                 setting.canplay = setting.availableplayers.some(function(playerschedule) {
@@ -577,7 +586,7 @@ function(config) {
             return weeks;
         },
 
-        buildTimeframesPlanning : function(mindaytime, daycount, settings, schedules, me) {
+        buildTimeframesPlanning : function(mindaytime, daycount, settings, schedules, comments, me) {
 
             // Initialisation
             var activeSettings = Array();
@@ -605,13 +614,19 @@ function(config) {
 
             // ajouter les schedule dans availablepj / available mj
 
-            var i, timeframe, rawschedule;
+            var i, timeframe, rawschedule, comment;
             var tfSetting;
             for ( i = 0; i < schedules.length; i++) {
                 rawschedule = schedules[i];
                 timeframe = tfMap[rawschedule.dayid + '-' + rawschedule.timeframe];
                 timeframe.collapsed = false;
                 addSchedule(rawschedule, timeframe, settings, me);
+            }
+            for ( i = 0; i < comments.length; i++) {
+                comment = comments[i];
+                timeframe = tfMap[comment.dayid + '-' + comment.timeframe];
+                timeframe.collapsed = false;
+                addComment(comment, timeframe, settings, me);
             }
             timeframes.forEach(function(item) {
                 item.settings.forEach(function(setting) {
@@ -707,9 +722,8 @@ function($http, config, planningBuilderService) {
             $http.get(config.urlbase + '/comment?minday=' + pm_dayid + '&maxday=' + pm_dayid + '&timeframe=' + pm_timeframe).success(callback).error(genericError);
         },
 
-        addComment : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_message, callback) {
+        addComment : function(pm_dayid, pm_timeframe, pm_setting, pm_message, callback) {
             var comment = {
-                player : pm_player,
                 dayid : pm_dayid,
                 timeframe : pm_timeframe,
                 setting : pm_setting,
@@ -718,10 +732,9 @@ function($http, config, planningBuilderService) {
             $http.post(config.urlbase + '/comment?log_action=SET_COMMENT', comment).success(callback).error(genericError);
         },
 
-        editComment : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_idcomment, pm_message, callback) {
+        editComment : function(pm_dayid, pm_timeframe, pm_setting, pm_idcomment, pm_message, callback) {
             var comment = {
                 id : pm_idcomment,
-                player : pm_player,
                 dayid : pm_dayid,
                 timeframe : pm_timeframe,
                 setting : pm_setting,

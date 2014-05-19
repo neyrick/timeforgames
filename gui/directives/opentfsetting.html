@@ -13,10 +13,10 @@
 
         <div>
             MJ :
-            <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }">{{ playerSchedule.player }}</span> </span>
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
             <br/>
             PJ :
-            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }">{{ playerSchedule.player }}</span> </span>
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
         </div>
 
         <!-- Boutons ajout / suppression de dispo -->
@@ -43,10 +43,10 @@
 
         <div>
             MJ :
-            <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span  ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: (playerSchedule.player == currentuser) }">{{ playerSchedule.player }}</span> </span>
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span  ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: (playerSchedule.player == currentuser) }" bo-text="playerSchedule.player"></span> </span>
             <br/>
             PJ :
-            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: isPlayerSelected(playerSchedule.player) }">{{ playerSchedule.player }}</span> </span>
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: isPlayerSelected(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
         </div>
 
         <div ng-click="validateGame()">
@@ -68,12 +68,12 @@
             MJ : <span ng-class="{caplayer: isAdmin(tfsetting.defgame.gm.player)}">{{ tfsetting.defgame.gm.player }}</span>
             <br/>
             PJ :
-            <span bindonce ng-repeat="playerSchedule in tfsetting.defgame.players"> <span bo-if="$index > 0">, </span><span bo-class="{caplayer : isAdmin(playerSchedule.player)}">{{ playerSchedule.player }}</span> </span>
+            <span bindonce ng-repeat="playerSchedule in tfsetting.defgame.players"> <span bo-if="$index > 0">, </span><span bo-class="{caplayer : isAdmin(playerSchedule.player)}" bo-text="playerSchedule.player"></span> </span>
         </div>
 
         <div>
             Restent dispo:
-            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }">{{ playerSchedule.player }}</span> </span>
+            <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
         </div>
 
         <div ng-if="tfsetting.defgame.gm.player == currentuser" ng-click="disbandGame()">
@@ -92,6 +92,17 @@
 <!-- Commentaires -->
 
 <div>
-    Commentaires (à réimplémenter)
+    Commentaires 
+    <div class="commentBox" bindonce ng-repeat="comment in tfsetting.comments">
+        <div><span bo-text="comment.player"></span></div>
+        <div class="msgBox"><span bo-text="comment.message"></span></div>
+        <div><a href="#" ng-click="switchComment(comment, $event)">Modifier</a> <a href="#" ng-click="deleteComment(comment)">Supprimer</a></div>
+    </div>
+    <div class="commentInput">
+        <div>
+            <textarea rows="5" placeholder="Tape ton commentaire" wrap="soft" ng-model="currentMessage"></textarea>
+        </div>
+        <div><a href="#" ng-click="storeComment()">Enregistrer</a></div>
+    </div>
 
 </div>
