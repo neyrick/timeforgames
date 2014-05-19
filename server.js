@@ -36,6 +36,7 @@ server.get('/api/setting/pic/:settingid', serv.getSettingPicture);
 
 // Methodes necessitant un compte standard
 
+server.get('/api/admins', security.requireLoggedIn, serv.fetchAdminList);
 server.get('/api/relogin', security.requireLoggedIn, serv.relogin);
 server.get('/api/resetPassword', security.requireLoggedIn, serv.resetPassword);
 
@@ -46,7 +47,9 @@ server.put('/api/setting/pic/:settingid', security.requireLoggedIn, serv.storeSe
 server.post('/api/schedule', security.requireLoggedIn, serv.createSchedule);
 server.del('/api/schedule/:idschedule', security.requireLoggedIn, serv.deleteSchedule);
 
-server.post('/api/comment', security.requireLoggedIn, serv.setComment);
+server.get('/api/comment', security.requireLoggedIn, serv.fetchComments);
+server.post('/api/comment', security.requireLoggedIn, serv.createComment);
+server.put('/api/comment/:idcomment', security.requireLoggedIn, serv.setComment);
 
 server.post('/api/game', security.requireLoggedIn, serv.createGame);
 server.put('/api/game/:idgame', security.requireLoggedIn, serv.reformGame);

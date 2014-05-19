@@ -15,6 +15,16 @@ function tfSettingStatus() {
     this.dispo = function() {
         return (this.dispoMJ || this.dispoPJ);
     };
+    this.onit = function() {
+        return (this.dispoMJ || this.dispoPJ || this.pj || this.mj);
+    };
+}
+
+function getSettingName(settingid, allSettings) {
+    allSettings.some(function(setting) {
+        if (setting.id == settingid) return setting.name;
+    });
+    return undefined;
 }
 
 function isLoggedIn() {

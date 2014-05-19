@@ -98,7 +98,6 @@ describe('RegularUser', function() {
     });
 
 
-
     describe('Login', function() {
         it('should return a valid token', function(done) {
             request.post(baseurl + '/login').send({
@@ -137,6 +136,24 @@ describe('RegularUser', function() {
         });
     }); 
 
+    describe('Admins', function() {
+        it('should return the list of admins', function(done) {
+	    request.get(baseurl + '/admins')
+		.set('Authorization', 'Bearer ' + loginToken1)
+	    .end(function(err, res) {
+		  if (err) {
+		    throw err;
+		  }
+		  res.should.have.status(200);
+		  res.should.be.json;
+		  res.body.should.be.an.Array;
+		  res.body.length.should.be.above(0);
+		  res.body.should.containEql("testAdmin");
+		  done();
+		});
+        });
+    }); 
+
   describe('SettingsManagement', function() {
 
     it('should return a new setting', function(done) {
@@ -167,7 +184,7 @@ describe('RegularUser', function() {
           res.should.be.json;
           res.body.should.be.an.Array;
           res.body.length.should.be.above(0);
-          res.body.should.containEql({ id: settingid, name : 'Chronique Test Auto', mode : 0, status : 0, code : null});
+          res.body.should.containEql({ id: settingid, name : 'Chronique Test Auto', mode : 0, status : 0});
           done();
         });
     });

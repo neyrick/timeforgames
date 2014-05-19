@@ -48,6 +48,14 @@ function($http, config, localStorageService) {
 
     return {
 
+        getAdmins : function(callback, errorcallback) {
+            $http.get(config.urlbase + '/admins').success(function(data, status) {
+                    callback(data);
+            }).error(function(data, status) {
+                    errorcallback(data);
+            });
+        },
+
         checkAdminStatus : function(callback, errorcallback) {
             $http.get(config.urlbase + '/status').success(function(data, status) {
                     callback(data);
@@ -338,7 +346,6 @@ function(config) {
                 var settingref = allSettings[i];
                 var newsetting = {
                     settingid : settingref.id,
-                    code : settingref.code,
                     name : settingref.name,
                     newStuff : false,
                     mode : settingref.mode,
@@ -365,8 +372,6 @@ function(config) {
             player : rawschedule.player,
             id : rawschedule.idschedule,
             game : rawschedule.game,
-            idcomment : rawschedule.idcomment,
-            comment : rawschedule.message
         };
         if (rawschedule.game != null) {
             tfSetting.hasgame = true;
@@ -387,7 +392,7 @@ function(config) {
                 game.gm = newschedule;
             else if (rawschedule.role == 'PLAYER')
                 game.players.push(newschedule);
-            timeframe.gaming[rawschedule.player] = rawschedule.setting;
+            timeframe.gaming[rawschedule.player] = getSettingName(rawschedule.setting, allSettings);
             if (rawschedule.player == me)
                 timeframe.mygame = game;
         } else {
@@ -412,31 +417,21 @@ function(config) {
                     timeframe.busy = true;
                 }
             }
-            if (rawschedule.idcomment != null)
-                tfSetting.idcomment = rawschedule.idcomment;
-            if (rawschedule.message != null)
-                tfSetting.message = rawschedule.message;
         }
     };
 
     return {
         MS_IN_DAY : 1000 * 60 * 60 * 24,
 
-        dispatchUpdatesFlags : function(updatesHash, weeks, lastVisit) {
-            var w, d, t, s, week, day, timeframe, setting, lastUpdate;
-            for ( w = 0; w < weeks.length; w++) {
-                week = weeks[w];
-                for ( d = 0; d < week.days.length; d++) {
-                    day = week.days[d];
-                    for ( t = 0; t < day.timeframes.length; t++) {
-                        timeframe = day.timeframes[t];
-                        for ( s = 0; s < timeframe.settings.length; s++) {
-                            setting = timeframe.settings[s];
-                            lastUpdate = updatesHash[day.id + '-' + timeframe.code + '-' + setting.settingid];
-                            if (( typeof lastUpdate != "undefined") && (lastUpdate > lastVisit))
-                                setting.newStuff = true;
-                        }
-                    }
+        dispatchUpdatesFlags : function(updatesHash, timeframes, lastVisit) {
+            var t, s, timeframe, setting, lastUpdate;
+            for ( t = 0; t < timeframes.length; t++) {
+                timeframe = timeframes[t];
+                for ( s = 0; s < timeframe.settings.length; s++) {
+                    setting = timeframe.settings[s];
+                    lastUpdate = updatesHash[timeframe.dayid + '-' + timeframe.code + '-' + setting.settingid];
+                    if (( typeof lastUpdate != "undefined") && (lastUpdate > lastVisit))
+                        setting.newStuff = true;
                 }
             }
         },
@@ -701,34 +696,44 @@ function($http, config, planningBuilderService) {
             $http.post(config.urlbase + '/game?log_action=ADD_GAME', game).success(callback).error(genericError);
         },
 
-        setComment : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_idcomment, pm_message, callback) {
-            var comment;
-            var action;
+        fetchComments : function(mindaytime, daycount, callback) {
+            var minday = planningBuilderService.getDayId(new Date(mindaytime));
+            var maxdaytime = mindaytime + daycount * planningBuilderService.MS_IN_DAY;
+            var maxday = planningBuilderService.getDayId(new Date(maxdaytime));
+            $http.get(config.urlbase + '/comment?minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
+        },
 
-            if (( typeof pm_message == "undefined") || (pm_message == '')) {
-                action = 'DEL_COMMENT';
-            } else {
-                action = 'SET_COMMENT';
-            }
-            if (pm_idcomment != null)
-                comment = {
-                    id : pm_idcomment,
-                    player : pm_player,
-                    dayid : pm_dayid,
-                    timeframe : pm_timeframe,
-                    setting : pm_setting,
-                    message : pm_message
-                };
-            else
-                comment = {
-                    player : pm_player,
-                    dayid : pm_dayid,
-                    timeframe : pm_timeframe,
-                    setting : pm_setting,
-                    message : pm_message
-                };
-            $http.post(config.urlbase + '/comment?log_action=' + action, comment).success(callback).error(genericError);
+        fetchTimeframeComments : function(pm_dayid, pm_timeframe, callback) {
+            $http.get(config.urlbase + '/comment?minday=' + pm_dayid + '&maxday=' + pm_dayid + '&timeframe=' + pm_timeframe).success(callback).error(genericError);
+        },
+
+        addComment : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_message, callback) {
+            var comment = {
+                player : pm_player,
+                dayid : pm_dayid,
+                timeframe : pm_timeframe,
+                setting : pm_setting,
+                message : pm_message
+            };
+            $http.post(config.urlbase + '/comment?log_action=SET_COMMENT', comment).success(callback).error(genericError);
+        },
+
+        editComment : function(pm_player, pm_dayid, pm_timeframe, pm_setting, pm_idcomment, pm_message, callback) {
+            var comment = {
+                id : pm_idcomment,
+                player : pm_player,
+                dayid : pm_dayid,
+                timeframe : pm_timeframe,
+                setting : pm_setting,
+                message : pm_message
+            };
+            $http.put(config.urlbase + '/comment/' + pm_idcomment + '?log_action=SET_COMMENT', comment).success(callback).error(genericError);
+        },
+
+        deleteComment : function(pm_idcomment, callback) {
+            $http.delete(config.urlbase + '/comment/' + pm_idcomment + '?log_action=DEL_COMMENT').success(callback).error(genericError);
         }
+
     };
 }]);
 

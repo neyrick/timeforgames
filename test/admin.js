@@ -91,6 +91,25 @@ describe('AdminUser', function() {
         });
     }); 
 
+    describe('Admins', function() {
+        it('should return the list of admins', function(done) {
+	    request.get(baseurl + '/admins')
+		.set('Authorization', 'Bearer ' + loginToken1)
+	    .end(function(err, res) {
+		  if (err) {
+		    throw err;
+		  }
+		  res.should.have.status(200);
+		  res.should.be.json;
+		  res.body.should.be.an.Array;
+		  res.body.length.should.be.above(0);
+		  res.body.should.containEql("testAdmin");
+		  res.body.should.containEql(adminName);
+		  done();
+		});
+        });
+    }); 
+
   describe('SettingsManagement', function() {
 
     it('should return a new setting', function(done) {

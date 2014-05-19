@@ -964,6 +964,15 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     $scope.timeframes = [];
 */
 
+    function applyFilters() {
+        $scope.settingsList.forEach(function(setting) {
+            if (setting.visible)
+                $('.setting-id-' + setting.id).removeClass('hidden');
+            else
+                $('.setting-id-' + setting.id).addClass('hidden');
+        });
+    }
+
     $scope.refreshSettings = function(andPlanning) {
         settingsService.getSettings(function(settings) {
             $scope.settingsList = sortSettings(settings);
@@ -998,20 +1007,20 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     };
 
     var initPlanning = function() {
-        //        $scope.loading = true;
-        //        setTimeout(function() {
-        //            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
-        plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
-            var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
-            //                    planningBuilderService.dispatchUpdatesFlags(updatesHash, weeks, $scope.config.lastUpdate);
-            //                    $scope.config.lastUpdate = new Date().getTime();
-            $scope.timeframes = timeframes;
-            //                    storeConfig();
-            //                    applyFilters();
-        });
-        //            });
-        //            $scope.loading = false;
-        //        }, 0);
+        $scope.loading = true;
+        setTimeout(function() {
+            plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
+                plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
+                    var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, $scope.currentUser);
+                    planningBuilderService.dispatchUpdatesFlags(updatesHash, timeframes, $scope.config.lastUpdate);
+                    $scope.config.lastUpdate = new Date().getTime();
+                    $scope.timeframes = timeframes;
+                    storeConfig();
+                    applyFilters();
+                });
+            });
+            $scope.loading = false;
+        }, 0);
     };
 
 
@@ -1023,10 +1032,72 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         }
     };
 
+    $scope.toggleSettingVisibility = function(settingid, force) {
+        var setting;
+        for (var i = 0; i < $scope.settingsList.length; i++) {
+            setting = $scope.settingsList[i];
+            if (setting.id == settingid) {
+                if ((setting.visible) && (force !== true)) {
+                    setting.visible = false;
+                    break;
+                }
+                if ((!setting.visible) && (force !== false)) {
+                    setting.visible = true;
+                }
+                break;
+            }
+        }
+        storeConfig();
+    };
 
     $scope.selectSetting = function(timeframe) {
         $scope.currentTimeframe = timeframe;
         $('#addsettingdialogcontainer').qtip('show');
+    };
+
+    $scope.createAndAddSetting = function() {
+        settingsService.storeSetting($scope.newsetting, function(newsetting) {
+            if ($scope.currentUploadFile != null) {
+                    $scope.progress = 0;
+                    $scope.uploading = true;
+                    settingsService.storePicture(newsetting.id, $scope.currentUploadFile, function(evt) {
+                        $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
+                    }, function(data, status, headers, config) {
+                        $scope.uploading = false;
+                    }, function(result) {
+                        $scope.uploading = false;
+                        window.alert("Upload échoué");
+                    });
+            }
+            $scope.settingsList.push(newsetting);
+            sortSettings($scope.settingsList);
+            $scope.timeframes.forEach(function(timeframe) {
+                timeframe.possibleNewSettings.push(newsetting);
+                sortSettings(timeframe.possibleNewSettings);
+            });
+            $scope.addSetting(newsetting);
+            newsetting.visible = true;
+            if (newsetting.mode == 0) {
+                $scope.openSettings.push(newsetting);
+                sortSettings($scope.openSettings);
+            } else if (newsetting.mode == 1) {
+                $scope.closedSettings.push(newsetting);
+                sortSettings($scope.closedSettings);
+            } else if (newsetting.mode == 2) {
+                $scope.oneShots.push(newsetting);
+                sortSettings($scope.oneShots);
+            } else if (newsetting.mode == 3) {
+                $scope.clubEvents.push(newsetting);
+                sortSettings($scope.clubEvents);
+            }
+            storeConfig();
+            $scope.newsetting.name = '';
+            $scope.newsetting.mode = -1;
+            $scope.newsetting.status = 0;
+        }, function(error) {
+            window.alert("Impossible de créer la chronique: " + error);
+        });
+
     };
 
     $scope.addSetting = function(setting) {
@@ -1125,8 +1196,19 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         $('#filtersBox').slideUp();
     };
 
-    $scope.isTfSettingOpen = function(tfsetting) {
-        return (typeof $scope.openTfSettings[tfsetting.key] != "undefined");
+    $scope.getSettingVisibility = function(tfsetting) {
+        if (!tfsetting.mystatus.onit()) {
+            var hidden = false;
+            var i, setting;
+            for (var i = 0; i<$scope.settingsList.length; i++) {
+                setting = $scope.settingsList[i];
+                if (setting.id == tfsetting.settingid) {
+                    if (!setting.visible) return "hidden";
+                }
+            }
+        }
+        if ($scope.openTfSettings[tfsetting.key]) return "open"
+        else return "closed";
     };
 
     $scope.getTfSettingDisplayMode = function(tfsetting) {
@@ -1134,11 +1216,24 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     };
 
     $scope.openTfSetting = function(tfsetting) {
-        $scope.openTfSettings[tfsetting.key] = "prepare";
+        $scope.openTfSettings[tfsetting.key] = true;
     };
 
     $scope.closeTfSetting = function(tfsetting) {
         delete $scope.openTfSettings[tfsetting.key];
+    };
+
+    function timeSlide(days) {
+        $scope.firstday = $scope.firstday + days * planningBuilderService.MS_IN_DAY;
+        initPlanning();
+    }
+
+    $scope.showPrevious = function() {
+        timeSlide(-1 * $scope.dayCount);
+    };
+
+    $scope.showNext = function() {
+        timeSlide($scope.dayCount);
     };
 
     function loadConfig() {
@@ -1194,7 +1289,12 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         $scope.gui = 'regular';
         $scope.openTfSettings = {};
         $scope.gamePicks = {};
+        $scope.uploading = false;
+        $scope.progress = 0;
+        $scope.currentUploadFile = null;
+        $scope.currentUploadData = null;
         $scope.currentEdit = {
+
         };
     }
 
@@ -1285,7 +1385,6 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         name : '',
         mode : -1,
         status : 0,
-        code : ''
     };
 
     if ($scope.display == 'desktop') {

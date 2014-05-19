@@ -10,6 +10,25 @@
 .selectedPlayer {
 	color: #FF0000;
 }
+.hidden {
+	display: none;
+}
+.fileDropZone {
+	border: 5px dashed #E0E0E0;
+	width: 500px;
+	height: 100px;
+	text-align: center;
+	padding-top: 35px;
+	background: #F8F8F8 auto no-repeat left center;
+	background-size: 500px 100px;
+}
+.fileDropZoneDragOver {
+	background-color: #303030;
+	color : white;
+	font-weight: bold;	
+}
+.infoTooltip {
+}
 div {
 	border: 1px solid black;
 }

@@ -106,6 +106,16 @@
                             <span ng-click="newsetting.mode=1" ng-class="{ noPlayBadge : newsetting.mode == 1 }">Fermée</span>
                             <span ng-click="newsetting.mode=2" ng-class="{ noPlayBadge : newsetting.mode == 2 }">One-Shot</span>
                         </div>
+		      <div class="fileDropZone" ng-file-drop="onSettingPictureSelect($files)" ng-file-drag-over-class="fileDropZoneDragOver"
+		            ng-show="dropSupported" >Déposer le fichier de l'image de fond ici (optionnel)</div>
+		      <div ng-file-drop-available="dropSupported=true" 
+		            ng-show="!dropSupported">Il est pourri ton navigateur !</div>
+		      <button type="button" class="btn btn-danger" ng-click="clearImage()" ng-show="!uploading">Supprimer l'image</button>
+			<div class="progress progress-striped active" ng-show="uploading">
+			  <div class="progress-bar" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress }}%">
+			    <span class="">{{progress }}%</span>
+			  </div>
+			</div>
                         <button ng-disabled="createSettingForm.$invalid || (newsetting.mode<0)" type="submit">
                             Valider
                         </button>
@@ -162,6 +172,12 @@
             </div>
         </div>
 
+        <div>
+        <a href="#" ng-click="showPrevious()">Avant</a>
+
+        <a href="#" ng-click="showNext()">Après</a>
+        </div>
+
         <div id="planning">
             <div bindonce ng-repeat="timeframe in timeframes">
 
@@ -193,21 +209,27 @@
                         <div>
                             Parties potentielles
                         </div>
-                        <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : false } " ng-switch="isTfSettingOpen(tfsetting)">
+                        <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : false } " ng-switch="getSettingVisibility(tfsetting)">
+
+                            <!-- Bloc chronique ouvert -->
+
+                            <div ng-switch-when="open">
+                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentUser="currentUser"/>
+                            </div>
 
                             <!-- Bloc chronique fermé -->
 
-                            <div ng-switch-when="false">
+                            <div ng-switch-when="closed">
                                 <span ng-show="tfsetting.mystatus.dispo">Dispo</span>
                                 <span>{{tfsetting.name}} (Fermé)</span>
                                 <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
                             </div>
 
-                            <!-- Bloc chronique ouvert -->
-
-                            <div ng-switch-when="true">
-                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentUser="currentUser"/>
+                            <!-- Bloc chronique caché -->
+        
+                            <div ng-switch-when="hidden" class="hidden">
                             </div>
+
                         </div>
                         <div ng-click="selectSetting(timeframe)">
                             Ajouter une partie
@@ -220,21 +242,27 @@
                         <div>
                             Parties validées
                         </div>
-                        <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : true } " ng-switch="isTfSettingOpen(tfsetting)">
+                        <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : true } " ng-switch="getSettingVisibility(tfsetting)">
         
+                            <!-- Bloc chronique ouvert -->
+        
+                            <div ng-switch-when="open">
+                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentuser="currentUser"/>
+                            </div>
+
                             <!-- Bloc chronique fermé -->
         
-                            <div ng-switch-when="false">
+                            <div ng-switch-when="closed">
                                 <span ng-show="(tfsetting.mystatus.pj) || (tfsetting.mystatus.mj)">Dispo</span>
                                 <span>{{tfsetting.name}} (Fermé)</span>
                                 <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
                             </div>
         
-                            <!-- Bloc chronique ouvert -->
+                            <!-- Bloc chronique caché -->
         
-                            <div ng-switch-when="true">
-                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentuser="currentUser"/>
+                            <div ng-switch-when="hidden" class="hidden">
                             </div>
+        
                         </div>
                     </div>
                 </div>                    
