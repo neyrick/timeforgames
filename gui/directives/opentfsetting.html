@@ -94,9 +94,7 @@
 <div>
     Commentaires 
     <div class="commentBox" bindonce ng-repeat="comment in tfsetting.comments">
-        <div><span bo-text="comment.player"></span></div>
-        <div class="msgBox"><span bo-text="comment.message"></span></div>
-        <div><a href="#" ng-click="switchComment(comment, $event)">Modifier</a> <a href="#" ng-click="deleteComment(comment)">Supprimer</a></div>
+        <comment-box comment="comment" reader="currentuser" timeframe="timeframe" setting="tfsetting.settingid">
     </div>
     <div class="commentInput">
         <div>

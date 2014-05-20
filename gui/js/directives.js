@@ -24,13 +24,13 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
 
             $scope.setDispo = function(role) {
                 plannerService.setDispo($scope.timeframe.dayid, $scope.timeframe.code, $scope.tfsetting.settingid, role, function() {
-                    $scope.$parent.refreshTimeframe($scope.timeframe);
+                       $scope.refreshTimeframe();
                 });
             };
 
             $scope.clearDispo = function(role) {
                 plannerService.clearDispo(getMyScheduleId($scope.currentuser, $scope.tfsetting, role), function() {
-                    $scope.$parent.refreshTimeframe($scope.timeframe);
+                       $scope.refreshTimeframe();
                 });
             };
 
@@ -51,24 +51,24 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
 
     	    $scope.disbandGame = function() {
     		   plannerService.disbandGame(getMyGMScheduleId($scope.currentuser, $scope.tfsetting.games), function() {
-                        $scope.$parent.refreshTimeframe($scope.timeframe);
+                       $scope.refreshTimeframe();
     	   	   });
     	    };
     
     	    $scope.dropGame = function() {
         		plannerService.dropGame(getMyPlayerScheduleId($scope.currentuser, $scope.tfsetting.games), function() {
-                    $scope.$parent.refreshTimeframe($scope.timeframe);
+                       $scope.refreshTimeframe();
         		});
     	    };
     
     	    $scope.validateGame = function() {
         		if ( typeof $scope.timeframe.mygame == "undefined") {
         		    plannerService.validateGame(getMyScheduleId($scope.currentuser, $scope.tfsetting, 'GM'), $scope.gamePicks, function() {
-        	                    $scope.$parent.refreshTimeframe($scope.timeframe);
+                           $scope.refreshTimeframe();
         		    });
         		} else {
         		    plannerService.reformGame($scope.timeframe.mygame.id, $scope.gamePicks, function() {
-        	                    $scope.$parent.refreshTimeframe($scope.timeframe);
+                               $scope.refreshTimeframe();
         		    });
         		}
     	    };
@@ -101,45 +101,23 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
                 return (admins.indexOf(playername) > -1);
             };
 
-            $scope.switchComment = function(comment) {
-                $scope.currentMessage = comment.message;
-                $scope.currentCommentId = comment.id;
-            };
-        
-            $scope.deleteComment = function(comment) {
-                plannerService.deleteComment(comment.id, function() {
-                    $scope.$parent.refreshTimeframe($scope.timeframe);
-                    $scope.currentMessage = "";
-                    $scope.currentCommentId = null;
-                });
-            };
-        
             $scope.storeComment = function() {
                 if ($scope.currentMessage == "") return;
-                if (!$scope.currentCommentId) {
-                    plannerService.addComment($scope.timeframe.dayid, $scope.timeframe.code, $scope.tfsetting.settingid, $scope.currentMessage, function() {
-                        $scope.$parent.refreshTimeframe($scope.timeframe);
-                        $scope.currentMessage = "";
-                        $scope.currentCommentId = null;
-                    });
-                }
-                else {
-                    plannerService.editComment($scope.timeframe.dayid, $scope.timeframe.code, $scope.tfsetting.settingid, $scope.currentCommentId, $scope.currentMessage, function() {
-                        $scope.$parent.refreshTimeframe($scope.timeframe);
-                        $scope.currentMessage = "";
-                        $scope.currentCommentId = null;
-                    });
-                }                
+                plannerService.addComment($scope.timeframe.dayid, $scope.timeframe.code, $scope.tfsetting.settingid, $scope.currentMessage, function() {
+                    $scope.refreshTimeframe();
+                });
             };
 
+            $scope.refreshTimeframe = function() {
+                $scope.$parent.refreshTimeframe($scope.timeframe);
+            };
         },
         restrict: 'E',
         templateUrl: 'directives/opentfsetting.html',
         scope: {
              timeframe : '=',
              tfsetting : '=',
-             currentuser : '=',
-             refresh : '&'
+             currentuser : '='
         },
         link: function(scope, element, attrs) {
             scope.resetDisplayMode();
@@ -154,6 +132,48 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
         }
     };
 }]);
+
+timeForGamesApp.directive('commentBox', ['plannerService', function(plannerService) {
+    
+        return {
+        controller : function ($scope, $element, $attrs) {
+            $scope.newmessage = "";
+        },
+        restrict: 'E',
+        templateUrl: 'directives/commentbox.html',
+        scope: {
+             comment : '=',
+             reader : '=',
+             timeframe : '=',
+             setting : '='
+        },
+        link: function(scope, element, attrs) {
+            scope.editing = false;
+            scope.newmessage = scope.comment.message;
+            scope.startEdit = function() {
+                scope.editing = true;
+            };
+            scope.cancelEdit = function() {
+                scope.editing = false;
+                scope.newmessage = scope.comment.message;
+            };
+
+            scope.deleteComment = function() {
+                plannerService.deleteComment(scope.comment.id, function() {
+                    scope.$parent.refreshTimeframe();
+                });
+            };
+        
+            scope.storeComment = function() {
+                if (scope.newmessage == "") return;
+                plannerService.editComment(scope.timeframe.dayid, scope.timeframe.code, scope.setting, scope.comment.id, scope.newmessage, function() {
+                    scope.$parent.refreshTimeframe();
+                });
+            };
+        }
+    };
+}]);
+
 /* Directives */
 /*
 timeForGamesApp.directive('ggTfSetting', function() {
