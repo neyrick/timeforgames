@@ -135,6 +135,9 @@
             <div id="welcomeText">
                 Bienvenue {{ currentUser }}
             </div>
+            <div ng-if="gui == 'admin'">
+                <a href="admin.html">Interface d'Administration</a>
+            </div>
             <div ng-click="logout()">
                 Se déconnecter
             </div>
