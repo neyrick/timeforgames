@@ -18,6 +18,9 @@ describe('RegularUser', function() {
   var userid1, userid2, userid3;
   var gameschedule1, gameschedule2, gameschedule3, gameschedule4, gameschedule5, gameschedule6;
   var gameid, gameid2;
+  var commentText = 'This is a test comment';
+  var commentText2 = 'This is a MODIFIED  test comment';
+  var commentid = 0;
 
   before(function(done) {
         request.post(baseurl + '/login')
@@ -356,6 +359,87 @@ describe('RegularUser', function() {
 
   });
 
+  describe('Comment', function() {
+
+    it('should allow to post a comment', function(done) {
+    request.post(baseurl + '/comment')
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .send({ dayid : todayid, timeframe : 'AFTERNOON', setting : settingid, message : commentText })
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+
+          res.should.have.status(200);
+          res.should.be.json;
+          commentid = res.body.id;
+          done();
+        });
+    });
+
+    it('should allow to edit a comment', function(done) {
+    request.put(baseurl + '/comment/' + commentid)
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .send({ dayid : todayid, timeframe : 'AFTERNOON', setting : settingid, message : commentText2 })
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+
+          res.should.have.status(200);
+          res.should.be.html;
+          res.text.should.equal('Update OK');
+          done();
+        });
+    });
+
+    it('should fetch the comments for today and the new setting', function(done) {
+    request.get(baseurl + '/comment?minday=' + todayid + '&maxday=' + todayid + '&setting=' + settingid)
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+
+          res.should.have.status(200);
+          res.should.be.json;
+          res.body.should.be.an.Array;
+          res.body.should.have.length(1);
+          done();
+        });
+    });
+
+    it('should not allow to delete someone else\'s comment', function(done) {
+    request.del(baseurl + '/comment/' + commentid)
+        .set('Authorization', 'Bearer ' + loginToken2)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+          res.should.have.status(403);
+          res.should.be.html;
+          res.text.should.equal('Erreur: Pas touche !');
+          done();
+        });
+    });
+
+    it('should allow to delete a comment', function(done) {
+    request.del(baseurl + '/comment/' + commentid)
+        .set('Authorization', 'Bearer ' + loginToken1)
+        .end(function(err, res) {
+          if (err) {
+            throw err;
+          }
+
+          res.should.have.status(200);
+          res.should.be.html;
+          res.text.should.equal('Delete OK');
+          done();
+        });
+    });
+
+  });
+
   describe('Games', function() {
 
     it('should allow to validate one\'s game', function(done) {
@@ -509,10 +593,10 @@ describe('RegularUser', function() {
           res.should.be.json;
           res.body.should.be.an.Array;
           res.body.should.have.length(4);
-          res.body.should.containEql({ idschedule : gameschedule3, dayid : todayid, timeframe : 'AFTERNOON', setting : settingid, game : null, player : 'test2', role : 'PLAYER', idcomment : null, message : null});
-          res.body.should.containEql({ idschedule : gameschedule5, dayid : todayid, timeframe : 'AFTERNOON', setting : settingid, game : null, player : 'test3', role : 'PLAYER', idcomment : null, message : null});
-          res.body.should.containEql({ idschedule : gameschedule4, dayid : todayid, timeframe : 'EVENING', setting : settingid, game : gameid2, player : 'test2', role : 'GM', idcomment : null, message : null});
-          res.body.should.containEql({ idschedule : gameschedule6, dayid : todayid, timeframe : 'EVENING', setting : settingid, game : gameid2, player : 'test3', role : 'PLAYER', idcomment : null, message : null});
+          res.body.should.containEql({ idschedule : gameschedule3, dayid : todayid, timeframe : 'AFTERNOON', setting : settingid, game : null, player : 'test2', role : 'PLAYER'});
+          res.body.should.containEql({ idschedule : gameschedule5, dayid : todayid, timeframe : 'AFTERNOON', setting : settingid, game : null, player : 'test3', role : 'PLAYER'});
+          res.body.should.containEql({ idschedule : gameschedule4, dayid : todayid, timeframe : 'EVENING', setting : settingid, game : gameid2, player : 'test2', role : 'GM'});
+          res.body.should.containEql({ idschedule : gameschedule6, dayid : todayid, timeframe : 'EVENING', setting : settingid, game : gameid2, player : 'test3', role : 'PLAYER'});
           
           done();
         });

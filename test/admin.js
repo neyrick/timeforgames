@@ -9,12 +9,16 @@ describe('AdminUser', function() {
   var adminLoginToken = null;
   var loginToken1 = null;
   var settingid = 0;
+  var today = new Date();
+  var todayid = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
   var adminName = 'tempAdminUser';
   var adminPassword = 'tempPassword';
   var adminUserid;
   var regularName = 'test1';
   var regularPassword = 'testPass1';
   var regularUserId;
+  var commentText = 'This is a test comment';
+  var commentid = 0;
 
   before(function(done) {
         request.post(baseurl + '/login')
@@ -32,7 +36,16 @@ describe('AdminUser', function() {
                 throw err;
               }
               adminUserid = res.body.id;
-              done();
+                request.post(baseurl + '/comment')
+                    .set('Authorization', 'Bearer ' + adminLoginToken)
+                    .send({ dayid : todayid, timeframe : 'AFTERNOON', setting : 1, message : commentText })
+                    .end(function(err, res) {
+                      if (err) {
+                        throw err;
+                      }
+                      commentid = res.body.id;
+                      done();
+                    });
             });
         });
   });
@@ -90,6 +103,23 @@ describe('AdminUser', function() {
           });
         });
     }); 
+
+    describe('Comment', function() {
+        it('should allow to delete any other user\'s comment', function(done) {
+            request.del(baseurl + '/comment/' + commentid)
+                .set('Authorization', 'Bearer ' + loginToken1)
+                .end(function(err, res) {
+                  if (err) {
+                    throw err;
+                  }
+                  res.should.have.status(200);
+                  res.should.be.html;
+                  res.text.should.equal('Delete OK');
+                  done();
+            });
+        });
+    }); 
+
 
     describe('Admins', function() {
         it('should return the list of admins', function(done) {
