@@ -302,7 +302,6 @@ function CalendarCtrl($scope, settingsService, userService, plannerService, plan
             $scope.newsetting.name = '';
             $scope.newsetting.mode = -1;
             $scope.newsetting.status = 0;
-            $scope.newsetting.code = '';
             $scope.tooltipLock.mainlock = false;
             if ($scope.display == 'desktop') {
                 $('#addSettingTooltipContainer').qtip('api').hide();
@@ -784,7 +783,6 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
     };
 
     $scope.storeSetting = function() {
-        $scope.currentEditSetting.code = "AAA";
         settingsService.storeSetting($scope.currentEditSetting, function(newsetting) {
             if ($scope.imagePristine) {
                 $scope.loadSettings();

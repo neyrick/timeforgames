@@ -75,9 +75,8 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
 
             $scope.openGMMode = function() {
                 $scope.displayMode = "validate";
-    	        $scope.gamePicks = [];
+    	        $scope.gamePicks = {};
 		          if ( typeof $scope.timeframe.mygame != "undefined") {
-	                   $scope.gamePicks = [];
 		              $scope.timeframe.mygame.players.forEach(function(playerschedule) {
 		                  $scope.gamePicks.push(playerschedule);
     		          });
@@ -123,6 +122,7 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             scope.resetDisplayMode();
             scope.currentMessage = "";
             scope.currentCommentId = null;
+            scope.gamePicks = {};
 
             scope.switchComment = function(comment, event) {
                 scope.currentMessage = comment.message;

@@ -148,7 +148,7 @@
         <div id="filtersSuperbox">
 
             <div id="filtersToggle">
-                Filtres <span ng-if="!filtersOpen" ng-click="openFilters()">Ouvrir</span><span ng-if="filtersOpen" ng-click="closeFilters()">Fermer</span>
+                Filtres <span ng-if="!filtersOpen" ng-click="openFilters()">Ouvrir <i class="fa fa-chevron-down"></i> </span><span ng-if="filtersOpen" ng-click="closeFilters()">Fermer</span>
             </div>
             <div id="filtersBox">
                 <div id="openSettingsFiltersBox">
@@ -186,7 +186,7 @@
 
                 <!-- Ligne d'aggrégation de plusieurs demi-journées -->
 
-                <div bo-if="timeframe.collapsed">
+                <div bo-if="timeframe.collapsed" class="multijournees">
 
                     Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span>
                     - <span class="selectDayToggle">Ajouter une partie</span>
@@ -199,17 +199,23 @@
 
                 <!-- Ligne relative à une demi-journée  -->
 
-                <div bo-if="!timeframe.collapsed">
+                <div bo-if="!timeframe.collapsed" class="demijournee">
+				<table class="parties">
+				<tr> <td class="demijourneedate">
                     <div>
                         <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>
                         <br/>
                         <span bo-text="timeframesNames[timeframe.code]"></span>
                     </div>
-                    <div>
+					
+					</td>
+                    
+					<td class="partiespotentielles">
+					<div>
 
                         <!-- Colonne des parties potentielles  -->
 
-                        <div>
+                        <div class="titre-colone">
                             Parties potentielles
                         </div>
                         <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : false } " ng-switch="getSettingVisibility(tfsetting)">
@@ -222,11 +228,15 @@
 
                             <!-- Bloc chronique fermé -->
 
-                            <div ng-switch-when="closed">
-                                <span ng-show="tfsetting.mystatus.dispo">Dispo</span>
-                                <span>{{tfsetting.name}} (Fermé)</span>
-                                <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
-                            </div>
+                            
+							<table ng-switch-when="closed" class="chroniquepotclose">
+							<tr>
+                              <!-- <td> <span ng-show="tfsetting.mystatus.dispo">Dispo</span> </td>-->
+                               <td class="nomchronique"> <span>{{tfsetting.name}} <!--(Fermé)--></span> </td>
+                               <td class="clickouvrir"> <a href="#" ng-click="openTfSetting(tfsetting)">></a> </td>
+							</tr>	
+								</table>
+                           
 
                             <!-- Bloc chronique caché -->
         
@@ -234,15 +244,18 @@
                             </div>
 
                         </div>
-                        <div ng-click="selectSetting(timeframe)">
-                            Ajouter une partie
+                        <div ng-click="selectSetting(timeframe)" class="ajouterpartie">
+                           Ajouter une partie
                         </div>
                     </div>
+					</td>
+					
+					<td class="partiesvalidees">
                     <div>
                     
                         <!-- Colonne des parties validées  -->
         
-                        <div>
+                        <div class="titre-colone">
                             Parties validées
                         </div>
                         <div ng-repeat="tfsetting in timeframe.settings | filter : { hasgame : true } " ng-switch="getSettingVisibility(tfsetting)">
@@ -268,6 +281,8 @@
         
                         </div>
                     </div>
+					</td>
+					</table>
                 </div>                    
             </div>
         </div>
