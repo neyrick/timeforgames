@@ -268,12 +268,15 @@
 
                             <!-- Bloc chronique fermé -->
         
-                            <div ng-switch-when="closed">
-                                <span ng-show="(tfsetting.mystatus.pj) || (tfsetting.mystatus.mj)">Dispo</span>
-                                <span>{{tfsetting.name}} (Fermé)</span>
-                                <a href="#" ng-click="openTfSetting(tfsetting)">Ouvrir</a>
-                            </div>
+                            <table ng-switch-when="closed" class="chroniquepotclose">
+							<tr>
+                              <!-- <td> <span ng-show="(tfsetting.mystatus.pj) || (tfsetting.mystatus.mj)">Dispo</span> </td> -->
+                                <td class="nomchronique"> <span>{{tfsetting.name}} <!--(Fermé)--></span> </td>
+                                <td class="clickouvrir"> <a href="#" ng-click="openTfSetting(tfsetting)">></a></td>
+								</tr>
+                            </table>
         
+
                             <!-- Bloc chronique caché -->
         
                             <div ng-switch-when="hidden" class="hidden">
@@ -282,6 +285,7 @@
                         </div>
                     </div>
 					</td>
+					</tr>
 					</table>
                 </div>                    
             </div>
