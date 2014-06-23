@@ -129,56 +129,62 @@
             </div>
         </div>
 
+        <div class="spacer">
+        </div>
+
+        <div id="title">Rêves et Légendes
+        </div>
         <!-- Boutons utilisateur -->
 
         <div id="userBox" ng-show="currentUser">
             <div id="welcomeText">
-                Bienvenue {{ currentUser }}
+                Bienvenue <span id="username">{{ currentUser }}</span>
             </div>
-            <div ng-if="gui == 'admin'">
-                <a href="admin.html">Interface d'Administration</a>
+            <div id="adminbutton" class="userbutton" ng-if="gui == 'admin'" onclick="location.href='admin.html';">
+                Interface d'Administration
             </div>
-            <div ng-click="logout()">
+            <div id="logoffbutton" class="userbutton" ng-click="logout()">
                 Se déconnecter
             </div>
+        </div>
+
+        <div id="banner">
         </div>
 
         <!-- Panneau des filtres -->
 
         <div id="filtersSuperbox">
 
-            <div id="filtersToggle">
-                Filtres <span ng-if="!filtersOpen" ng-click="openFilters()">Ouvrir <i class="fa fa-chevron-down"></i> </span><span ng-if="filtersOpen" ng-click="closeFilters()">Fermer</span>
-            </div>
             <div id="filtersBox">
                 <div id="openSettingsFiltersBox">
-                    Chroniques ouvertes
-
-                    <div bindonce ng-repeat="setting in openSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
-                        <div>
-                            <span bo-text="setting.name"></span>
+                    <div class="filtersBoxTitle">Chroniques ouvertes</div>
+                    <div class="filtersList">
+                        <div class="filterSwitch" bindonce ng-repeat="setting in openSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
+                             <span bo-text="setting.name"></span>
                         </div>
                     </div>
-
                 </div>
                 <div id="closedSettingsFiltersBox">
-
-                    Chroniques fermées
-
-                    <div bindonce ng-repeat="setting in closedSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
-                        <div>
+                    <div class="filtersBoxTitle">Chroniques fermées</div>
+                    <div class="filtersList">
+                        <div class="filterSwitch" bindonce ng-repeat="setting in closedSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
                             <span bo-text="setting.name"></span>
                         </div>
                     </div>
-
                 </div>
+            </div>
+            <div id="filtersToggle">
+                <div ng-if="!filtersOpen" class="switch" ng-click="openFilters()">Filtres &nbsp;&nbsp;<span class="downtext">&gt;</span></div>
+                <div ng-if="filtersOpen" class="switch" ng-click="closeFilters()">Filtres &nbsp;&nbsp;<span class="downtext">&lt;</span></div>
             </div>
         </div>
 
-        <div>
-        <a href="#" ng-click="showPrevious()">Avant</a>
+        <div id="dateScrollers">
+            <a href="#" ng-click="showPrevious()" class="arrow">&lt;</a>
 
-        <a href="#" ng-click="showNext()">Après</a>
+            Du {{ firstday | date : 'longDate' }} au {{ lastday | date : 'longDate' }}
+
+            <a href="#" ng-click="showNext()"class="arrow">&gt;</a>
         </div>
 
         <div id="planning">

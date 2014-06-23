@@ -1227,6 +1227,7 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 
     function timeSlide(days) {
         $scope.firstday = $scope.firstday + days * planningBuilderService.MS_IN_DAY;
+        $scope.lastday = $scope.firstday + $scope.dayCount * planningBuilderService.MS_IN_DAY;
         initPlanning();
     }
 
@@ -1396,6 +1397,8 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     }
 
     $scope.firstday = planningBuilderService.getDefaultMinDay();
+    $scope.lastday = $scope.firstday + $scope.dayCount * planningBuilderService.MS_IN_DAY;
+    
     $scope.timeframesNames = {
         "AFTERNOON" : "Après-midi",
         "EVENING" : "Soirée"
