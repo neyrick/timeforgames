@@ -1,8 +1,13 @@
+* {
+	-webkit-font-smoothing: antialiased;
+}
+​
+html, html a, button {
+    -webkit-font-smoothing: antialiased !important;
+}
+
 .dropdown {
 	display: none;
-}
-.selectedPlayer {
-	color: #FF0000;
 }
 .hidden {
 	display: none;
@@ -72,6 +77,18 @@ div {
 }
 
 /* -------------- CSS Maureen ----------------- */
+
+@font-face {
+    font-family: 'glyphicons';
+    src: url('font/glyphicons/glyphicons-halflings-regular.eot');
+    src: url('font/glyphicons/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
+         url('font/glyphicons/glyphicons-halflings-regular.woff') format('woff'),
+         url('font/glyphicons/glyphicons-halflings-regular.ttf') format('truetype'),
+         url('font/glyphicons/glyphicons-halflings-regular.svg#glyphicons') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
 
 @font-face {
     font-family: 'pt_sansregular';
@@ -204,7 +221,7 @@ margin: 0px;
 	background-color:#CA153E;
         color: white;
         cursor: pointer;
-        border: 1px solid #CA153E;
+        border: 1px solid white;
 	text-align: center;
 }
 
@@ -220,6 +237,74 @@ margin: 0px;
 
 .button:disabled {
 	background-color:#9dcdd6;
+}
+
+.disabled3 {
+	background-color:#e995a2;
+}
+
+.squarebutton {
+	width: 25px;
+	height: 25px;
+	padding: 0px;
+	font-family: pt_sansbold_italic;
+	line-height: 25px;
+	display: inline-block;
+}
+
+.glyph {
+	font-family: glyphicons;
+	font-size: 12px;
+}
+
+.verticalButton {
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	transform: rotate(-90deg);
+	position: absolute;
+}
+
+.rightSideButton1 {
+	width: 70px;
+	top: 40px;
+	left: -61px;	
+}
+
+.rightSideButton2 {
+	width: 70px;
+	top: -14px;
+	left: -61px;	
+}
+
+.rightSideButton3 {
+	width: 50px;
+	top: -14px;
+	left: -51px;	
+}
+
+.rightSideButton4 {
+	width: 50px;
+	top: 14px;
+	left: -51px;	
+}
+
+.buttonsRow {
+	text-align:center;
+}
+
+.buttonsRow > div {
+	margin-left: 20px;
+	margin-right: 20px;
+	display: inline-block;
+}
+
+.leftSideNote1 {
+	width: 70px;
+	top: 22px;
+	left: -31px;
+	cursor: auto;	
 }
 
 #title {
@@ -529,7 +614,7 @@ width:25px;
 
 .clickfermer{
 position:absolute;
-top:0px;
+top:-1px;
 right:-1px;
 border: 1px solid #a6a6a6;
 line-height:25px;
@@ -605,12 +690,111 @@ width:100%;
 line-height:30px;
 padding:5px;
 margin:5px;
-width:80%;
 }
 
-.lignejoueur .mj, .lignejoueur .pj{
+.lignejoueur .mj, .lignejoueur .pj, .lignejoueur .titre{
 width:15%;
 font-weight:bold;
+}
+
+.chroniquepotouverte {
+	background-color:white;
+	color:#3d3d3d;
+	margin:5px;
+	border: 1px solid #a6a6a6;
+	position: relative;
+}
+
+.openTFSRow {
+	clear: both;
+	padding: 8px 0px;
+	vertical-align: top;
+}
+
+.openTFSMargin {
+	width: 12%;
+	display: inline-block;
+}
+
+.openTFSRowHeader {
+	width: 15%;
+    font-family: pt_sansbold;
+	display: inline-block;
+}
+
+.openTFSComments {
+	width: 87%;
+}
+
+.openTFSRowContent {
+	display: inline-block;
+}
+
+.openTFSRowLabel {
+	width: 30%;
+	display: inline-block;
+}
+
+.openTFSRowField {
+	width: 45%;
+	display: inline-block;
+}
+.openTFSLeftButtons {
+	display: inline-block;	
+	float: left;
+	position: relative;
+}
+
+.openTFSRightButtons {
+	display: inline-block;	
+	float: right;
+	position: relative;
+}
+
+.caplayer {
+	font-family: pt_sansbold;
+}
+
+.selectedPlayer {
+	color: #CA153E;
+	border: 1px solid #CA153E;
+	padding: 0px 5px;
+}
+
+.commentUser {
+    font-family: pt_sansitalic;
+}
+
+.commentSeparatorRow {
+	line-height: 1px;
+}
+.commentSeparator {
+    border-bottom: 1px dashed #a6a6a6;
+    width: 58%;
+    padding: 0px;
+    display: inline-block;
+}
+
+.commentText {
+	width: 58%;
+}
+
+.storyName {
+	font-family: pt_sansitalic;
+	text-align: center;
+	margin-top: -20px;
+	font-size: 16px;
+}
+
+.gameTime {
+	margin-top: 20px;
+	position: absolute;
+	right: 0;
+    padding: 5px 10px;
+	background-color:#CA153E;
+    color: white;
+    border: 1px solid white;
+	text-align: center;
 }
 
 .boutonplus{

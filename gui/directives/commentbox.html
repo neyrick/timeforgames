@@ -1,14 +1,24 @@
-    <div>{{comment.player}}</span></div>
-    <div class="msgBox">
-        <span ng-show="!editing">{{comment.message}}</span>
+  <div>
+    <div>
+        <div class="openTFSRow openTFSMargin"></div>
+        <div class="openTFSRow openTFSRowHeader commentUser">{{comment.player}}</div>
+        <div class="openTFSRow openTFSRowContent commentText">
+            <span ng-show="!editing">{{comment.message}}</span>
             <textarea ng-show="editing" rows="5" wrap="soft" ng-model="newmessage"></textarea>
-    </div>
-    <div ng-show="reader == comment.player">
-        <div ng-show="editing">
-            <a href="#" ng-click="storeComment()">Enregistrer</a> <a href="#" ng-click="cancelEdit()">Annuler</a>
         </div>
-        <div ng-show="!editing">
-            <a href="#" ng-click="startEdit()">Modifier</a> <a href="#" ng-click="deleteComment()">Supprimer</a>
+        <div class="openTFSRightButtons" ng-show="(reader == comment.player) || (gui == 'admin')">
+            <div ng-show="editing">
+                <div class="button squarebutton glyph" title="Enregistrer" ng-click="storeComment()">&#xE013;</div>
+                <div class="button3 squarebutton glyph" title="Annuler" ng-click="cancelEdit()">&#xE030;</div>
+            </div>
+            <div ng-show="!editing">
+                <div class="button squarebutton glyph" title="Modifier" ng-click="startEdit()">&#x270F;</div>
+                <div class="button3 squarebutton glyph" title="Supprimer" ng-click="deleteComment()">&#xE014;</div>
+            </div>
         </div>
     </div>
-
+    <div class="commentSeparatorRow">
+        <div class="openTFSMargin"></div>
+        <div class="commentSeparator"></div>
+    </div>
+  </div>

@@ -92,7 +92,7 @@
         <!-- Pop-up d'ajout d'une chronique -->
 
         <div id="addsettingdialogcontainer" style="display: none">
-            <div id="addsettingdialog" class="buttonBox"">
+            <div id="addsettingdialog" class="buttonBox">
                 <div>
                     <div class="addSettingColumn">
                         <div class="addSettingColumnHeader">Chroniques Ouvertes</div>
@@ -240,7 +240,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 				<tr> <td class="demijourneedate">
                     <div>
                         <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>
-                        <br/>
+                        <br />
                         <span bo-text="timeframesNames[timeframe.code]"></span>
                     </div>
 					
@@ -308,7 +308,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 							<tr>
                               <!-- <td> <span ng-show="(tfsetting.mystatus.pj) || (tfsetting.mystatus.mj)">Dispo</span> </td> -->
                                 <td class="nomchronique"> <span>{{tfsetting.name}} <!--(Fermé)--></span> </td>
-                                <td class="clickouvrir"> <a href="#" ng-click="openTfSetting(tfsetting)">></a></td>
+                                 <td class="clickouvrir" ng-click="openTfSetting(tfsetting)"><span>&gt;</span></td>
 								</tr>
                             </table>
         

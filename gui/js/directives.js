@@ -141,6 +141,7 @@ timeForGamesApp.directive('commentBox', ['plannerService', function(plannerServi
         },
         restrict: 'E',
         templateUrl: 'directives/commentbox.html',
+        replace: true,
         scope: {
              comment : '=',
              reader : '=',
