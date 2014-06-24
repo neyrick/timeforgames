@@ -952,8 +952,8 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 }]);
 
 timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService',
-'userService', 'config',  
-function TestCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config) {
+'userService', 'config', '$window',   
+function TestCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window) {
 /*
     $scope.firstday = planningBuilderService.getDefaultMinDay();
     $scope.dayCount = 30;
@@ -961,6 +961,10 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 
     $scope.timeframes = [];
 */
+
+    function setLastDay() {
+        $scope.lastday = $scope.firstday + ($scope.dayCount-1) * planningBuilderService.MS_IN_DAY;
+    }
 
     function applyFilters() {
         $scope.settingsList.forEach(function(setting) {
@@ -1094,6 +1098,7 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
             $scope.newsetting.name = '';
             $scope.newsetting.mode = -1;
             $scope.newsetting.status = 0;
+            $('#createSettingForm').hide();
         }, function(error) {
             window.alert("Impossible de créer la chronique: " + error);
         });
@@ -1225,9 +1230,41 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         delete $scope.openTfSettings[tfsetting.key];
     };
 
+    $scope.onSettingPictureSelect = function($files) {
+        var pictureFile = $files[0];
+        if ( typeof pictureFile == "undefined") {
+            window.alert("Fichier impossible à récupérer");
+            return;
+        }
+        if (pictureFile.type.indexOf('image') != 0) {
+            window.alert("Avec un fichier image, ça passera mieux...");
+            return;
+        }
+
+        if (window.FileReader) {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(pictureFile);
+            fileReader.onload = function(e) {
+                $scope.$apply(function() {
+                    $scope.currentUploadData = e.target.result;
+                    $('#newSettingImg').attr('src', $scope.currentUploadData );
+                    $scope.currentUploadFile = pictureFile;
+                    $('#newSettingImgMessage').hide();
+                });
+            };
+        }
+    };
+
+    $scope.clearImage = function() {
+        $scope.currentUploadFile = null;
+        $scope.currentUploadData = null;
+        $('#newSettingImgMessage').show();
+    };
+
+
     function timeSlide(days) {
         $scope.firstday = $scope.firstday + days * planningBuilderService.MS_IN_DAY;
-        $scope.lastday = $scope.firstday + $scope.dayCount * planningBuilderService.MS_IN_DAY;
+        setLastDay();
         initPlanning();
     }
 
@@ -1310,7 +1347,7 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         $.fn.qtip.modal_zindex = 16000;
         $('#logindialogcontainer').qtip({
             style : {
-                classes : ''
+                classes : 'popup loginpopup'
             },
             content : {
                 text : $('#logindialog')
@@ -1334,15 +1371,16 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 
         $('#addsettingdialogcontainer').qtip({
             style : {
-                classes : ''
+                classes : 'popup addsettingpopup'
             },
             content : {
                 text : $('#addsettingdialog')
             },
             position : {
-                my : 'center',
-                at : 'center',
-                target : $(window)
+                my: 'center',
+                at: 'center',
+                target : $(window),
+                adjust : { y : -100 }
             },
             show : {
                 event : false,
@@ -1350,23 +1388,41 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
                     on : true,
                     blur : true,
                     escape : true
-                }
+                },
+            },
+            events: {
+                visible: function (event, api) {
+                    api.set('position.target', $(window));
+                    api.reposition(event);
+                },
+                hide: function (event, api) {
+                    $scope.newsetting.name = '';
+                    $scope.newsetting.mode = -1;
+                    $('#createSettingForm').hide();
+                },
             },
             hide : false
         });
 
+//        $('#planning').on('click', '.selectDayToggle', function(event) {
         $('#planning').on('click', '.selectDayToggle', function(event) {
-            $(this).qtip({
+            $(event.target).qtip({
                 style : {
-                    classes : ''
+                    classes : 'popup'
                 },
                 content : {
-                    text : $(this).parent().find('.selectDayDropdown')
+                    text : $(event.target).closest('.multijournees').find('.selectDayDropdown')
                 },
                 position : {
-                    my : 'top center',
-                    at : 'bottom center',
-                    target : $(this)
+                    my: 'top center', 
+                    at: 'bottom center',
+                    viewport: $(window),
+                    target : $(event.target),
+                    effect : false,
+                    adjust : {
+                        mouse: false,
+                        method: 'flip shift'
+                    }
                 },
                 overwrite: false,
                 show : {
@@ -1377,6 +1433,11 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
                     event : 'mouseleave',
                     fixed : true,
                     delay : 100
+                },
+                events: {
+                    show: function (subevent, api) {
+//                        api.reposition();
+                    }
                 }
         }); });
     }
@@ -1397,7 +1458,7 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
     }
 
     $scope.firstday = planningBuilderService.getDefaultMinDay();
-    $scope.lastday = $scope.firstday + $scope.dayCount * planningBuilderService.MS_IN_DAY;
+    setLastDay();
     
     $scope.timeframesNames = {
         "AFTERNOON" : "Après-midi",
