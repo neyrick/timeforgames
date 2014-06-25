@@ -52,19 +52,6 @@ div {
     margin: 0px;
     padding: 0px;
 }
-.managerPanel {
-    margin: 10px;
-    padding: 10px;
-    border-top-right-radius: 9px;
-    border-top-left-radius: 9px;
-    border-bottom-right-radius: 9px;
-    border-bottom-left-radius: 9px;
-    background-color:#FFFFFF;
-    max-width: none;
-}
-.managerHeading {
-    overflow: hidden;
-}
 .largeModal {
     width: 1100px;
 }
@@ -205,6 +192,8 @@ margin: 0px;
         cursor: pointer;
         border: 1px solid white;
 	text-align: center;
+        border-radius: 0px;
+        background-image: none;
 }
 
 .button2 {
@@ -214,6 +203,8 @@ margin: 0px;
         cursor: pointer;
         border: 1px solid #009bba;
 	text-align: center;
+        border-radius: 0px;
+        background-image: none;
 }
 
 .button3 {
@@ -223,6 +214,8 @@ margin: 0px;
         cursor: pointer;
         border: 1px solid white;
 	text-align: center;
+        border-radius: 0px;
+        background-image: none;
 }
 
 .button2on {
@@ -230,9 +223,22 @@ margin: 0px;
         color: white;
 }
 
-.button2:hover {
+.button:hover, .button:active, .button:focus {
+	background-color: white;
+        color: #009bba;
+        border: 1px solid #009bba;
+}
+
+.button2:hover, .button2:active, .button2:focus {
 	background-color:#009bba;
         color: white;
+        border: 1px solid white;
+}
+
+.button3:hover, .button3:active, .button3:focus {
+	background-color: white;
+        color: #CA153E;
+        border: 1px solid #CA153E;
 }
 
 .button:disabled {
@@ -607,21 +613,40 @@ padding: 5px;
 text-align:center;
 }
 
-.clickouvrir{
-background-color:white;
-width:25px;
+.myschedule {
+position:absolute;
+line-height:26px;
+width:26px;
+height:26px;
+padding: 1px;
 }
+
+.clickouvrir{
+position:absolute;
+top:-1px;
+right:-1px;
+border: 1px solid #a6a6a6;
+line-height:26px;
+width:26px;
+height:26px;
+background-color:white;
+cursor: pointer;
+padding: 1px;
+}
+
+
 
 .clickfermer{
 position:absolute;
 top:-1px;
 right:-1px;
 border: 1px solid #a6a6a6;
-line-height:25px;
+line-height:26px;
 width:26px;
-height:25px;
+height:26px;
 background-color:white;
 cursor: pointer;
+padding: 1px;
 }
 
 .clickouvrir span, .clickfermer span {
@@ -636,6 +661,12 @@ text-decoration:none;
 -ms-transform: rotate(90deg);
 -o-transform: rotate(90deg);
 transform: rotate(90deg);
+}
+
+.myschedule span {
+	text-align:center;
+	vertical-align:middle;
+	display:block;
 }
 
 .partieouverte{
@@ -703,6 +734,7 @@ font-weight:bold;
 	margin:5px;
 	border: 1px solid #a6a6a6;
 	position: relative;
+        width: 100%;
 }
 
 .openTFSRow {
@@ -841,3 +873,75 @@ margin-left:-25px;
 
 }
 
+#adminNav {
+    text-align: center;
+}
+
+#adminNav .button {
+    display: inline-block;
+    margin: 10px 30px;
+}
+
+.managerPanel {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 0px;
+    background-color:#FFFFFF;
+    max-width: none;
+}
+.managerPanel > .managerHeading {
+    background-image: none;
+    background-color:#009bba;
+    color:white;
+    border-radius: 0px;
+    overflow: hidden;
+}
+
+.managerHeading > h3 {
+    float: left;
+}
+
+.managerHeading > button {
+    float: right;
+}
+
+.settingPic {
+    width: 100%;
+    height: auto;
+}
+
+.managerPicsColumn {
+    width: 40%;
+}
+
+/* Surcharges Bootstrap */
+
+.modal-content {
+    border-radius: 0px;
+}
+
+.modal-header {
+    background-color:#009bba;
+    color:white;
+}
+
+.modal-header .close {
+    color:white;
+    opacity: 1;
+}
+
+.btn {
+    border-radius: 0px;
+    background-image: none;
+}
+
+.btn-success.active, .btn-success:hover, .btn-success:focus, .btn-success,
+.btn-primary.active, .btn-primary:hover, .btn-primary:focus, .btn-primary {
+    background-color: #009bba;
+    border-color: #a6a6a6;
+}
+
+.btn-danger.active, .btn-danger:hover, .btn-danger:focus, .btn-danger {
+    background-color: #ca153e;
+    border-color: #a6a6a6;
+}

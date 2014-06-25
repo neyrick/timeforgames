@@ -3,7 +3,7 @@
 <div class="clickfermer" ng-click="close()"><span>&lt;</span></div>
 
 <div ng-if="tfsetting.hasgame" class="gameTime">19h30{{tfsetting.defgame.start}}</div>
-<div class="chroniquepartie">{{tfsetting.name}} <!--(Ouvert)--></div>
+<div class="chroniquepartie">{{tfsetting.name}} </div>
 <div ng-if="tfsetting.hasgame" class="storyName">Nom du scénar{{tfsetting.defgame.name}}</div>
 <div class="barrechronique"></div>
 
@@ -105,7 +105,7 @@
                         ng-model="gameTime" required />            
             </div>
             <div class="openTFSRightButtons">
-                 <div class="button3 verticalButton rightSideButton2" ng-class="{ disabled3 : mjForm.$invalid }" ng-click="validateGame();">Valider</div>
+                 <div class="button3 verticalButton rightSideButton2" ng-class="{ disabled3 : mjForm.$invalid || isGameValidable() }" ng-click="validateGame();">Valider</div>
             </div>
         </div>
       </form>

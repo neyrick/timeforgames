@@ -689,8 +689,9 @@ function($http, config, planningBuilderService) {
             $http.get(config.urlbase + '/planning?minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
         },
 
-        reformGame : function(pm_idgame, pm_newplayers, callback) {
+        reformGame : function(pm_idgame, pm_time, pm_title, pm_newplayers, callback) {
             $http.put(config.urlbase + '/game/' + pm_idgame + '?log_action=RFM_GAME', {
+                game : { time : pm_time, title : pm_title },
                 players : pm_newplayers
             }).success(callback).error(genericError);
         },
@@ -703,9 +704,11 @@ function($http, config, planningBuilderService) {
             $http.delete(config.urlbase + '/schedule/' + idschedule + '?log_action=DEL_GAME').success(callback).error(genericError);
         },
 
-        validateGame : function(schedule_id, players, callback) {
+        validateGame : function(schedule_id, time, title, players, callback) {
             var game = {
                 masterschedule : schedule_id,
+                time : time,
+                title : title,
                 players : players
             };
             $http.post(config.urlbase + '/game?log_action=ADD_GAME', game).success(callback).error(genericError);

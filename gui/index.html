@@ -264,15 +264,12 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 
                             <!-- Bloc chronique fermé -->
 
-                            
-							<table ng-switch-when="closed" class="chroniquepotclose">
-							<tr>
-                              <!-- <td> <span ng-show="tfsetting.mystatus.dispo">Dispo</span> </td>-->
-                               <td class="nomchronique"> <span>{{tfsetting.name}} <!--(Fermé)--></span> </td>
-                               <td class="clickouvrir" ng-click="openTfSetting(tfsetting)"><span>&gt;</span></td>
-							</tr>	
-								</table>
-                           
+                            <div ng-switch-when="closed" class="chroniquepotclose">
+                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo"><span>&#xE008;</span></div>
+                                <div class="clickouvrir" ng-click="openTfSetting(tfsetting)"><span>&gt;</span></div>
+                                <div class="nomchronique">{{tfsetting.name}}</div>
+                                
+                            </div>                           
 
                             <!-- Bloc chronique caché -->
         

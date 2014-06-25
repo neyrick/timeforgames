@@ -255,20 +255,37 @@
 	  </div><!-- /.modal-dialog -->
 	</div>
 
-
-
-      <div id="mainNav" class="navBar">
-	<div class="dummyInlineContainer pull-left">
-	  <button type="button" class="btn btn-default btn-lg" ng-class="{'btn-primary' : tab == 'users'}" ng-click="tab = 'users'">Gestion des Utilisateurs</button>
-	  <button type="button" class="btn btn-default btn-lg" ng-class="{'btn-primary' : tab == 'settings'}" ng-click="tab = 'settings'">Gestion des Chroniques</button>
-	</div>
-
-        <div class="dummyInlineContainer pull-right">
-	  <a href="index.html" role="button" class="btn btn-default btn-lg">Retour au Planificateur</a>
-	  <button type="button" class="btn btn-danger btn-lg" ng-click="logout()"><span class="glyphicon glyphicon-off"></span> Déconnexion</button>
+        <div class="spacer fullwidth">
         </div>
 
-        <div class="dummyInlineContainer pull-right"><h3 style="margin: 10px">Salut {{ currentUser }} !</h3></div>
+        <div id="title">Rêves et Légendes
+        </div>
+        <!-- Boutons utilisateur -->
+
+        <div id="userBox" ng-show="currentUser">
+            <div id="welcomeText">
+                Bienvenue <span id="username">{{ currentUser }}</span>
+            </div>
+            <div id="adminbutton" class="userbutton" onclick="location.href='index.html';">
+                Retour au Planificateur
+            </div>
+            <div id="logoffbutton" class="userbutton" ng-click="logout()">
+                Se déconnecter
+            </div>
+        </div>
+
+        <div id="banner" class="fullwidth">
+        </div>
+
+
+      <div id="adminNav">
+
+
+
+	<div class="dummyInlineContainer">
+          <div class="button" ng-class="{'button2' : tab != 'users'}" ng-click="tab = 'users'">Gestion des Utilisateurs</div>
+          <div class="button" ng-class="{'button2' : tab != 'settings'}" ng-click="tab = 'settings'">Gestion des Chroniques</div>
+	</div>
 
 
       </div>
@@ -276,8 +293,8 @@
 	<div id="usersManagerPanel" class="panel panel-default managerPanel" ng-show="tab == 'users'">
 
 	  <div class="panel-heading managerHeading">
-             <h3 class="pull-left" style="margin-top: 10px">Gestion des utilisateurs</h3>
-	     <button type="button" class="btn btn-primary btn-lg pull-right" ng-click="editUser()">Ajouter un utilisateur</button>
+             <h3 class="" style="margin-top: 10px">Gestion des utilisateurs</h3>
+	     <button type="button" class="btn btn-primary btn-lg button" ng-click="editUser()">Ajouter un utilisateur</button>
 	  </div>
 
 	  <table class="table table-hover table-condensed">
@@ -304,12 +321,12 @@
                   </td>
                   <td>
                     <div class="btn-group">
-                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Modifier l'utilisateur" ng-click="editUser(user)"><span class="glyphicon glyphicon-edit"></span></button>
-                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Envoyer un nouveau mot de passe" ng-click="resetPassword(user)"><span class="glyphicon glyphicon-envelope"></span></button>
-                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showUserHistory(user)"><span class="glyphicon glyphicon-calendar"></span></button>
-                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Se connecter comme l'utilisateur" ng-click="spoofLogin(user)"><span class="glyphicon glyphicon-user"></span></button>
-                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer l'utilisateur" ng-click="promptDestroyUser(user)"><span class="glyphicon glyphicon-remove"></span></button>
-                       <button type="button" class="btn btn-primary btn-sm buttonHelper"></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton button" data-title="Modifier l'utilisateur" ng-click="editUser(user)"><span class="glyphicon glyphicon-edit"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton button" data-title="Envoyer un nouveau mot de passe" ng-click="resetPassword(user)"><span class="glyphicon glyphicon-envelope"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton button" data-title="Historique des opérations" ng-click="showUserHistory(user)"><span class="glyphicon glyphicon-calendar"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton button" data-title="Se connecter comme l'utilisateur" ng-click="spoofLogin(user)"><span class="glyphicon glyphicon-user"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton button3" data-title="Supprimer l'utilisateur" ng-click="promptDestroyUser(user)"><span class="glyphicon glyphicon-remove"></span></button>
+                       <button type="button" class="btn btn-primary btn-sm buttonHelper button"></button>
                     </div>
                   </td>
                 </tr>
@@ -320,8 +337,8 @@
 	<div id="settingsManagerPanel" class="panel panel-default managerPanel" ng-show="tab == 'settings'">
 
 	  <div class="panel-heading managerHeading">
-             <h3 class="pull-left" style="margin-top: 10px">Gestion des chroniques</h3>
-	     <button type="button" class="btn btn-primary btn-lg pull-right" ng-click="editSetting()">Ajouter une chronique</button>
+             <h3 class="" style="margin-top: 10px">Gestion des chroniques</h3>
+	     <button type="button" class="btn btn-primary btn-lg button" ng-click="editSetting()">Ajouter une chronique</button>
 	  </div>
           <div class="panel-body">
 		<div class="btn-group btn-group-justified">
@@ -351,7 +368,7 @@
               </thead>
               <tbody>
                 <tr bindonce ng-repeat="setting in settingsList | filter : { mode : settingsMode }">
-                  <td><img ng-src="{{ getSettingPicUrl(setting.id) }}" bo-class="'settingPic-' + setting.id"></img></td>
+                  <td class="managerPicsColumn"><img class="settingPic" ng-src="{{ getSettingPicUrl(setting.id) }}" bo-class="'settingPic-' + setting.id"></img></td>
                   <td><span bo-text="setting.name"></span></td>
                   <td>
                     <div class="dummyInlineContainer text-success" bo-if="setting.status == 0"><span class="glyphicon glyphicon-ok"></span> Active</div>
@@ -359,10 +376,10 @@
                   </td>
                   <td>
                     <div class="btn-group">
-                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Modifier la chronique" ng-click="editSetting(setting)"><span class="glyphicon glyphicon-edit"></span></button>
-                      <button type="button" class="btn btn-primary btn-sm functButton" data-title="Historique des opérations" ng-click="showSettingHistory(setting)"><span class="glyphicon glyphicon-calendar"></span></button>
-                      <button type="button" class="btn btn-danger btn-sm functButton" data-title="Supprimer la chronique" ng-click="promptDestroySetting(setting)"><span class="glyphicon glyphicon-remove"></span></button>
-                       <button type="button" class="btn btn-primary btn-sm buttonHelper"></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton button" data-title="Modifier la chronique" ng-click="editSetting(setting)"><span class="glyphicon glyphicon-edit"></span></button>
+                      <button type="button" class="btn btn-primary btn-sm functButton button" data-title="Historique des opérations" ng-click="showSettingHistory(setting)"><span class="glyphicon glyphicon-calendar"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm functButton button3" data-title="Supprimer la chronique" ng-click="promptDestroySetting(setting)"><span class="glyphicon glyphicon-remove"></span></button>
+                       <button type="button" class="btn btn-primary btn-sm buttonHelper button"></button>
                     </div>
                 </tr>
               </tbody>

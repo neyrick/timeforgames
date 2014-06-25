@@ -61,13 +61,25 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
         		});
     	    };
     
+            $scope.isGameValidable = function() {
+                if ($scope.gameTime.trim() == "") return false;
+                if ($scope.storyName.trim() == "") return false;
+                for (var player in $scope.gamePicks) {
+                    if ($scope.gamePicks.hasOwnProperty(player)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
     	    $scope.validateGame = function() {
+                if (!$scope.isGameValidable()) return;
         		if ( typeof $scope.timeframe.mygame == "undefined") {
-        		    plannerService.validateGame(getMyScheduleId($scope.currentuser, $scope.tfsetting, 'GM'), $scope.gamePicks, function() {
+        		    plannerService.validateGame(getMyScheduleId($scope.currentuser, $scope.tfsetting, 'GM'), $scope.gameTime, $scope.storyName, $scope.gamePicks, function() {
                            $scope.refreshTimeframe();
         		    });
         		} else {
-        		    plannerService.reformGame($scope.timeframe.mygame.id, $scope.gamePicks, function() {
+        		    plannerService.reformGame($scope.timeframe.mygame.id, $scope.gameTime, $scope.storyName, $scope.gamePicks, function() {
                                $scope.refreshTimeframe();
         		    });
         		}
@@ -123,6 +135,8 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             scope.currentMessage = "";
             scope.currentCommentId = null;
             scope.gamePicks = {};
+            scope.storyName = "";
+            scope.gameTime = "";
 
             scope.switchComment = function(comment, event) {
                 scope.currentMessage = comment.message;
