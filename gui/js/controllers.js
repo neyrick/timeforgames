@@ -734,42 +734,6 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
             hide : false
         });
 
-//        $('#planning').on('click', '.selectDayToggle', function(event) {
-        $('#planning').on('click', '.selectDayToggle', function(event) {
-            $(event.target).qtip({
-                style : {
-                    classes : 'popup'
-                },
-                content : {
-                    text : $(event.target).closest('.multijournees').find('.selectDayDropdown')
-                },
-                position : {
-                    my: 'top center', 
-                    at: 'bottom center',
-                    viewport: $(window),
-                    target : $(event.target),
-                    effect : false,
-                    adjust : {
-                        mouse: false,
-                        method: 'flip shift'
-                    }
-                },
-                overwrite: false,
-                show : {
-                    event : event.type,
-                    ready: true
-                },
-                hide :  {
-                    event : 'mouseleave',
-                    fixed : true,
-                    delay : 100
-                },
-                events: {
-                    show: function (subevent, api) {
-//                        api.reposition();
-                    }
-                }
-        }); });
     }
 
     $scope.loading = false;

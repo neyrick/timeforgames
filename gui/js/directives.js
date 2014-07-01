@@ -1,5 +1,61 @@
 'use strict';
 
+timeForGamesApp.directive('timeframesGroup', [ function() {
+
+        return {
+        controller : function ($scope, $element, $attrs) {
+            $scope.selectSetting = function(subtf) {
+                $scope.$parent.selectSetting(subtf);
+            };
+
+            $scope.timeframesNames = $scope.$parent.timeframesNames;
+        },
+        restrict: 'E',
+        templateUrl: 'directives/timeframesgroup.html',
+        replace: true,
+        scope: {
+             timeframe : '=',
+        },
+        link: function(scope, element, attrs) {
+
+		    $(element).qtip({
+		        style : {
+		            classes : 'popup'
+		        },
+		        content : {
+		            text : $(element).find('.selectDayDropdown')
+		        },
+		        position : {
+		            my: 'top center', 
+		            at: 'bottom center',
+		            viewport: $(window),
+		            target : 'mouse',
+		            effect : false,
+		            adjust : {
+		                mouse: false,
+		                method: 'flip shift'
+		            }
+		        },
+		        overwrite: false,
+		        show : {
+		            event : 'click',
+		        },
+		        hide :  {
+		            event : 'mouseleave',
+		            fixed : true,
+		            delay : 100
+		        },
+		        events: {
+		            show: function (subevent, api) {
+	//                        api.reposition();
+		            }
+		        }
+		});
+
+        }
+    };
+}]);
+
 timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userService', function(config, plannerService, userService) {
     
 	var admins = [];

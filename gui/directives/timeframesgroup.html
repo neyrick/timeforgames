@@ -1,0 +1,12 @@
+<div class="multijournees">
+
+    Période du <span class="dateBoundary">[ <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[timeframe.code]"></span> ]</span> au  <span class="dateBoundary">[ <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[timeframe.end.code]"></span> ]</span> 
+    <div class="selectDayToggle">Cliquer pour ajouter une partie</div>
+    <ul class="selectDayDropdown dropdown">
+        <li class="button2" bindonce ng-repeat="subtf in timeframe.subs" ng-click="selectSetting(subtf)">
+            <span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]">
+        </li>
+    </ul>
+</div>
+
+

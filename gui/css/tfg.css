@@ -454,10 +454,16 @@ margin: 0px;
         color: white;
 }
 
+.dateBoundary {
+        font-family: 'pt_sansbold';
+}
+
 .selectDayToggle {
         display: inline-block;
         padding: 0px 10px;
-        margin-left: 5em;
+        margin-right: 20%;
+        float: right;
+        font-family: 'pt_sansitalic';
 }
 
 .addSettingColumn {
@@ -669,21 +675,6 @@ transform: rotate(90deg);
 	display:block;
 }
 
-.partieouverte{
-position:relative;
-width:100%;
-background-color:white;
-color:#3d3d3d;
-margin:5px;
-border: 1px solid #a6a6a6;
-border-collapse:collapse;
-padding:0;
-}
-
-.partieouverte td{
-padding:0;
-}
-
 .imagechronique{
 width:100%;
 position:relative;
@@ -706,26 +697,6 @@ background-color:#a6a6a6;
 height:1px;
 width:75%;
 margin:10px auto;
-}
-
-.tablebouton{
-position:relative;
-}
-
-.joueurchronique{
-position:relative;
-width:100%;
-}
-
-.lignejoueur{
-line-height:30px;
-padding:5px;
-margin:5px;
-}
-
-.lignejoueur .mj, .lignejoueur .pj, .lignejoueur .titre{
-width:15%;
-font-weight:bold;
 }
 
 .chroniquepotouverte {
@@ -827,50 +798,6 @@ font-weight:bold;
     color: white;
     border: 1px solid white;
 	text-align: center;
-}
-
-.boutonplus{
-position:absolute;
-top:0px;
-right:-2px;
-width:25px;
-height:25px;
-background-color:#009bba;
-color:white;
-}
-
-.boutonmoins{
-position:absolute;
-top:0px;
-right:-2px;
-width:25px;
-height:25px;
-background-color:#ca153e;
-color:white;
-}
-
-.boutonmoins a, .boutonplus a {
-color:white;
-font-family:pt_sansbold_italic;
-text-align:center;
-display:block;
-text-decoration:none;
-line-height:25px;
-}
-
-.validationpartie{
--webkit-transform: rotate(-90deg);
--moz-transform: rotate(-90deg);
--ms-transform: rotate(-90deg);
--o-transform: rotate(-90deg);
-transform: rotate(-90deg);
-text-align:center;
-background-color:#ca153e;
-color:white;
-line-height:30px;
-width:75px;
-margin-left:-25px;
-
 }
 
 #adminNav {

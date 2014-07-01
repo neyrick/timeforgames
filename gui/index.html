@@ -221,16 +221,8 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
             <div bindonce ng-repeat="timeframe in timeframes">
 
                 <!-- Ligne d'aggrégation de plusieurs demi-journées -->
-
-                <div bo-if="timeframe.collapsed" class="multijournees">
-
-                    Période du <span bo-text="timeframe.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.code]"></span> au <span bo-text="timeframe.end.date | date:'EEE dd/MM/yyyy'"></span>-<span bo-text="timeframesNames[timeframe.end.code]"></span>
-                    - <div class="selectDayToggle button">Ajouter une partie</div>
-                    <ul class="selectDayDropdown dropdown">
-                        <li class="button2" bindonce ng-repeat="subtf in timeframe.subs" ng-click="selectSetting(subtf)">
-                            <span bo-text="subtf.date | date:'EEE dd/MM/yyyy'"></span> - <span bo-text="timeframesNames[subtf.code]">
-                        </li>
-                    </ul>
+                <div bo-if="timeframe.collapsed">
+	                <timeframes-group timeframe="timeframe" />
                 </div>
 
                 <!-- Ligne relative à une demi-journée  -->
@@ -265,7 +257,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                             <!-- Bloc chronique fermé -->
 
                             <div ng-switch-when="closed" class="chroniquepotclose">
-                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo"><span>&#xE008;</span></div>
+                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo()"><span>&#xE008;</span></div>
                                 <div class="clickouvrir" ng-click="openTfSetting(tfsetting)"><span>&gt;</span></div>
                                 <div class="nomchronique">{{tfsetting.name}}</div>
                                 
