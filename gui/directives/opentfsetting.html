@@ -1,10 +1,10 @@
 <div class="chroniquepotouverte">
-<div class="imagechronique"><img ng-src="{{ getSettingPicUrl(tfsetting.settingid) }}"></img></div>
+<div class="imagechronique" ng-click="close()"><img ng-src="{{ getSettingPicUrl(tfsetting.settingid) }}"></img></div>
 <div class="clickfermer" ng-click="close()"><span>&lt;</span></div>
 
-<div ng-if="tfsetting.hasgame" class="gameTime">19h30{{tfsetting.defgame.start}}</div>
+<div ng-if="tfsetting.hasgame" class="gameTime">{{tfsetting.defgame.gameTime}}</div>
 <div class="chroniquepartie">{{tfsetting.name}} </div>
-<div ng-if="tfsetting.hasgame" class="storyName">Nom du scénar{{tfsetting.defgame.name}}</div>
+<div ng-if="tfsetting.hasgame" class="storyName">{{tfsetting.defgame.storyName}}</div>
 <div class="barrechronique"></div>
 
 
@@ -62,7 +62,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">MJ :</div>
             <div class="openTFSRow openTFSRowContent">
-                <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span  ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: (playerSchedule.player == currentuser) }" bo-text="playerSchedule.player"></span> </span>
+                <span bindonce ng-repeat="playerSchedule in gmspool"> <span bo-if="$index > 0">, </span><span  ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: (playerSchedule.player == currentuser) }" bo-text="playerSchedule.player"></span> </span>
             </div>
         </div>
     
@@ -70,7 +70,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">Joueurs :</div>
             <div class="openTFSRow openTFSRowContent">
-                 <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: isPlayerSelected(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
+                 <span bindonce ng-repeat="playerSchedule in playerspool"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" ttip="timeframe.gaming[playerSchedule.player]" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: isPlayerSelected(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
             </div>
             <div class="openTFSRightButtons">
                  <div class="button3 verticalButton rightSideButton2" ng-click="cancelGMMode()">Annuler</div>
@@ -92,7 +92,7 @@
             <div class="openTFSRow openTFSRowField">
                 <input type="text" 
                         placeholder="Entrer un nom"
-                        ng-model="storyName" required />            
+                        ng-model="gameData.storyName" required />            
             </div>
         </div>
 
@@ -102,10 +102,10 @@
             <div class="openTFSRow openTFSRowField">
                 <input type="text" 
                         placeholder="Entrer une heure"
-                        ng-model="gameTime" required />            
+                        ng-model="gameData.gameTime" required />            
             </div>
             <div class="openTFSRightButtons">
-                 <div class="button3 verticalButton rightSideButton2" ng-class="{ disabled3 : mjForm.$invalid || isGameValidable() }" ng-click="validateGame();">Valider</div>
+                 <div class="button3 verticalButton rightSideButton2" ng-class="{ disabled3 : mjForm.$invalid || (!isGameValidable()) }" ng-click="validateGame();">Valider</div>
             </div>
         </div>
       </form>
@@ -150,6 +150,8 @@
             </div>
             <div class="openTFSRightButtons">
                  <div ng-if="tfsetting.defgame.gm.player == currentuser" class="button3 verticalButton rightSideButton4" ng-click="openGMMode()">Modifier</div>
+                <div class="button squarebutton glyph" ng-click="setDispo('PLAYER')"  ng-show="!(tfsetting.mystatus.pj || tfsetting.mystatus.mj || tfsetting.mystatus.dispoPJ)">&#x002B;</div>
+                <div class="button3 squarebutton glyph" ng-click="clearDispo('PLAYER')"  ng-show="!(tfsetting.mystatus.pj || tfsetting.mystatus.mj) && tfsetting.mystatus.dispoPJ">&#x2212;</div>
             </div>
         </div>
                         

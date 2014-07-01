@@ -118,24 +118,24 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
     	    };
     
             $scope.isGameValidable = function() {
-                if ($scope.gameTime.trim() == "") return false;
-                if ($scope.storyName.trim() == "") return false;
+                if ($scope.gameData.gameTime.trim() == "") return false;
+                if ($scope.gameData.storyName.trim() == "") return false;
                 for (var player in $scope.gamePicks) {
                     if ($scope.gamePicks.hasOwnProperty(player)) {
                         return true;
                     }
                 }
                 return false;
-            }
+            };
 
     	    $scope.validateGame = function() {
                 if (!$scope.isGameValidable()) return;
         		if ( typeof $scope.timeframe.mygame == "undefined") {
-        		    plannerService.validateGame(getMyScheduleId($scope.currentuser, $scope.tfsetting, 'GM'), $scope.gameTime, $scope.storyName, $scope.gamePicks, function() {
+        		    plannerService.validateGame(getMyScheduleId($scope.currentuser, $scope.tfsetting, 'GM'), $scope.gameData.gameTime, $scope.gameData.storyName, $scope.gamePicks, function() {
                            $scope.refreshTimeframe();
         		    });
         		} else {
-        		    plannerService.reformGame($scope.timeframe.mygame.id, $scope.gameTime, $scope.storyName, $scope.gamePicks, function() {
+        		    plannerService.reformGame($scope.timeframe.mygame.id, $scope.gameData.gameTime, $scope.gameData.storyName, $scope.gamePicks, function() {
                                $scope.refreshTimeframe();
         		    });
         		}
@@ -144,11 +144,23 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             $scope.openGMMode = function() {
                 $scope.displayMode = "validate";
     	        $scope.gamePicks = {};
+                $scope.playerspool.length = 0;
+                $scope.gmspool.length = 0;
 		          if ( typeof $scope.timeframe.mygame != "undefined") {
 		              $scope.timeframe.mygame.players.forEach(function(playerschedule) {
-		                  $scope.gamePicks.push(playerschedule);
+                          $scope.playerspool.push(playerschedule);
+		                  $scope.gamePicks[playerschedule.player] = playerschedule;
     		          });
+    		          $scope.gameData.storyName = $scope.timeframe.mygame.storyName;
+    		          $scope.gameData.gameTime = $scope.timeframe.mygame.gameTime;
+                      $scope.gmspool.push($scope.timeframe.mygame.gm);
 		          }
+		         $scope.tfsetting.availablegms.forEach(function (gmschedule) {
+		              $scope.gmspool.push(gmschedule);
+		         });
+                 $scope.tfsetting.availableplayers.forEach(function (playerschedule) {
+                      $scope.playerspool.push(playerschedule);
+                 });
             };
         
             $scope.cancelGMMode = function() {
@@ -191,8 +203,9 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             scope.currentMessage = "";
             scope.currentCommentId = null;
             scope.gamePicks = {};
-            scope.storyName = "";
-            scope.gameTime = "";
+            scope.gameData = { storyName : "", gameTime : "" };
+            scope.playerspool = [];
+            scope.gmspool = [];
 
             scope.switchComment = function(comment, event) {
                 scope.currentMessage = comment.message;

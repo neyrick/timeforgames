@@ -389,7 +389,9 @@ function(config) {
             if (game == null) {
                 game = {
                     id : rawschedule.game,
-                    players : []
+                    players : [],
+                    storyName : rawschedule.title,
+                    gameTime : rawschedule.time
                 };
                 tfSetting.games.push(game);
             }

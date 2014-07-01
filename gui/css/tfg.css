@@ -144,9 +144,10 @@ margin: 0px;
 }
 
 #topContainer {
-    width: 1216px;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;	
+    max-width: 1216px;
 }
 
 .popup {
@@ -612,6 +613,7 @@ color:white;
 margin:5px;
 border: 1px solid #a6a6a6;
 border-collapse:collapse;
+height: 2em;
 }
 
 .nomchronique{
@@ -627,11 +629,21 @@ height:26px;
 padding: 1px;
 }
 
+.newStuff {
+position:absolute;
+line-height:26px;
+width:26px;
+height:26px;
+padding: 1px;
+color: white;
+left: 30px;
+}
+
 .clickouvrir{
 position:absolute;
-top:-1px;
-right:-1px;
-border: 1px solid #a6a6a6;
+top:-0x;
+right:0px;
+/*border: 1px solid #a6a6a6;*/
 line-height:26px;
 width:26px;
 height:26px;
@@ -644,9 +656,9 @@ padding: 1px;
 
 .clickfermer{
 position:absolute;
-top:-1px;
-right:-1px;
-border: 1px solid #a6a6a6;
+top:0px;
+right:0px;
+/*border: 1px solid #a6a6a6;*/
 line-height:26px;
 width:26px;
 height:26px;

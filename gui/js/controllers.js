@@ -346,7 +346,8 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
                     plannerService.fetchComments($scope.firstday, $scope.dayCount, function(comments) {
                         var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, comments, $scope.currentUser);
                         planningBuilderService.dispatchUpdatesFlags(updatesHash, timeframes, $scope.config.lastUpdate);
-                        $scope.config.lastUpdate = new Date().getTime();
+                        var newUpdate = new Date();
+                        $scope.config.lastUpdate = (newUpdate.getTime() + newUpdate.getTimezoneOffset() * 60000);
                         $scope.timeframes = timeframes;
                         storeConfig();
                         applyFilters();
