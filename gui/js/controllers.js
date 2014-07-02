@@ -524,6 +524,14 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
         });
     };
 
+    $scope.resetPassword = function(user) {
+        userService.resetMyPassword(user, function(data) {
+            $scope.loginMessage = 'Un e-mail a été envoyé à ' + user + ' pour réinitialiser son mot de passe.';
+        }, function(error) {
+            $scope.loginMessage = error;
+        });
+    };
+
     $scope.openFilters = function() {
         $scope.filtersOpen = true;
         $('#filtersBox').slideDown(200);

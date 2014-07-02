@@ -81,7 +81,10 @@
                         ng-model="tempPassword" required />
                     </div>
                     <div class="buttonBox">
-                        <button id="nameButton" class="button" ng-disabled="loginForm.$invalid" type="submit">
+                        <button class="button" ng-disabled="!tempUser" type="button" ng-click="resetPassword(tempUser)">
+                            J'ai perdu mot de passe
+                        </button>
+                        <button id="nameButton" class="button" ng-disabled="(!tempUser) || (!tempPassword)" type="submit">
                             Valider
                         </button>
                     </div>

@@ -33,6 +33,8 @@ server.post('/api/login', serv.login);
 server.get('/api/status', serv.getStatus);
 server.get('/api/expireToken', serv.expireToken);
 server.get('/api/setting/pic/:settingid', serv.getSettingPicture);
+server.post('/api/secureStore', serv.storeSecureAction);
+server.get('/api/securePerform/:actionid', serv.performSecureAction);
 
 // Methodes necessitant un compte standard
 

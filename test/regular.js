@@ -760,7 +760,7 @@ describe('RegularUser', function() {
         done();
       });
     });
-    
+    /*
     it('should allow resetting one\'s password', function(done) {
         request.post(baseurl + '/login').send({
             username : testlogin1,
@@ -784,7 +784,7 @@ describe('RegularUser', function() {
         });
       });
     });
-    
+    */
     it('should not allow using the previous token', function(done) {
         request.get(baseurl + '/relogin')
         .set('Authorization', 'Bearer ' + loginToken1)

@@ -144,6 +144,19 @@ function($http, config, localStorageService) {
             }
         },
                 
+        resetMyPassword : function(username, callback, errorcallback) {
+            var pw_request = {
+                action : 'RES_PW_SEC',
+                username: username,
+                params : {}
+            };
+            $http.post(config.urlbase + '/secureStore', pw_request).success(function(data, status) {
+                callback(data);
+            }).error(function(data, status) {
+                errorcallback(data);
+            });
+        },
+/*
         resetPassword : function(callback, errorcallback) {
             $http.get(config.urlbase + '/resetPassword').success(function(data, status) {
                 callback(data);
@@ -151,7 +164,7 @@ function($http, config, localStorageService) {
                 errorcallback(data);
             });
         },
-
+*/
         adminResetPassword : function(pm_user, callback, errorcallback) {
             $http.get(config.urlbase + '/resetPassword/' + pm_user.name).success(function(data, status) {
                 callback(data);
