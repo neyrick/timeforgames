@@ -58,17 +58,15 @@ timeForGamesApp.directive('timeframesGroup', [ function() {
 
 timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userService', function(config, plannerService, userService) {
     
-	var admins = [];
-
         return {
         controller : function ($scope, $element, $attrs) {
-
+/*
             userService.getAdmins(function(result) {
                 admins = result;
             }, function(error) {
                 window.alert("Impossible d'identifier les membres du CA: " + error);
             });
-
+*/
             $scope.basePicUrl = config.urlbase + "/setting/pic/";
             $scope.getSettingPicUrl = function(settingid) {
                 return $scope.basePicUrl + settingid;
@@ -177,7 +175,7 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             };
  
             $scope.isAdmin = function(playername) {
-                return (admins.indexOf(playername) > -1);
+                return ($scope.admins.indexOf(playername) > -1);
             };
 
             $scope.storeComment = function() {
@@ -196,7 +194,8 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
         scope: {
              timeframe : '=',
              tfsetting : '=',
-             currentuser : '='
+             currentuser : '=',
+             admins: '='
         },
         link: function(scope, element, attrs) {
             scope.resetDisplayMode();
@@ -211,6 +210,27 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
                 scope.currentMessage = comment.message;
                 scope.currentCommentId = comment.id;
             };
+
+            $(element).on('mouseover', ':not([playing=""])', function(event) {
+                // Bind the qTip within the event handler
+                $(this).qtip({
+                    overwrite: false, // Make sure the tooltip won't be overridden once created
+                    style : {
+                        classes : 'playingTooltip'
+                    },
+                    content: {
+                        attr : 'playing'
+                    },
+                    position : {
+                        my : 'top center',
+                        at : 'bottom center'
+                    },
+                    show: {
+                        event: event.type, // Use the same show event as the one that triggered the event handler
+                        ready: true // Show the tooltip as soon as it's bound, vital so it shows up the first time you hover!
+                    },
+                }, event); // Pass through our original event to qTip
+            });
         
         }
     };
