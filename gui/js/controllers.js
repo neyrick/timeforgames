@@ -337,13 +337,18 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
             plannerService.getUpdates($scope.firstday, $scope.dayCount, $scope.currentUser, function(updatesHash) {
                 plannerService.getPlanning($scope.firstday, $scope.dayCount, function(planning) {
                     plannerService.fetchComments($scope.firstday, $scope.dayCount, function(comments) {
-                        var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, comments, $scope.currentUser);
-                        planningBuilderService.dispatchUpdatesFlags(updatesHash, timeframes, $scope.config.lastUpdate);
-                        var newUpdate = new Date();
-                        $scope.config.lastUpdate = (newUpdate.getTime() + newUpdate.getTimezoneOffset() * 60000);
-                        $scope.timeframes = timeframes;
-                        storeConfig();
-                        applyFilters();
+                        userService.getAdmins(function(admins) {
+                            $scope.admins = admins;
+                            var timeframes = planningBuilderService.buildTimeframesPlanning($scope.firstday, $scope.dayCount, $scope.settingsList, planning, comments, $scope.currentUser);
+                            planningBuilderService.dispatchUpdatesFlags(updatesHash, timeframes, $scope.config.lastUpdate);
+                            var newUpdate = new Date();
+                            $scope.config.lastUpdate = (newUpdate.getTime() + newUpdate.getTimezoneOffset() * 60000);
+                            $scope.timeframes = timeframes;
+                            storeConfig();
+                            applyFilters();
+                        }, function(error) {
+                            window.alert("Impossible d'identifier les membres du CA: " + error);
+                        });
                     });
                 });
             });
@@ -644,6 +649,9 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         */
         localStorageService.add('tfgconfig-' + $scope.currentUser, JSON.stringify($scope.config));
     }
+
+    $scope.admins = [];
+
 
     function reset() {
         $scope.tempUser = '';

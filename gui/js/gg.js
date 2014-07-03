@@ -21,10 +21,14 @@ function tfSettingStatus() {
 }
 
 function getSettingName(settingid, allSettings) {
+    var result = undefined;
     allSettings.some(function(setting) {
-        if (setting.id == settingid) return setting.name;
+        if (setting.id == settingid) {
+            result = setting.name;
+            return true;
+        }
     });
-    return undefined;
+    return result;
 }
 
 function isLoggedIn() {

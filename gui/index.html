@@ -82,7 +82,7 @@
                     </div>
                     <div class="buttonBox">
                         <button class="button" ng-disabled="!tempUser" type="button" ng-click="resetPassword(tempUser)">
-                            J'ai perdu mot de passe
+                            J'ai perdu mon mot de passe
                         </button>
                         <button id="nameButton" class="button" ng-disabled="(!tempUser) || (!tempPassword)" type="submit">
                             Valider
@@ -254,7 +254,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                             <!-- Bloc chronique ouvert -->
 
                             <div ng-switch-when="open">
-                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentUser="currentUser"/>
+                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentUser="currentUser" admins="admins"/>
                             </div>
 
                             <!-- Bloc chronique fermé -->
@@ -292,20 +292,19 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                             <!-- Bloc chronique ouvert -->
         
                             <div ng-switch-when="open">
-                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentuser="currentUser"/>
+                                <open-tf-setting timeframe="timeframe" tfsetting="tfsetting" refresh="refreshTimeFrame(timeframe)" currentuser="currentUser" admins="admins"/>
                             </div>
 
                             <!-- Bloc chronique fermé -->
-        
-                            <table ng-switch-when="closed" class="chroniquepotclose">
-							<tr>
-                              <!-- <td> <span ng-show="(tfsetting.mystatus.pj) || (tfsetting.mystatus.mj)">Dispo</span> </td> -->
-                                <td class="nomchronique"> <span>{{tfsetting.name}} <!--(Fermé)--></span> </td>
-                                 <td class="clickouvrir" ng-click="openTfSetting(tfsetting)"><span>&gt;</span></td>
-								</tr>
-                            </table>
-        
 
+                            <div ng-switch-when="closed" class="chroniquepotclose" ng-click="openTfSetting(tfsetting)">
+                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo()"><span>&#xE008;</span></div>
+                                <div class="newStuff glyph" ng-show="tfsetting.newStuff"><span>&#xE101;</span></div>
+                                <div class="clickouvrir"><span>&gt;</span></div>
+                                <div class="nomchronique">{{tfsetting.name}}</div>
+                                
+                            </div>                           
+        
                             <!-- Bloc chronique caché -->
         
                             <div ng-switch-when="hidden" class="hidden">
