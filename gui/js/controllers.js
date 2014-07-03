@@ -283,14 +283,7 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
 timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService',
 'userService', 'config', '$window',   
-function TestCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window) {
-/*
-    $scope.firstday = planningBuilderService.getDefaultMinDay();
-    $scope.dayCount = 30;
-    $scope.currentUser = 'Neyrick';
-
-    $scope.timeframes = [];
-*/
+function CalendarCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window) {
 
     function setLastDay() {
         $scope.lastday = $scope.firstday + ($scope.dayCount-1) * planningBuilderService.MS_IN_DAY;
@@ -787,4 +780,92 @@ function TestCtrl($scope, planningBuilderService, plannerService, settingsServic
 }]);
 
 
+timeForGamesApp.controller('GamesCalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService',
+'userService', 'config', '$window',   
+function GamesCalendarCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window) {
+
+    $scope.refreshSettings = function(andPlanning) {
+        settingsService.getSettings(function(settings) {
+            $scope.settingsList = sortSettings(settings);
+             $scope.openSettings = [];
+             $scope.closedSettings = [];
+             $scope.oneShots = [];
+             $scope.clubEvents = [];
+             $scope.settingsList.forEach(function(item) {
+             if (item.status > 0)
+                 return;
+             if (item.mode == 0) {
+                 $scope.openSettings.push(item);
+             } else if (item.mode == 1) {
+                 $scope.closedSettings.push(item);
+             } else if (item.mode == 2) {
+                $scope.oneShots.push(item);
+             } else if (item.mode == 3) {
+                $scope.clubEvents.push(item);
+             }
+           });
+            if (andPlanning) initPlanning();
+            $scope.settingsReady = true;
+        }, function(error) {
+            window.alert("Impossible de récupérer les chroniques: " + error);
+        });
+    };
+
+    var initPlanning = function() {
+        $scope.loading = true;
+        setTimeout(function() {
+            plannerService.getGames($scope.firstday, $scope.lastday, function(planning) {
+                var weeks = planningBuilderService.buildMonthGamesPlanning($scope.currentMonth, $scope.currentYear, $scope.settingsList, planning, $scope.currentUser);
+                $scope.weeks = weeks;
+            };
+            $scope.loading = false;
+        }, 0);
+    };
+
+    function initDates() {
+        var currdate = new Date();
+        $scope.currentYear date.getFullYear();
+        $scope.currentMonth = date.getMonth() + 1;
+        computeDayIds();
+    }
+
+    function computeDayIds() {
+        $scope.currentDate = new Date($scope.currentYear, $scope.currentMonth, 0);
+        var maxday = $scope.currentDate.getDate();
+        $scope.firstday = $scope.currentYear * 10000 + $scope.currentMonth * 100 + 1;
+        $scope.lastday = $scope.firstday + maxday - 1; 
+        $scope.currentDate = new Date();
+    }
+
+    function timeSlide(months) {
+        $scope.currentMonth += months;
+        var yeardelta = Math.floor(($scope.currentMonth-1) / 12);
+        $scope.currentYear += yeardelta;
+        computeDayIds();
+        initPlanning();
+    }
+
+    $scope.showPrevious = function() {
+        timeSlide(-1);
+    };
+
+    $scope.showNext = function() {
+        timeSlide(1);
+    };
+
+
+    $scope.currentUser = localStorageService.get('tfgUser');
+
+    $scope.timeframesNames = {
+        "AFTERNOON" : "Après-midi",
+        "EVENING" : "Soirée"
+    };
+
+    $scope.days = [ 'Vendredi', 'Samedi', 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi' ];
+
+
+    initDates();
+    
+
+}]);
 

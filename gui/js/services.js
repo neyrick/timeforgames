@@ -557,6 +557,79 @@ function(config) {
             });
         },
 
+        buildMonthGamesPlanning(month, year, settings, games, me) {
+
+            var maxDayOfMonth = new Date(year, month, 0).getDate();
+            minday = year * 10000 + month * 100 + 1;
+            maxday = minday + maxDayOfMonth - 1; 
+
+            // Initialisation des semaines
+            var weeks = Array();
+            var currwek = { days : [] };
+            weeks.push(currweek);
+            
+            var currdayid;
+            var dayMap = new Object();
+
+            var currdow = (new Date(year, month-1, 1).getDay())-1;
+            var currdom = 1;
+            for (currdayid = minday; currdayid <= maxday; currdayid ++) {
+                currdow++;
+                currdom++;
+                if (currdow > 6) {
+                    currdow = 0;
+                    currweek = {
+                        days : []
+                    };
+                    weeks.push(currweek);
+                }
+                currday = {
+                    id : currdayid,
+                    dow : currdow,
+                    dom : currdom,
+                    timeframes = [{
+                        code : 'AFTERNOON',
+                        games : [],
+                        busy : false,
+                    }, {
+                        code : 'EVENING',
+                        games : [],
+                        busy : false,
+                    }]
+                };
+
+                currweek.days.push(currday);
+                dayMap[currday.id] = currday;
+            }
+
+            var gamesMap = new Object();
+            var targetgame;
+            games.forEach(function(gameschedule) {
+                targetgame = gamesMap[gameschedule.game];
+                if (targetgame == "undefined") {
+                    targetgame = {
+                        id: gameschedule.game,
+                        setting: gameschedule.setting,
+                        dayid: gameschedule.dayid,
+                        timeframe: gameschedule.timeframe,
+                        title: gameschedule.title,
+                        time : gameschedule.time,
+                        players : []
+                        gm : undefined
+                    };
+                    gamesMap[targetgame.id] = targetgame;
+                }
+                if (gameschedule.role == 'GM') targetgame.gm = gameschedule.player;
+                else targetgame.players.push(gameschedule.player);                
+            }
+
+            var targettimeframe;
+            for (var gameid in gamesMap) {
+                targettimeframe = dayMap[gameschedule.dayid].timeframes[timeframeIndex[gameschedule.timeframe]];
+                targettimeframe.games.push(gamesMap[gameid]);
+            });
+        },
+
         buildWeeksPlanning : function(mindaytime, daycount, settings, schedules, me) {
 
             // Initialisation des semaines
@@ -702,6 +775,10 @@ function($http, config, planningBuilderService) {
             var maxdaytime = mindaytime + daycount * planningBuilderService.MS_IN_DAY;
             var maxday = planningBuilderService.getDayId(new Date(maxdaytime));
             $http.get(config.urlbase + '/planning?minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
+        },
+
+        getGames : function(minday, maxday, callback) {
+            $http.get(config.urlbase + '/games?minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
         },
 
         reformGame : function(pm_idgame, pm_time, pm_title, pm_newplayers, callback) {

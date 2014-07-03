@@ -35,6 +35,7 @@ server.get('/api/expireToken', serv.expireToken);
 server.get('/api/setting/pic/:settingid', serv.getSettingPicture);
 server.post('/api/secureStore', serv.storeSecureAction);
 server.get('/api/securePerform/:actionid', serv.performSecureAction);
+server.get('/api/planning', serv.fetchPlanning);
 
 // Methodes necessitant un compte standard
 
@@ -56,8 +57,6 @@ server.del('/api/comment/:idcomment', security.requireLoggedIn, serv.deleteComme
 
 server.post('/api/game', security.requireLoggedIn, serv.createGame);
 server.put('/api/game/:idgame', security.requireLoggedIn, serv.reformGame);
-
-server.get('/api/planning', security.requireLoggedIn, serv.fetchPlanning);
 
 server.get('/api/updates', security.requireLoggedIn, serv.fetchUpdates);
 
