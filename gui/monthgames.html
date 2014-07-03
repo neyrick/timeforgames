@@ -52,7 +52,6 @@
                     }
                 });
 
-                angular.element('body').scope().relogin();
             });
         </script>
 
@@ -92,17 +91,31 @@
        <table id="calendar">
           <thead>
             <tr>
-              <th ng-repeat="day in days">
-                {{ day }}
+              <th bindonce ng-repeat="day in days">
+                <span bo-text="day"></span>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="week in weeks">
-              <td ng-repeat="day in week.days">
-                Jour : {{ day.dom }}
-                <div>Après-midi</div>
-                <div>Soir</div>
+            <tr bindonce ng-repeat="week in weeks">
+              <td bindonce ng-repeat="day in week.days" bo-class="{ outside : day.outside }">
+                <div bo-if="day.outside">&nbsp;</div>
+                <div bo-if="!day.outside">
+		        <div class="caldaynum" bo-text="day.dom"></div>
+		        <div class="caltimeframe" bindonce ng-repeat="timeframe in day.timeframes">
+                          <div class="caltfname"><span bo-text="timeframesNames[timeframe.code]"></span></div>
+                          <div class="calgame" bindonce ng-repeat="game in timeframe.games">
+                            <span bo-text="game.setting"></span>
+                            <div class="gameTooltipBox">
+                              <div>Setting: <span bo-text="game.setting"></span></div>
+                              <div>Titre: <span bo-text="game.title"></span></div>
+                              <div>Heure: <span bo-text="game.time"></span></div>
+                              <div>MJ: <span bo-text="game.gm"></span></div>
+                              <div>PJ: <span bindonce ng-repeat="player in game.players"> <span bo-if="$index > 0">,</span><span bo-text="player"></span></div>
+                            </div>
+                          </div>
+                        </div>
+                </div>
               </td>
             </tr>
           </tbody>

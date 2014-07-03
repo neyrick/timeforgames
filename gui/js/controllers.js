@@ -792,7 +792,7 @@ timeForGamesApp.controller('GamesCalendarCtrl', ['$scope', 'planningBuilderServi
 'userService', 'config', '$window',   
 function GamesCalendarCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window) {
 
-    $scope.refreshSettings = function(andPlanning) {
+    function refreshSettings(andPlanning) {
         settingsService.getSettings(function(settings) {
             $scope.settingsList = sortSettings(settings);
              $scope.openSettings = [];
@@ -812,28 +812,30 @@ function GamesCalendarCtrl($scope, planningBuilderService, plannerService, setti
                 $scope.clubEvents.push(item);
              }
            });
-            if (andPlanning) initPlanning();
+            if (andPlanning)
+                initPlanning();
             $scope.settingsReady = true;
         }, function(error) {
             window.alert("Impossible de récupérer les chroniques: " + error);
         });
     };
 
-    var initPlanning = function() {
+    function initPlanning() {
         $scope.loading = true;
         setTimeout(function() {
             plannerService.getGames($scope.firstday, $scope.lastday, function(planning) {
                 var weeks = planningBuilderService.buildMonthGamesPlanning($scope.currentMonth, $scope.currentYear, $scope.settingsList, planning, $scope.currentUser);
                 $scope.weeks = weeks;
-            };
+            });
             $scope.loading = false;
         }, 0);
     };
 
     function initDates() {
         var currdate = new Date();
-        $scope.currentYear date.getFullYear();
-        $scope.currentMonth = date.getMonth() + 1;
+        $scope.currentYear = currdate.getFullYear();
+//        $scope.currentMonth = currdate.getMonth() + 1;
+        $scope.currentMonth = 1;
         computeDayIds();
     }
 
@@ -842,12 +844,12 @@ function GamesCalendarCtrl($scope, planningBuilderService, plannerService, setti
         var maxday = $scope.currentDate.getDate();
         $scope.firstday = $scope.currentYear * 10000 + $scope.currentMonth * 100 + 1;
         $scope.lastday = $scope.firstday + maxday - 1; 
-        $scope.currentDate = new Date();
     }
 
     function timeSlide(months) {
         $scope.currentMonth += months;
         var yeardelta = Math.floor(($scope.currentMonth-1) / 12);
+        $scope.currentMonth -= yeardelta * 12;
         $scope.currentYear += yeardelta;
         computeDayIds();
         initPlanning();
@@ -873,7 +875,29 @@ function GamesCalendarCtrl($scope, planningBuilderService, plannerService, setti
 
 
     initDates();
-    
+    refreshSettings(true);
+
+    $('#calendar').on('mouseover click', '.calgame', function(event) {
+        // Bind the qTip within the event handler
+        $(this).qtip({
+            overwrite: false, // Make sure the tooltip won't be overridden once created
+            style : {
+                classes : 'gameTooltip'
+            },
+            content: {
+                text : $(this).find('.gameTooltipBox')
+            },
+            position : {
+                my : 'bottom center',
+                at : 'top center'
+            },
+            show: {
+                event: event.type, // Use the same show event as the one that triggered the event handler
+                ready: true // Show the tooltip as soon as it's bound, vital so it shows up the first time you hover!
+            }
+//            ,hide : { event : false }
+        }, event); // Pass through our original event to qTip
+    });
 
 }]);
 

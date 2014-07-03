@@ -882,6 +882,53 @@ margin-bottom: 5px;
     width: 40%;
 }
 
+/* Month Calendar */
+#calendar {
+    border: 1px solid black;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#calendar td {
+    border: 0px none;
+}
+
+#calendar td.outside {
+    background-color: #A0A0A0;
+}
+
+#calendar .caldaynum {
+    background-color:#009bba;
+    color:white;
+    font-family: pt_sansbold;
+}
+
+#calendar .caltimeframe {
+    border-left: 1px solid #009bba;
+    border-right: 1px solid #009bba;
+    border-bottom: 1px solid #009bba;
+    border-top: 0px none;
+}
+
+#calendar .caltfname {
+}
+
+#calendar .calgame {
+    padding: 0px 5px;
+    font-family: pt_sansbold;
+}
+
+.gameTooltip {
+   border: 1px double #009bba;
+   display: none;
+   background-color: #FFF;
+}
+
+.gameTooltipBox {
+    display: none;
+}
 /* Surcharges Bootstrap */
 
 .modal-content {

@@ -557,37 +557,42 @@ function(config) {
             });
         },
 
-        buildMonthGamesPlanning(month, year, settings, games, me) {
+        buildMonthGamesPlanning : function (month, year, settings, games, me) {
 
             var maxDayOfMonth = new Date(year, month, 0).getDate();
-            minday = year * 10000 + month * 100 + 1;
-            maxday = minday + maxDayOfMonth - 1; 
+            var minday = year * 10000 + month * 100 + 1;
+            var maxday = minday + maxDayOfMonth - 1; 
 
             // Initialisation des semaines
             var weeks = Array();
-            var currwek = { days : [] };
-            weeks.push(currweek);
+            var currweek;
+            var currdow = (new Date(year, month-1, 1).getDay())-1;
+            if (currdow != 4) {
+              currweek = { days : [] };
+              weeks.push(currweek);
+              for (var tempdow = currdow; (tempdow != 4) && (tempdow != -3); tempdow--) {
+                  currweek.days.push( { outside : true } );
+              }
+            }
             
             var currdayid;
+            var currday;
             var dayMap = new Object();
 
-            var currdow = (new Date(year, month-1, 1).getDay())-1;
             var currdom = 1;
             for (currdayid = minday; currdayid <= maxday; currdayid ++) {
                 currdow++;
-                currdom++;
-                if (currdow > 6) {
-                    currdow = 0;
-                    currweek = {
-                        days : []
-                    };
+                if (currdow == 7) currdow = 0;
+                if (currdow == 5) {
+                    currweek = { days : [] };
                     weeks.push(currweek);
                 }
                 currday = {
                     id : currdayid,
                     dow : currdow,
                     dom : currdom,
-                    timeframes = [{
+                    outside : false,
+                    timeframes : [{
                         code : 'AFTERNOON',
                         games : [],
                         busy : false,
@@ -600,34 +605,41 @@ function(config) {
 
                 currweek.days.push(currday);
                 dayMap[currday.id] = currday;
+                currdom++;
+            }
+            for (var tempdow = currdow; (tempdow != 4) && (tempdow != 11); tempdow++) {
+                currweek.days.push( { outside : true } );
             }
 
             var gamesMap = new Object();
             var targetgame;
             games.forEach(function(gameschedule) {
                 targetgame = gamesMap[gameschedule.game];
-                if (targetgame == "undefined") {
+                if (typeof targetgame == "undefined") {
                     targetgame = {
                         id: gameschedule.game,
-                        setting: gameschedule.setting,
+                        setting: getSettingName(gameschedule.setting, settings),
                         dayid: gameschedule.dayid,
                         timeframe: gameschedule.timeframe,
                         title: gameschedule.title,
                         time : gameschedule.time,
-                        players : []
+                        players : [],
                         gm : undefined
                     };
                     gamesMap[targetgame.id] = targetgame;
                 }
                 if (gameschedule.role == 'GM') targetgame.gm = gameschedule.player;
                 else targetgame.players.push(gameschedule.player);                
-            }
+            });
 
             var targettimeframe;
             for (var gameid in gamesMap) {
-                targettimeframe = dayMap[gameschedule.dayid].timeframes[timeframeIndex[gameschedule.timeframe]];
-                targettimeframe.games.push(gamesMap[gameid]);
-            });
+                targetgame = gamesMap[gameid];
+                targettimeframe = dayMap[targetgame.dayid].timeframes[timeframeIndex[targetgame.timeframe]];
+                targettimeframe.games.push(targetgame);
+            }
+
+            return weeks;
         },
 
         buildWeeksPlanning : function(mindaytime, daycount, settings, schedules, me) {
@@ -778,7 +790,7 @@ function($http, config, planningBuilderService) {
         },
 
         getGames : function(minday, maxday, callback) {
-            $http.get(config.urlbase + '/games?minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
+            $http.get(config.urlbase + '/planning?gamesonly=1&minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
         },
 
         reformGame : function(pm_idgame, pm_time, pm_title, pm_newplayers, callback) {

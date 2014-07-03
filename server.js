@@ -36,6 +36,7 @@ server.get('/api/setting/pic/:settingid', serv.getSettingPicture);
 server.post('/api/secureStore', serv.storeSecureAction);
 server.get('/api/securePerform/:actionid', serv.performSecureAction);
 server.get('/api/planning', serv.fetchPlanning);
+server.get('/api/setting', serv.fetchAllSettings);
 
 // Methodes necessitant un compte standard
 
@@ -43,7 +44,6 @@ server.get('/api/admins', security.requireLoggedIn, serv.fetchAdminList);
 server.get('/api/relogin', security.requireLoggedIn, serv.relogin);
 server.get('/api/resetPassword', security.requireLoggedIn, serv.resetPassword);
 
-server.get('/api/setting', security.requireLoggedIn, serv.fetchAllSettings);
 server.post('/api/setting', security.requireLoggedIn, serv.createSetting);
 server.put('/api/setting/pic/:settingid', security.requireLoggedIn, serv.storeSettingPicture);
 
