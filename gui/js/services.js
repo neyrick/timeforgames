@@ -618,6 +618,7 @@ function(config) {
                 if (typeof targetgame == "undefined") {
                     targetgame = {
                         id: gameschedule.game,
+                        mygame : false,
                         setting: getSettingName(gameschedule.setting, settings),
                         dayid: gameschedule.dayid,
                         timeframe: gameschedule.timeframe,
@@ -629,7 +630,8 @@ function(config) {
                     gamesMap[targetgame.id] = targetgame;
                 }
                 if (gameschedule.role == 'GM') targetgame.gm = gameschedule.player;
-                else targetgame.players.push(gameschedule.player);                
+                else targetgame.players.push(gameschedule.player);
+                if (gameschedule.player == me) targetgame.mygame = true;             
             });
 
             var targettimeframe;

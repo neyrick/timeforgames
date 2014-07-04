@@ -930,6 +930,11 @@ margin-bottom: 5px;
 	padding: 2px 20px;
 }
 
+#calendar .mygame > span {
+	border: 1px solid #CA153E;
+	color: #CA153E;
+}
+
 .gameTooltip {
    border: 1px solid #009bba;
    display: none;

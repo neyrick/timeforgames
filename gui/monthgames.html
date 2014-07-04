@@ -101,7 +101,7 @@
 		        <div class="caldaynum" bo-text="day.dom"></div>
 		        <div class="caltimeframe" bindonce ng-repeat="timeframe in day.timeframes">
                           <div class="caltfname"><span bo-text="timeframesNames[timeframe.code]"></span></div>
-                          <div class="calgame" bindonce ng-repeat="game in timeframe.games">
+                          <div class="calgame" bindonce ng-repeat="game in timeframe.games" bo-class="{ mygame : game.mygame }">
                             <span bo-text="game.setting"></span>
                             <div class="gameTooltipBox">
                               <div class="gameSetting"><span bo-text="game.setting"></span></div>
