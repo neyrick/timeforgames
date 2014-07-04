@@ -12,6 +12,9 @@ html, html a, button {
 .hidden {
 	display: none;
 }
+.clickable {
+	cursor: pointer;
+}
 #newSettingImg {
        width: 100%
 }
