@@ -8,9 +8,9 @@
  - {{= schedule.player }} {{ if (schedule.idcomment) { }} ({{= schedule.comment }}){{ } }}
  {{ }) }}
 
-{{ if (gm.idcomment > 0) { }}
-Commentaire du MJ: {{= gm.comment }}
-{{ } }}
+Nom de la partie: {{= game.title }}
+
+Heure de début: {{= game.time }}
 
 {{ include ../parts/footer-text }}
 

@@ -89,8 +89,6 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             };
 
             $scope.togglePlayerSelection = function(playerschedule) {
-                if (playerschedule.player == $scope.currentuser) return;
-                if ($scope.timeframe.gaming[playerschedule.player]) return;
                 if ($scope.isPlayerSelected(playerschedule.player)) {
                     delete $scope.gamePicks[playerschedule.player];
                 }
@@ -153,10 +151,17 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
     		          $scope.gameData.gameTime = $scope.timeframe.mygame.gameTime;
                       $scope.gmspool.push($scope.timeframe.mygame.gm);
 		          }
+		          else {
+		              $scope.tfsetting.availableplayers.forEach(function (playerschedule) {
+                          if ((!$scope.othergames[playerschedule.player]) && (playerschedule.player != $scope.currentuser)) $scope.gamePicks[playerschedule.player] = playerschedule;
+                      });
+		          }
 		         $scope.tfsetting.availablegms.forEach(function (gmschedule) {
 		              $scope.gmspool.push(gmschedule);
 		         });
                  $scope.tfsetting.availableplayers.forEach(function (playerschedule) {
+                      if (playerschedule.player == $scope.currentuser) return;
+                      if ($scope.othergames[playerschedule.player]) return;
                       $scope.playerspool.push(playerschedule);
                  });
             };
@@ -205,6 +210,13 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             scope.gameData = { storyName : "", gameTime : "" };
             scope.playerspool = [];
             scope.gmspool = [];
+            
+            scope.othergames = {};
+            for (var player in scope.timeframe.gaming) {
+                if (scope.timeframe.gaming[player] != scope.tfsetting.name) {
+                    scope.othergames[player] = scope.timeframe.gaming[player];
+                } 
+            }
 
             scope.switchComment = function(comment, event) {
                 scope.currentMessage = comment.message;

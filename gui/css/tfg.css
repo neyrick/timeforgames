@@ -884,7 +884,7 @@ margin-bottom: 5px;
 
 /* Month Calendar */
 #calendar {
-    border: 1px solid black;
+    border: 1px solid #a6a6a6;
     width: 90%;
     margin-left: auto;
     margin-right: auto;
@@ -893,10 +893,11 @@ margin-bottom: 5px;
 
 #calendar td {
     border: 0px none;
+    vertical-align: top;
 }
 
 #calendar td.outside {
-    background-color: #A0A0A0;
+    background-color: #e0e0e0;
 }
 
 #calendar .caldaynum {
@@ -910,25 +911,61 @@ margin-bottom: 5px;
     border-right: 1px solid #009bba;
     border-bottom: 1px solid #009bba;
     border-top: 0px none;
+    padding: 5px 0px;
 }
 
 #calendar .caltfname {
 }
 
 #calendar .calgame {
-    padding: 0px 5px;
+    margin: 5px 0px;
     font-family: pt_sansbold;
 }
 
+#calendar .calgame > span {
+	border: 1px solid #009bba;
+	padding: 2px 20px;
+}
+
 .gameTooltip {
-   border: 1px double #009bba;
+   border: 1px solid #009bba;
    display: none;
    background-color: #FFF;
+   font-size: 14px;
+   color: black;
 }
 
 .gameTooltipBox {
     display: none;
 }
+
+.gameTooltip > .qtip-content{
+    padding: 0px;
+}
+
+.gameTooltipBox .gameSetting {
+    background-color:#009bba;
+    color:white;
+    font-family: pt_sansregular;
+    padding: 10px 14px;
+}
+
+.gameTooltipBox .gameTitle {
+    font-style: italic;
+}
+
+.gameTooltipBox .calGameLabel {
+    font-family: pt_sansbold;
+}
+
+.gameTooltipBox .gameData {
+    padding: 10px 10px;
+}
+
+.gameTooltipBox .gameData > div {
+    padding: 5px 0px;
+}
+
 /* Surcharges Bootstrap */
 
 .modal-content {

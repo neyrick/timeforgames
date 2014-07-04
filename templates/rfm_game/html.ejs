@@ -27,12 +27,13 @@
 </ul>
 </div>
 
-{{ if (gm.idcomment > 0) { }}
 <div>
-Commentaire du MJ: {{= gm.comment }}
+Nom de la partie: {{= game.title }}
 </div>
 
-{{ } }}
+<div>
+Heure de début: {{= game.time }}
+</div>
 
 {{ include ../parts/footer-html }}
 

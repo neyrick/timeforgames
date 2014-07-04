@@ -18,7 +18,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">MJ :</div>
             <div class="openTFSRow openTFSRowContent">
-                <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span playing="{{timeframe.gaming[playerSchedule.player]}}" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
+                <span bindonce ng-repeat="playerSchedule in tfsetting.availablegms"> <span bo-if="$index > 0">, </span><span playing="{{othergames[playerSchedule.player]}}" ng-class="{busyplayer : othergames[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
             </div>
             <div class="openTFSRightButtons">
                 <div class="button squarebutton glyph" ng-click="setDispo('GM')"  ng-show="!tfsetting.mystatus.dispoMJ">&#x002B;</div>
@@ -30,7 +30,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">Joueurs :</div>
             <div class="openTFSRow openTFSRowContent">
-                 <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span playing="{{timeframe.gaming[playerSchedule.player]}}" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
+                 <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span playing="{{othergames[playerSchedule.player]}}" ng-class="{busyplayer : othergames[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
             </div>
             <div class="openTFSRightButtons">
                 <div class="button squarebutton glyph" ng-click="setDispo('PLAYER')"  ng-show="!tfsetting.mystatus.dispoPJ">&#x002B;</div>
@@ -62,7 +62,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">MJ :</div>
             <div class="openTFSRow openTFSRowContent">
-                <span bindonce ng-repeat="playerSchedule in gmspool"> <span bo-if="$index > 0">, </span><span  playing="{{timeframe.gaming[playerSchedule.player]}}" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: (playerSchedule.player == currentuser) }" bo-text="playerSchedule.player"></span> </span>
+                <span bindonce ng-repeat="playerSchedule in gmspool"> <span bo-if="$index > 0">, </span><span  playing="{{othergames[playerSchedule.player]}}" ng-class="{busyplayer : othergames[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: (playerSchedule.player == currentuser) }" bo-text="playerSchedule.player"></span> </span>
             </div>
         </div>
     
@@ -70,7 +70,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">Joueurs :</div>
             <div class="openTFSRow openTFSRowContent">
-                 <span bindonce ng-repeat="playerSchedule in playerspool"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" playing="{{timeframe.gaming[playerSchedule.player]}}" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: isPlayerSelected(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
+                 <span bindonce ng-repeat="playerSchedule in playerspool"> <span bo-if="$index > 0">, </span><span ng-click="togglePlayerSelection(playerSchedule)" playing="{{othergames[playerSchedule.player]}}" ng-class="{busyplayer : othergames[playerSchedule.player], caplayer : isAdmin(playerSchedule.player), selectedPlayer: isPlayerSelected(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
             </div>
             <div class="openTFSRightButtons">
                  <div class="button3 verticalButton rightSideButton2" ng-click="cancelGMMode()">Annuler</div>
@@ -146,7 +146,7 @@
             <div class="openTFSRow openTFSMargin"></div>
             <div class="openTFSRow openTFSRowHeader">Restent dispos :</div>
             <div class="openTFSRow openTFSRowContent">
-                 <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span playing="{{timeframe.gaming[playerSchedule.player]}}" ng-class="{busyplayer : timeframe.gaming[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
+                 <span bindonce ng-repeat="playerSchedule in tfsetting.availableplayers"> <span bo-if="$index > 0">, </span><span playing="{{othergames[playerSchedule.player]}}" ng-class="{busyplayer : othergames[playerSchedule.player], caplayer : isAdmin(playerSchedule.player) }" bo-text="playerSchedule.player"></span> </span>
             </div>
             <div class="openTFSRightButtons">
                  <div ng-if="tfsetting.defgame.gm.player == currentuser" class="button3 verticalButton rightSideButton4" ng-click="openGMMode()">Modifier</div>

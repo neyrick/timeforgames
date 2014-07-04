@@ -5,9 +5,9 @@
  - {{= player.player }} {{ if (player.idcomment) { }} ({{= player.comment }}) {{ } }}
  {{ }) }}
 
-{{ if (gm.idcomment > 0) { }}
-Commentaire du MJ: {{= gm.comment }}
-{{ } }}
+Nom de la partie: {{= game.title }}
+
+Heure de début: {{= game.time }}
 
 {{ include ../parts/footer-text }}
 

@@ -834,8 +834,8 @@ function GamesCalendarCtrl($scope, planningBuilderService, plannerService, setti
     function initDates() {
         var currdate = new Date();
         $scope.currentYear = currdate.getFullYear();
-//        $scope.currentMonth = currdate.getMonth() + 1;
-        $scope.currentMonth = 1;
+        $scope.currentMonth = currdate.getMonth() + 1;
+//        $scope.currentMonth = 1;
         computeDayIds();
     }
 
