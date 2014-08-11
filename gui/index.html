@@ -165,23 +165,24 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 
         <div class="spacer fullwidth">
         </div>
-
-        <div id="title">Rêves et Légendes
-        </div>
+        <div id="headerBar">
+            <div id="title">Rêves et Légendes
+            </div>
         <!-- Boutons utilisateur -->
 
-        <div id="userBox" ng-show="currentUser">
-            <div id="welcomeText">
-                Bienvenue <span id="username">{{ currentUser }}</span>
-            </div>
-            <div id="adminbutton" class="userbutton" ng-if="gui == 'admin'" onclick="location.href='admin.html';">
-                Interface d'Administration
-            </div>
-            <div class="button" onclick="location.href='monthgames.html';">
-                Mode Calendrier
-            </div>
-            <div id="logoffbutton" class="userbutton" ng-click="logout()">
-                Se déconnecter
+            <div id="userBox" ng-show="currentUser">
+                <div id="welcomeText">
+                    Bienvenue <span id="username">{{ currentUser }}</span>
+                </div>
+                <div id="adminbutton" class="userbutton" ng-if="gui == 'admin'" onclick="location.href='admin.html';">
+                    Interface d'Administration
+                </div>
+                <div class="button" onclick="location.href='monthgames.html';">
+                    Mode Calendrier
+                </div>
+                <div id="logoffbutton" class="userbutton" ng-click="logout()">
+                    Se déconnecter
+                </div>
             </div>
         </div>
 
@@ -245,8 +246,8 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 					
 					</td>
                     
-					<td class="partiespotentielles">
-					<div>
+					<td class="demijourneeparties">
+					<div class="colonneparties">
 
                         <!-- Colonne des parties potentielles  -->
 
@@ -281,10 +282,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                            Ajouter une partie
                         </div>
                     </div>
-					</td>
-					
-					<td class="partiesvalidees">
-                    <div>
+                    <div class="colonneparties">
                     
                         <!-- Colonne des parties validées  -->
         
