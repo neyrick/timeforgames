@@ -199,6 +199,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                     <div class="filtersList">
                         <div class="filterSwitch" bindonce ng-repeat="setting in openSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
                              <span bo-text="setting.name"></span>
+                             <watch-flag level="watches[setting.id]" setting="setting.id" />
                         </div>
                     </div>
                 </div>
@@ -207,6 +208,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                     <div class="filtersList">
                         <div class="filterSwitch" bindonce ng-repeat="setting in closedSettings" ng-click="toggleSettingVisibility(setting.id)" ng-class="{filterDisabled : !setting.visible}">
                             <span bo-text="setting.name"></span>
+                             <watch-flag level="watches[setting.id]" setting="setting.id" />
                         </div>
                     </div>
                 </div>

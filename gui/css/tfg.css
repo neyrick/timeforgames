@@ -435,9 +435,34 @@ margin: 0px;
 	cursor: pointer;
 }
 
+.notifFlag {
+        display: inline;
+/*
+        padding: 1px 3px 2px 3px;
+        border-radius: 12px;
+        border-width: 2px;
+        border-style: solid;
+        border-color: #009bba;
+*/
+        vertical-align: sub;
+        color: #009bba;
+}
+
 .filterDisabled{
 	background-color:#009bba;
 	color: white;
+}
+
+.filterDisabled .notifFlag {
+	background-color:#009bba;
+	color: white;
+}
+
+.notifFlag .notifAll {
+       color: #CA153E;
+}
+
+.notifFlag .notifNewGames {
 }
 
 #dateScrollers {

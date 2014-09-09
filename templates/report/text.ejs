@@ -1,0 +1,27 @@
+{{ include ../parts/header-text }}
+
+Voici quelques notifications susceptibles de t'intéresser:
+{{ settings.forEach( function (setting) { }}
+- {{= setting.name }} {{ setting.updates.forEach( function (update) { }}
+         	{{ if (setting.level == 1) { }}
+      - {{= update.player }} a proposé une partie le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "ADD_DISPO") { }}
+      - {{= update.player }} s'est inscrit pour le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "DEL_DISPO") { }}
+      - {{= update.player }} s'est désinscrit pour le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "ADD_GAME") { }}
+      - {{= update.player }} a validé une partie le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "RFM_GAME") { }}
+      - {{= update.player }} a modifié la composition d'une partie le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "DEL_GAME") { }}
+      - {{= update.player }} a annulé une partie le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "SET_COMMENT") { }}
+      - {{= update.player }} a mis un commentaire pour le {{= update.date }} {{= update.timeframe }}
+         	{{ } else if (update.action == "DEL_COMMENT") { }}
+      - {{= update.player }} a supprimé son commentaire pour le {{= update.date }} {{= update.timeframe }}
+        	{{ } }}
+	{{ } }}
+ {{ }) }}
+
+{{ include ../parts/footer-text }}
+

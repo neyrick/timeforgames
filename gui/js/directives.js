@@ -248,6 +248,35 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
     };
 }]);
 
+timeForGamesApp.directive('watchFlag', ['watchService', function(watchService) {
+
+    return {
+        controller : function ($scope, $element, $attrs) {
+        },
+        restrict: 'E',
+        templateUrl: 'directives/watch.html',
+        replace: true,
+        scope: {
+             level : '=',
+             setting : '=',
+        },
+        link: function(scope, element, attrs) {
+             if (typeof scope.level == "undefined") scope.level = 0;
+             scope.toggleWatch = function($event) {
+                 if ((scope.level == 0) || (scope.level == 1)) {
+                     scope.level = scope.level+1;
+                     watchService.setWatch(scope.level, scope.setting, function() {}, function(error) { window.alert(error)});
+                 }
+                 else {
+                     scope.level = 0;
+                     watchService.clearWatch(scope.setting, function() {}, function() {});
+                 }
+                 $event.stopPropagation();
+             }
+        }
+    };
+}]);
+
 timeForGamesApp.directive('commentBox', ['plannerService', function(plannerService) {
     
         return {

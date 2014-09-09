@@ -281,9 +281,8 @@ function AdminCtrl($scope, $timeout, config, settingsService, userService, local
 
 }]);
 
-timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService',
-'userService', 'config', '$window',   
-function CalendarCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window) {
+timeForGamesApp.controller('CalendarCtrl', ['$scope', 'planningBuilderService', 'plannerService', 'settingsService', 'localStorageService', 'userService', 'config', '$window', 'watchService', 
+function CalendarCtrl($scope, planningBuilderService, plannerService, settingsService, localStorageService, userService, config, $window, watchService) {
 
     function setLastDay() {
         $scope.lastday = $scope.firstday + ($scope.dayCount-1) * planningBuilderService.MS_IN_DAY;
@@ -453,6 +452,15 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         });
     };
 
+    $scope.loadWatches = function() {
+         watchService.getWatches(function(watches) {
+                     for (setting in $scope.watches) { delete $scope.watches[setting]; };
+                     for (setting in watches) { $scope.watches[setting] = watches[setting]; };
+         }, function(error) {
+//             window.alert("Impossible de récupérer les réglages de notifications: " + error);
+         });
+    } 
+
     $scope.login = function() {
 
         userService.login($scope.tempUser, $scope.tempPassword, function(result) {
@@ -465,6 +473,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                 $scope.gui = result.gui;
                 $scope.weeks = [];
                 loadConfig();
+                $scope.loadWatches();
                 $scope.refreshSettings(true);
 
                 if ($scope.display == 'desktop') {
@@ -495,7 +504,9 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                 $scope.tempPassword = '';
                 $scope.weeks = [];
                 loadConfig();
+                $scope.loadWatches();
                 $scope.refreshSettings(true);
+
             }, function(denialmsg) {
                 localStorageService.remove('tfgLoginToken');
                 window.alert("Identification invalide: " + denialmsg);
@@ -748,6 +759,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
 
     $scope.loading = false;
     $scope.basePicUrl = config.urlbase + "/setting/pic/";
+    $scope.watches = {};
 
     $scope.newsetting = {
         name : '',

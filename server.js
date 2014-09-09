@@ -1,6 +1,8 @@
 var serv = require("./lib/services");
 var security = require("./lib/security");
+var cron = require("./lib/cronjobs");
 
+var schedule = require('node-schedule');
 var express = require('express');
 var bodyparser = require('body-parser');
 var compression = require('compression');
@@ -46,6 +48,10 @@ server.get('/api/resetPassword', security.requireLoggedIn, serv.resetPassword);
 
 server.post('/api/setting', security.requireLoggedIn, serv.createSetting);
 server.put('/api/setting/pic/:settingid', security.requireLoggedIn, serv.storeSettingPicture);
+
+server.get('/api/watch', security.requireLoggedIn, serv.fetchMyWatches);
+server.put('/api/watch/:idsetting', security.requireLoggedIn, serv.setWatch);
+server.del('/api/watch/:idsetting', security.requireLoggedIn, serv.clearWatch);
 
 server.post('/api/schedule', security.requireLoggedIn, serv.createSchedule);
 server.del('/api/schedule/:idschedule', security.requireLoggedIn, serv.deleteSchedule);

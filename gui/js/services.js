@@ -43,6 +43,36 @@ timeForGamesApp.factory('authInterceptor', ['localStorageService', function (loc
   };
 }]);
 
+timeForGamesApp.factory('watchService', ['$http', 'config', function($http, config) {
+
+    return {
+
+        getWatches : function(callback, errorcallback) {
+            $http.get(config.urlbase + '/watch').success(function(data, status) {
+                    callback(data);
+            }).error(function(data, status) {
+                    errorcallback(data);
+            });
+        },
+
+        setWatch : function(pm_level, pm_setting, callback, errorcallback) {
+            $http.put(config.urlbase + '/watch/' + pm_setting, { level : pm_level }).success(function(data, status) {
+                    callback(data);
+            }).error(function(data, status) {
+                    errorcallback(data);
+            });
+        },
+
+        clearWatch : function(pm_setting, callback, errorcallback) {
+            $http.delete(config.urlbase + '/watch/' + pm_setting).success(function(data, status) {
+                    callback(data);
+            }).error(function(data, status) {
+                    errorcallback(data);
+            });
+        }
+    };
+}]);
+
 timeForGamesApp.factory('userService', ['$http', 'config', 'localStorageService', 
 function($http, config, localStorageService) {
 
