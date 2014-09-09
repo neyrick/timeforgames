@@ -27,6 +27,11 @@ html, html a, button {
 	font-weight: bold;	
 }
 .infoTooltip {
+	border-color: #CA153E;
+	color: #CA153E;
+	background-color: white;
+	font-size: 12px;
+	border-width: 2px;
 }
 /*
 div {
@@ -435,34 +440,44 @@ margin: 0px;
 	cursor: pointer;
 }
 
-.notifFlag {
-        display: inline;
-/*
-        padding: 1px 3px 2px 3px;
-        border-radius: 12px;
-        border-width: 2px;
-        border-style: solid;
-        border-color: #009bba;
-*/
-        vertical-align: sub;
-        color: #009bba;
-}
-
 .filterDisabled{
 	background-color:#009bba;
 	color: white;
 }
 
+.notifFlag {
+        display: inline;
+        vertical-align: -1px;
+        color: #009bba;
+        padding: 1px 3px 2px 3px;
+        border-radius: 12px;
+        border-width: 2px;
+        border-style: solid;
+ 	    border-color: #009bba;
+}
+
 .filterDisabled .notifFlag {
-	background-color:#009bba;
-	color: white;
+	    background-color:#009bba;
+    	color: white;
+ 	    border-color: white;
 }
 
-.notifFlag .notifAll {
-       color: #CA153E;
+.notifFlag.notifNone {
+	   border-color: white;
 }
 
-.notifFlag .notifNewGames {
+.filterDisabled .notifFlag.notifNone {
+ 	    border-color: #009bba;
+}
+
+.notifFlag.notifAll {
+	border-color:#CA153E;
+	color: #CA153E;
+}
+
+
+.notifFlag.notifNewGames {
+	border
 }
 
 #dateScrollers {

@@ -454,12 +454,17 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
 
     $scope.loadWatches = function() {
          watchService.getWatches(function(watches) {
-                     for (setting in $scope.watches) { delete $scope.watches[setting]; };
-                     for (setting in watches) { $scope.watches[setting] = watches[setting]; };
+             var setting;
+             for (setting in $scope.watches) {
+                  delete $scope.watches[setting];
+             };
+             for (setting in watches) {
+                  $scope.watches[setting] = watches[setting];
+             };
          }, function(error) {
 //             window.alert("Impossible de récupérer les réglages de notifications: " + error);
          });
-    } 
+    }; 
 
     $scope.login = function() {
 

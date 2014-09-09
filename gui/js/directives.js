@@ -250,6 +250,12 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
 
 timeForGamesApp.directive('watchFlag', ['watchService', function(watchService) {
 
+    function getTooltip(level) {
+        if (level == 1 ) return "Être averti lorsqu'un MJ pose des dates";
+        else if (level == 2 ) return "Être averti de n'importe quelle action";
+        else return "Ne recevoir aucune notification";
+    }
+
     return {
         controller : function ($scope, $element, $attrs) {
         },
@@ -265,14 +271,36 @@ timeForGamesApp.directive('watchFlag', ['watchService', function(watchService) {
              scope.toggleWatch = function($event) {
                  if ((scope.level == 0) || (scope.level == 1)) {
                      scope.level = scope.level+1;
-                     watchService.setWatch(scope.level, scope.setting, function() {}, function(error) { window.alert(error)});
+                     watchService.setWatch(scope.level, scope.setting, function() {}, function(error) { window.alert(error); });
                  }
                  else {
                      scope.level = 0;
                      watchService.clearWatch(scope.setting, function() {}, function() {});
                  }
+                 $(element).qtip('option', 'content.text', getTooltip(scope.level));
                  $event.stopPropagation();
-             }
+             };
+             $(element).qtip({
+                    style : {
+                        classes : 'infoTooltip'
+                    },
+                    content : {
+                        text : function(event, api) {
+                            return getTooltip(scope.level);
+                        }
+                    },
+                    position : {
+                        my : 'bottom left',
+                        at : 'top right'
+                    },
+                    show : {
+                        event : 'mouseenter click',
+                    },
+                    hide : {
+                        delay : 5,
+                        event : 'mouseleave',
+                    }
+                });
         }
     };
 }]);
