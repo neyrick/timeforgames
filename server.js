@@ -12,6 +12,19 @@ var config = require("./config.json");
 var server = express();
 server.enable('trust proxy');
 
+var rule = new schedule.RecurrenceRule();
+rule.hour = 10;
+//rule.minute = 0;
+
+var j = schedule.scheduleJob(rule, function(){
+    console.log('Declenchement de l\'envoi' + new Date());
+    cron.notifyNewSchedules();
+    console.log('Fin de l\'envoi' + new Date());
+});
+
+// TODO: regler les occurences avec hour et minute
+// TODO: passer de console.log a envoi de mail
+
 function indexHandler(req, res, next) {
     if (req.url == "/") {
         res.redirect("/gui/index.html");
