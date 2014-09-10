@@ -13,8 +13,8 @@ var server = express();
 server.enable('trust proxy');
 
 var rule = new schedule.RecurrenceRule();
-rule.hour = 10;
-//rule.minute = 0;
+rule.hour = 5;
+rule.minute = 0;
 
 var j = schedule.scheduleJob(rule, function(){
     console.log('Declenchement de l\'envoi' + new Date());
