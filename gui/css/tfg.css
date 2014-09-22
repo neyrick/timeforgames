@@ -163,6 +163,28 @@ margin: 0px;
 	margin-right: 6px;
 }
 
+.relMenu {
+	clear: both;
+	background: none repeat scroll 0% 0% #009BB9;
+	min-height: 36px;
+}
+
+.relMenuItem {
+	font: 15px/26px "pt_sansregular","Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif;
+	display: inline-block;
+	padding: 5px;
+	color: #FFF;
+}
+
+.relMenuItemSelected {
+	background-color: #0D7B92;
+}
+
+.relMenuItem a{
+	text-decoration: none;
+	color: #FFF;
+}
+
 .infoMessage {
     text-align: center;
     border: 1px solid #009bba;

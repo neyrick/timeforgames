@@ -62,19 +62,28 @@
         <div class="spacer fullwidth">
         </div>
 
-        <div id="title">Rêves et Légendes
-        </div>
-        <!-- Boutons utilisateur -->
+        <div id="headerBar">
 
-        <div id="userBox">
-            <div id="welcomeText" ng-show="currentUser">
-                Bienvenue <span id="username">{{ currentUser }}</span>
+            <div id="title">Rêves et Légendes
             </div>
-            <div class="button" onclick="location.href='index.html';">
-                Planification des Parties
+            <!-- Boutons utilisateur -->
+    
+            <div id="userBox">
+                <div id="welcomeText" ng-show="currentUser">
+                    Bienvenue <span id="username">{{ currentUser }}</span>
+                </div>
+                <div class="button" onclick="location.href='index.html';">
+                    Planification des Parties
+                </div>
             </div>
-        </div>
+       </div>
 
+       <div class="relMenu">
+          <div class="relMenuItem" ><a href="/">Wiki</a></div>
+          <div class="relMenuItem relMenuItemSelected" >Planning des parties</div>
+          <div class="relMenuItem" ><a href="http://reves-et-legendes.forum2jeux.com">Forum</a></div>
+        </div>
+        
         <div id="banner" class="fullwidth">
         </div>
 
