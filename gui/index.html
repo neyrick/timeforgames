@@ -63,7 +63,7 @@
             <div id="logindialog">
                 <form id="loginForm" role="form"
                 name="loginForm" ng-submit="login()" novalidate>
-                    <div id="loginmessage">
+                    <div id="loginmessage" ng-class="{ errorMessage : loginError }">
                         {{ loginMessage }}
                     </div>
 
@@ -99,7 +99,7 @@
             <div id="setpassworddialog">
                 <form id="setpasswordForm" role="form"
                 name="setpasswordForm" ng-submit="setPassword()" novalidate>
-                    <div id="setpasswordmessage">
+                    <div id="setpasswordmessage" ng-class="{ errorMessage : setpasswordError }">
                         {{ setpasswordMessage }}
                     </div>
                     <div>
@@ -237,8 +237,8 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
           <div class="relMenuItem" ><a href="http://rel-wiki.neyrick.fr">Wiki</a></div>
           <div class="relMenuItem relMenuItemSelected" >Planning des parties</div>
           <div class="relMenuItem" ><a href="http://reves-et-legendes.forum2jeux.com">Forum</a></div>
-          <div class="relMenuItem right logoffbutton" ng-click="logout()" ><a href="https://www.youtube.com/watch?v=HNY-Du1kZ98" target="_blank">Se déconnecter</a></div>
-          <div class="relMenuItem right" ><a href="javascript:void(0)" ng-click="openSetPassword()">Modifier son mot de passe</a></div>
+          <div class="relMenuItem right logoffbutton" ng-click="logout()" ><a href="javascript:void(0)">Se déconnecter</a></div>
+          <div class="relMenuItem right" ng-click="openSetPassword()"><a href="javascript:void(0)">Modifier son mot de passe</a></div>
           <div class="relMenuItem right"><a href="javascript:void(0)" onclick="$('#helpdialogcontainer').qtip('toggle', true);">Besoin d'aide ?</a></div>
         </div>
     

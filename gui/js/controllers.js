@@ -480,6 +480,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                 loadConfig();
                 $scope.loadWatches();
                 $scope.refreshSettings(true);
+                $scope.loginError = false;
 
                 if ($scope.display == 'desktop') {
                     $("#logindialogcontainer").qtip("toggle", false);
@@ -488,12 +489,15 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                 }
             } else {
                 $scope.loginMessage = result.error;
+                $scope.loginError = true;
             }
         }, function(error) {
             if ( typeof error == "object") {
                 $scope.loginMessage = error.message;
+                $scope.loginError = true;
             } else {
                 $scope.loginMessage = error;
+                $scope.loginError = true;
             }
         });
     };
@@ -543,6 +547,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         $scope.newPassword1 = '';
         $scope.newPassword2 = '';
         $scope.setpasswordMessage = 'Modification du mot de passe';
+        $scope.setpasswordError = false;
         $("#setpassworddialogcontainer").qtip("toggle", true);
     };
 
@@ -551,12 +556,14 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         $scope.newPassword1 = '';
         $scope.newPassword2 = '';
         $scope.setpasswordMessage = '';
+        $scope.setpasswordError = false;
         $("#setpassworddialogcontainer").qtip("toggle", false);
     };
 
     $scope.setPassword = function() {
        if ($scope.newPassword1 != $scope.newPassword2) {
            $scope.setpasswordMessage = 'Tu dois taper le même mot de passe 2 fois!';
+           $scope.setpasswordError = true;
            return;
        };
         userService.setPassword($scope.oldPassword, $scope.newPassword1, function(data) {
@@ -564,14 +571,17 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
             $scope.logout();
         }, function(error) {
             $scope.setpasswordMessage = error;
+           $scope.setpasswordError = true;
         });
     };
 
     $scope.resetPassword = function(user) {
         userService.resetMyPassword(user, function(data) {
             $scope.loginMessage = 'Un e-mail a été envoyé à ' + user + ' pour réinitialiser son mot de passe.';
+            $scope.loginError = true;
         }, function(error) {
             $scope.loginMessage = error;
+            $scope.loginError = true;
         });
     };
 
@@ -704,6 +714,8 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         $scope.oldPassword = '';
         $scope.newPassword1 = '';
         $scope.newPassword2 = '';
+        $scope.loginError = false;
+        $scope.setpasswordError = false;
         $scope.currentTimeframe = null;
         $scope.filtersOpen = false;
         $scope.timeframes = [];

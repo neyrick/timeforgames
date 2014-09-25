@@ -580,6 +580,11 @@ margin: 0px;
         color: white;
 }
 
+#loginmessage.errorMessage,
+#setpasswordmessage.errorMessage {
+	background-color: #CA153E;
+}
+
 .dateBoundary {
         font-family: 'pt_sansbold';
 }
