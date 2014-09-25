@@ -93,6 +93,14 @@
             </div>
         </div>
 
+        <!-- Pop-up d'aide -->
+
+        <div id="helpdialogcontainer" style="display: none">
+            <div id="helpdialog">
+                <iframe width="420" height="315" src="//www.youtube.com/embed/HNY-Du1kZ98" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+
         <!-- Pop-up d'ajout d'une chronique -->
 
         <div id="addsettingdialogcontainer" style="display: none">
@@ -180,16 +188,16 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                 <div class="button" onclick="location.href='monthgames.html';">
                     Mode Calendrier
                 </div>
-                <div id="logoffbutton" class="userbutton" ng-click="logout()">
-                    Se déconnecter
-                </div>
             </div>
         </div>
 
        <div class="relMenu">
-          <div class="relMenuItem" ><a href="/">Wiki</a></div>
+          <div class="relMenuItem" ><a href="http://rel-wiki.neyrick.fr">Wiki</a></div>
           <div class="relMenuItem relMenuItemSelected" >Planning des parties</div>
           <div class="relMenuItem" ><a href="http://reves-et-legendes.forum2jeux.com">Forum</a></div>
+          <div class="relMenuItem right logoffbutton" ng-click="logout()" ><a href="https://www.youtube.com/watch?v=HNY-Du1kZ98" target="_blank">Se déconnecter</a></div>
+        <!--  <div class="relMenuItem right" ><a href="https://www.youtube.com/watch?v=HNY-Du1kZ98" target="_blank">Modifier son mot de passe</a></div> -->
+          <div class="relMenuItem right"><a href="javascript:void(0)" onclick="$('#helpdialogcontainer').qtip('toggle', true);">Besoin d'aide ?</a></div>
         </div>
     
         <div id="banner" class="fullwidth">

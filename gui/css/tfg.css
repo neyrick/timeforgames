@@ -38,6 +38,9 @@ div {
 	border: 1px solid black;
 }
 */
+.right {
+    float: right;
+}
 
 /* -------------- CSS admin ------------------ */
 
@@ -167,6 +170,7 @@ margin: 0px;
 	clear: both;
 	background: none repeat scroll 0% 0% #009BB9;
 	min-height: 36px;
+	overflow: hidden;
 }
 
 .relMenuItem {
@@ -183,6 +187,19 @@ margin: 0px;
 .relMenuItem a{
 	text-decoration: none;
 	color: #FFF;
+}
+
+.relMenuItem.right a {
+	border: 1px solid #FFF;
+	padding: 3px 9px;
+	background-color: #009bba;
+	color: #FFF;	
+}
+
+.relMenuItem.right a:hover,
+.relMenuItem.right a:active {
+	background-color: #FFF;
+	color: #009bba;	
 }
 
 .infoMessage {
@@ -527,6 +544,12 @@ margin: 0px;
 .loginpopup .qtip-content {
     padding: 0px;
 }
+
+.helppopup {
+    max-width: 440px;
+    width: 100%;
+}
+
 
 #loginForm > div {
     padding: 5px 10px;

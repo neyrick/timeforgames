@@ -701,6 +701,30 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
     if ($scope.display == 'desktop') {
 
         $.fn.qtip.modal_zindex = 16000;
+
+        $('#helpdialogcontainer').qtip({
+            style : {
+                classes : 'popup helppopup'
+            },
+            content : {
+                text : $('#helpdialog')
+            },
+            position : {
+                my : 'center',
+                at : 'center',
+                target : $(window)
+            },
+            show : {
+                event : false,
+                modal : {
+                    on : true,
+                    blur : true,
+                    escape : true
+                }
+            },
+            hide : false
+        });
+
         $('#logindialogcontainer').qtip({
             style : {
                 classes : 'popup loginpopup'
