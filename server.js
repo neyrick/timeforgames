@@ -55,6 +55,8 @@ server.get('/api/setting', serv.fetchAllSettings);
 
 // Methodes necessitant un compte standard
 
+server.put('/api/password', security.requireLoggedIn, serv.setPassword);
+
 server.get('/api/admins', security.requireLoggedIn, serv.fetchAdminList);
 server.get('/api/relogin', security.requireLoggedIn, serv.relogin);
 server.get('/api/resetPassword', security.requireLoggedIn, serv.resetPassword);

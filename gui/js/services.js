@@ -186,15 +186,15 @@ function($http, config, localStorageService) {
                 errorcallback(data);
             });
         },
-/*
-        resetPassword : function(callback, errorcallback) {
-            $http.get(config.urlbase + '/resetPassword').success(function(data, status) {
+
+        setPassword : function(pm_oldpass, pm_newpass, callback, errorcallback) {
+            $http.put(config.urlbase + '/password', { oldp : pm_oldpass, newp : pm_newpass}).success(function(data, status) {
                 callback(data);
             }).error(function(data, status) {
                 errorcallback(data);
             });
         },
-*/
+
         adminResetPassword : function(pm_user, callback, errorcallback) {
             $http.get(config.urlbase + '/resetPassword/' + pm_user.name).success(function(data, status) {
                 callback(data);

@@ -538,6 +538,35 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         });
     };
 
+    $scope.openSetPassword = function() {
+        $scope.oldPassword = '';
+        $scope.newPassword1 = '';
+        $scope.newPassword2 = '';
+        $scope.setpasswordMessage = 'Modification du mot de passe';
+        $("#setpassworddialogcontainer").qtip("toggle", true);
+    };
+
+    $scope.cancelSetPassword = function() {
+        $scope.oldPassword = '';
+        $scope.newPassword1 = '';
+        $scope.newPassword2 = '';
+        $scope.setpasswordMessage = '';
+        $("#setpassworddialogcontainer").qtip("toggle", false);
+    };
+
+    $scope.setPassword = function() {
+       if ($scope.newPassword1 != $scope.newPassword2) {
+           $scope.setpasswordMessage = 'Tu dois taper le même mot de passe 2 fois!';
+           return;
+       };
+        userService.setPassword($scope.oldPassword, $scope.newPassword1, function(data) {
+            $("#setpassworddialogcontainer").qtip("toggle", false);
+            $scope.logout();
+        }, function(error) {
+            $scope.setpasswordMessage = error;
+        });
+    };
+
     $scope.resetPassword = function(user) {
         userService.resetMyPassword(user, function(data) {
             $scope.loginMessage = 'Un e-mail a été envoyé à ' + user + ' pour réinitialiser son mot de passe.';
@@ -672,6 +701,9 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
     function reset() {
         $scope.tempUser = '';
         $scope.tempPassword = '';
+        $scope.oldPassword = '';
+        $scope.newPassword1 = '';
+        $scope.newPassword2 = '';
         $scope.currentTimeframe = null;
         $scope.filtersOpen = false;
         $scope.timeframes = [];
@@ -701,6 +733,29 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
     if ($scope.display == 'desktop') {
 
         $.fn.qtip.modal_zindex = 16000;
+
+        $('#setpassworddialogcontainer').qtip({
+            style : {
+                classes : 'popup setpasswordpopup'
+            },
+            content : {
+                text : $('#setpassworddialog')
+            },
+            position : {
+                my : 'center',
+                at : 'center',
+                target : $(window)
+            },
+            show : {
+                event : false,
+                modal : {
+                    on : true,
+                    blur : true,
+                    escape : true
+                }
+            },
+            hide : false
+        });
 
         $('#helpdialogcontainer').qtip({
             style : {
