@@ -312,7 +312,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                  item.visible = ($scope.config.invisibleOpenSettings.indexOf(item.id) == -1);
              } else if (item.mode == 1) {
                  $scope.closedSettings.push(item);
-                item.visible = ($scope.config.visibleClosedSettings.indexOf(item.id) > -1);
+                item.visible = ($scope.config.invisibleClosedSettings.indexOf(item.id) == -1);
              } else if (item.mode == 2) {
                 $scope.oneShots.push(item);
                 item.visible = true; 
@@ -674,6 +674,9 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         var config = localStorageService.get('tfgconfig-' + $scope.currentUser);
         if (( typeof config == "undefined") || (config === '') || (config == null))
             return;
+        if (typeof config.invisibleClosedSettings == "undefined") 
+            config.invisibleClosedSettings = [];
+        delete config.visibleClosedSettings;
         $scope.config = config;
     }
 
@@ -681,7 +684,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         if ( typeof $scope.currentUser == "undefined")
             return;
         $scope.config.invisibleOpenSettings = [];
-        $scope.config.visibleClosedSettings = [];
+        $scope.config.invisibleClosedSettings = [];
         $scope.config.invisibleOneShots = [];
         $scope.config.invisibleStatus = [];
         $scope.openSettings.forEach(function(item) {
@@ -689,8 +692,8 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                 $scope.config.invisibleOpenSettings.push(item.id);
         });
         $scope.closedSettings.forEach(function(item) {
-            if (item.visible)
-                $scope.config.visibleClosedSettings.push(item.id);
+            if (!item.visible)
+                $scope.config.invisibleClosedSettings.push(item.id);
         });
         /*
         $scope.oneShots.forEach(function(item) {
@@ -723,7 +726,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
 //            invisibleStatus : [],
             invisibleOpenSettings : [],
 //            invisibleOneShots : [],
-            visibleClosedSettings : [],
+            invisibleClosedSettings : [],
             lastUpdate : 0
         };
         $scope.gui = 'regular';
