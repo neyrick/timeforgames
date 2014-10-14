@@ -452,6 +452,28 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         });
     };
 
+    $scope.getTfSettingStyle = function(tfsetting) {
+        var result;
+        if (tfsetting.mode == 0) {
+            result = "chroniqueouverte";
+        }
+        else if (tfsetting.mode == 1) {
+            result = "chroniquefermee";
+        }
+        else if (tfsetting.mode == 2) {
+            result = "oneshot";
+        }
+        else if (tfsetting.mode == 3) {
+            result = "evenement";
+        }
+        if (tfsetting.availablegms.length > 0) {
+            return result;
+        }
+        else {
+            return result + " nomj";
+        }
+    };
+
     $scope.loadWatches = function() {
          watchService.getWatches(function(watches) {
              var setting;

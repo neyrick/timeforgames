@@ -742,7 +742,6 @@ cursor:pointer;
 .chroniquepotclose{
 position:relative;
 width:100%;
-background-color:#009bba;
 font-family:pt_sansbold_italic;
 color:white;
 margin-top: 5px;
@@ -755,6 +754,34 @@ height: 2em;
 .nomchronique{
 padding: 5px;
 text-align:center;
+}
+
+.chroniqueouverte, .oneshot {
+    background-color:#009bba;
+}
+
+.chroniquefermee {
+    background-color:#6668CC;
+}
+
+.evenement {
+    background-color:#CA153E;
+}
+
+.chroniqueouverte.nomj {
+    background: linear-gradient(-45deg, #5b7479 25%,
+    #0e6779 25%, #0e6779 50%, 
+    #5b7479 50%, #5b7479 75%, 
+    #0e6779 75%);
+    background-size:100px 100px;
+}
+
+.chroniquefermee.nomj {
+    background: linear-gradient(-45deg, #636470 25%,
+    #3f4080 25%, #3f4080 50%, 
+    #636470 50%, #636470 75%, 
+    #3f4080 75%);
+    background-size:100px 100px;
 }
 
 .myschedule {

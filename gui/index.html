@@ -322,7 +322,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 
                             <!-- Bloc chronique fermé -->
 
-                            <div ng-switch-when="closed" class="chroniquepotclose" ng-click="openTfSetting(tfsetting)">
+                            <div ng-switch-when="closed" ng-class="getTfSettingStyle(tfsetting)" class="chroniquepotclose" ng-click="openTfSetting(tfsetting)">
                                 <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo()"><span>&#xE008;</span></div>
                                 <div class="newStuff glyph" ng-show="tfsetting.newStuff"><span>&#xE101;</span></div>
                                 <div class="clickouvrir"><span>&gt;</span></div>
@@ -357,7 +357,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
 
                             <!-- Bloc chronique fermé -->
 
-                            <div ng-switch-when="closed" class="chroniquepotclose" ng-click="openTfSetting(tfsetting)">
+                            <div ng-switch-when="closed" ng-class="getTfSettingStyle(tfsetting)" class="chroniquepotclose" ng-click="openTfSetting(tfsetting)">
                                 <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo()"><span>&#xE008;</span></div>
                                 <div class="newStuff glyph" ng-show="tfsetting.newStuff"><span>&#xE101;</span></div>
                                 <div class="clickouvrir"><span>&gt;</span></div>
