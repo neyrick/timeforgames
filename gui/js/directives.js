@@ -1,5 +1,24 @@
 'use strict';
 
+timeForGamesApp.directive('ggHistory', function() {
+    var roles = { GM : "maîtriser", PLAYER : "jouer" };
+    return {
+        restrict: 'E',
+        templateUrl: 'directives/history.html',
+        scope: { row : '=' },
+        link: function(scope, element, attrs) {
+            scope.tstamp = scope.row.tstamp;
+            scope.dayid = scope.row.dayid;
+            scope.timeframe = scope.row.timeframe;
+            scope.setting = scope.row.setting;
+            scope.player = scope.row.player;
+            scope.data = scope.row.data;
+            scope.action = scope.row.action;
+            scope.roles = roles;
+        }
+    };
+});
+
 timeForGamesApp.directive('timeframesGroup', [ function() {
 
         return {
