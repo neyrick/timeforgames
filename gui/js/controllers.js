@@ -466,7 +466,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         else if (tfsetting.mode == 3) {
             result = "evenement";
         }
-        if (tfsetting.availablegms.length > 0) {
+        if (tfsetting.hasgame || (tfsetting.availablegms.length > 0)) {
             return result;
         }
         else {
