@@ -907,6 +907,7 @@ margin-bottom: 5px;
 
 .openTFSRowContent {
 	display: inline-block;
+	max-width: 58%;
 }
 
 .openTFSRowLabel {
@@ -967,7 +968,6 @@ margin-bottom: 5px;
 }
 
 .commentText {
-	width: 58%;
 }
 
 .storyName {
