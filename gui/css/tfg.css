@@ -1069,12 +1069,13 @@ margin-bottom: 5px;
     font-family: pt_sansbold;
 }
 
-#calendar .calgame > span {
+#calendar .calgame > div {
 	border: 1px solid #009bba;
 	padding: 2px 20px;
+	margin: 5px;
 }
 
-#calendar .mygame > span {
+#calendar .mygame > div {
 	border: 1px solid #CA153E;
 	color: #CA153E;
 }
