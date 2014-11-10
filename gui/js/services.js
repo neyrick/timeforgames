@@ -816,7 +816,7 @@ function($http, config, planningBuilderService) {
 
         getPlanning : function(mindaytime, daycount, callback) {
             var minday = planningBuilderService.getDayId(new Date(mindaytime));
-            var maxdaytime = mindaytime + daycount * planningBuilderService.MS_IN_DAY;
+            var maxdaytime = mindaytime + (daycount-1) * planningBuilderService.MS_IN_DAY;
             var maxday = planningBuilderService.getDayId(new Date(maxdaytime));
             $http.get(config.urlbase + '/planning?minday=' + minday + '&maxday=' + maxday).success(callback).error(genericError);
         },
