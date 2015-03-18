@@ -26,7 +26,8 @@
       "body-parser" : ">=1.0.1" ,
       "compression" : ">=1.0.1" ,       
       "response-time" : ">=1.0.0",
-      "busboy" : ">=0.2.3"   
+      "busboy" : ">=0.2.3",
+      "ldapjs" : ">=0.7.1"
   },
   "analyze": true,
   "devDependencies": {

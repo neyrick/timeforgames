@@ -1,6 +1,7 @@
 var serv = require("./lib/services");
 var security = require("./lib/security");
 var cron = require("./lib/cronjobs");
+var ldap = require("./lib/ldap");
 
 var schedule = require('node-schedule');
 var express = require('express');
@@ -41,6 +42,8 @@ server.use(compression());
 
 server.use('/api', security.authParser);
 server.use('/gui', express.static('gui'));
+
+server.get('/api/newsched', cron.notifyNewSchedules);
 
 
 // Methodes en acces libre
