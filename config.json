@@ -5,11 +5,15 @@
 	"smtp" : {
 	      "service" : "Gmail",
 	      "auth" : {
-		"user" : "neyrick@gmail.com",
+		"user" : "blah@gmail.com",
 		"pass" : "######"
 	      }
 	},
 	"jwt" : {
 		"secret" : "******"
+	},
+	"ldap" : {
+	    "basedn" : "o=reves-et-legendes,c=fr",
+        "port" : 6000
 	}
 }
