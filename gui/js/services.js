@@ -400,7 +400,8 @@ function(config) {
                     mystatus : new tfSettingStatus(),
                     key : '' + timeframe.dayid + timeframe.code + settingref.id,
                     comments : [],
-                    hasgame : false
+                    hasgame : false,
+                    trash : false
                 };
                 currentArray.push(newsetting);
                 return newsetting;
@@ -470,6 +471,25 @@ function(config) {
             }
         }
     };
+
+    var settingsSort = function(settinga, settingb) {
+                if ((settinga.trash) && (!settingb.trash)) return 1;
+                if ((settingb.trash) && (!settinga.trash)) return -1;
+                return settinga.name.localeCompare(settingb.name);
+    };
+
+    var timeframePostCompute = function(timeframe, currentUser) {
+                timeframe.settings.forEach(function(setting) {
+                    setting.canplay = setting.availableplayers.some(function(playerschedule) {
+                        return ((typeof timeframe.gaming[playerschedule.player] == "undefined") && (playerschedule.player != currentUser));
+                    });
+                    setting.trash = !setting.availablegms.some(function(gmschedule) {
+                        return (typeof timeframe.gaming[gmschedule.player] == "undefined");
+                    });
+                });
+                timeframe.settings.sort(settingsSort);
+    };
+
 
     return {
         MS_IN_DAY : 1000 * 60 * 60 * 24,
@@ -577,14 +597,7 @@ function(config) {
             for ( i = 0; i < comments.length; i++) {
                 addComment(comments[i], timeframe, settings, me);
             }
-            timeframe.settings.forEach(function(setting) {
-                setting.canplay = setting.availableplayers.some(function(playerschedule) {
-                    return ((typeof timeframe.gaming[playerschedule.player] == "undefined") && (playerschedule.player != me));
-                });
-            });
-            timeframe.settings.sort(function(settinga, settingb) {
-                return settinga.name.localeCompare(settingb.name);
-            });
+            timeframePostCompute(timeframe, me);
         },
 
         buildMonthGamesPlanning : function (month, year, settings, games, me) {
@@ -761,14 +774,7 @@ function(config) {
                 addComment(comment, timeframe, settings, me);
             }
             timeframes.forEach(function(item) {
-                item.settings.forEach(function(setting) {
-                    setting.canplay = setting.availableplayers.some(function(playerschedule) {
-                        return ((typeof item.gaming[playerschedule.player] == "undefined") && (playerschedule.player != me));
-                    });
-                });
-    		    item.settings.sort(function(settinga, settingb) {
-    		        return settinga.name.localeCompare(settingb.name);
-    		    });
+                timeframePostCompute(item, me);
             });
 
             return aggregateTimeframes(timeframes);

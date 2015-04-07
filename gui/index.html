@@ -5,12 +5,12 @@
         <meta charset="utf-8">
         <title>Rêves et Légendes - Planification des Parties</title>
 
-        <link rel="stylesheet" href="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css">
+        <link rel="stylesheet" href="http://cdn.jsdelivr.net/qtip2/2.2.1/jquery.qtip.min.css">
         <link rel="stylesheet" href="css/tfg.css">
         <link rel="shortcut icon" type="image/x-icon" href="images/logo_t10.jpg" />
 
         <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-        <script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
+        <script src="http://cdn.jsdelivr.net/qtip2/2.2.1/jquery.qtip.min.js"></script>
 
         <script src="lib/angular-file-upload-shim.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
@@ -336,7 +336,7 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                             </div>
 
                         </div>
-                        <div ng-click="selectSetting(timeframe)" class="ajouterpartie">
+                        <div ng-click="selectSetting(timeframe, $event)" class="ajouterpartie">
                            Ajouter une partie
                         </div>
                     </div>
@@ -358,7 +358,8 @@ Utilise une image plutôt large que haute (500 x 100 par exemple)
                             <!-- Bloc chronique fermé -->
 
                             <div ng-switch-when="closed" ng-class="getTfSettingStyle(tfsetting)" class="chroniquepotclose" ng-click="openTfSetting(tfsetting)">
-                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.dispo()"><span>&#xE008;</span></div>
+                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.picked()"><span>&#xE008;</span></div>
+                                <div class="myschedule glyph" ng-show="tfsetting.mystatus.ignored()"><span>&#xE083;</span></div>
                                 <div class="newStuff glyph" ng-show="tfsetting.newStuff"><span>&#xE101;</span></div>
                                 <div class="clickouvrir"><span>&gt;</span></div>
                                 <div class="nomchronique">{{tfsetting.name}}</div>

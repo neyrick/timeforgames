@@ -382,9 +382,9 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         storeConfig();
     };
 
-    $scope.selectSetting = function(timeframe) {
+    $scope.selectSetting = function(timeframe, event) {
         $scope.currentTimeframe = timeframe;
-        $('#addsettingdialogcontainer').qtip('show');
+        $('#addsettingdialogcontainer').qtip('show', event);
     };
 
     $scope.createAndAddSetting = function() {
@@ -466,7 +466,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
         else if (tfsetting.mode == 3) {
             result = "evenement";
         }
-        if (tfsetting.hasgame || (tfsetting.availablegms.length > 0)) {
+        if (tfsetting.hasgame || !tfsetting.trash) {
             return result;
         }
         else {
@@ -849,10 +849,15 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
                 text : $('#addsettingdialog')
             },
             position : {
-                my: 'center',
-                at: 'center',
-                target : $(window),
-                adjust : { y : -100 }
+                my: 'top center',
+                at: 'top center',
+                target : 'event',
+/*                adjust : { y : -100 }*/
+               viewport: $(window),
+               adjust : {
+                   method: 'shift none', 
+                   scroll: 'false'
+               }
             },
             show : {
                 event : false,
@@ -864,7 +869,7 @@ function CalendarCtrl($scope, planningBuilderService, plannerService, settingsSe
             },
             events: {
                 visible: function (event, api) {
-                    api.set('position.target', $(window));
+                    api.set('position.target', event.originalEvent.currentTarget);
                     api.reposition(event);
                 },
                 hide: function (event, api) {

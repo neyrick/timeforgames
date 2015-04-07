@@ -18,6 +18,12 @@ function tfSettingStatus() {
     this.onit = function() {
         return (this.dispoMJ || this.dispoPJ || this.pj || this.mj);
     };
+    this.picked = function() {
+        return (this.pj || this.mj);
+    };
+    this.ignored = function() {
+        return (this.dispoPJ && !this.pj);
+    };
 }
 
 function getSettingName(settingid, allSettings) {
