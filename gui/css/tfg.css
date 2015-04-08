@@ -931,6 +931,21 @@ margin-bottom: 5px;
 	position: relative;
 }
 
+.openTFSButtonsRow {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.openTFSButtonsRow > div {
+    display: table-cell;
+    text-align: center;
+}
+
+.openTFSButtonsRow div.button3 {
+    display: inline-block;
+}
+
 .caplayer {
 	font-family: pt_sansbold;
 }

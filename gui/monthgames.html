@@ -118,8 +118,8 @@
                               <div class="gameData">
                                   <div><span bo-text="game.title" class="gameTitle"></span></div>
                                   <div><span class="calGameLabel">Heure:</span> <span bo-text="game.time"></span></div>
-                                  <div><span class="calGameLabel">MJ:</span> <span bo-text="game.gm"></span></div>
-                                  <div><span class="calGameLabel">PJ:</span> <span bindonce ng-repeat="player in game.players"><span bo-if="$index > 0">,</span> <span bo-text="player"></span></div>
+                                  <div bo-if="game.gm != '__EVENTS__'"><span class="calGameLabel">MJ:</span> <span bo-text="game.gm"></span></div>
+                                  <div bo-if="game.gm != '__EVENTS__'"><span class="calGameLabel">PJ:</span> <span bindonce ng-repeat="player in game.players"><span bo-if="$index > 0">,</span> <span bo-text="player"></span></div>
                               </div>
                             </div>
                           </div>

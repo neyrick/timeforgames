@@ -93,6 +93,9 @@ server.get('/api/history/setting/:setting', security.requireLoggedIn, serv.fetch
 
 server.del('/api/setting/:id', security.requireAdmin, serv.deleteSetting);
 
+server.del('/api/event/:dayid/:timeframe/:setting', security.requireAdmin, serv.cancelEvent);
+server.put('/api/event/:id', security.requireAdmin, serv.updateEvent);
+
 server.get('/api/user', security.requireAdmin, serv.fetchAllUsers);
 server.post('/api/user', security.requireAdmin, serv.createUser);
 server.put('/api/user/:id', security.requireAdmin, serv.updateUser);

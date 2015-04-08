@@ -816,6 +816,19 @@ function($http, config, planningBuilderService) {
             $http.delete(config.urlbase + '/schedule/' + idschedule + '?log_action=DEL_DISPO').success(callback).error(genericError);
         },
 
+        updateEvent : function(idevent, gametime, storyname, callback) {
+            $http.put(config.urlbase + '/event/' + idevent + '?log_action=UPD_EVENT', {
+                game : {
+                    time : gametime,
+                    title : storyname
+                }
+            }).success(callback).error(genericError);
+        },
+
+        cancelEvent : function(dayid, timeframe, setting, callback) {
+            $http.delete(config.urlbase + '/event/' + dayid + '/' + timeframe + '/' + setting + '?log_action=DEL_EVENT').success(callback).error(genericError);
+        },
+
         getTimeframePlanning : function(dayid, timeframecode, callback) {
             $http.get(config.urlbase + '/planning?minday=' + dayid + '&maxday=' + dayid + '&timeframe=' + timeframecode).success(callback).error(genericError);
         },

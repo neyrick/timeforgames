@@ -131,6 +131,12 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
                        $scope.refreshTimeframe();
         		});
     	    };
+
+    	    $scope.cancelEvent = function() {
+                plannerService.cancelEvent($scope.timeframe.dayid, $scope.timeframe.code, $scope.tfsetting.settingid, function() {
+                    $scope.refreshTimeframe();
+        	});
+            };
     
             $scope.isGameValidable = function() {
                 if ($scope.gameData.gameTime.trim() == "") return false;
@@ -155,6 +161,18 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
         		    });
         		}
     	    };
+
+            $scope.openEditEventMode = function() {
+                $scope.displayMode = "editevent";
+    	        $scope.gameData.storyName = $scope.tfsetting.defgame.storyName;
+                $scope.gameData.gameTime = $scope.tfsetting.defgame.gameTime;
+            }
+
+    	    $scope.updateEvent = function() {
+                plannerService.updateEvent($scope.tfsetting.defgame.id, $scope.gameData.gameTime, $scope.gameData.storyName, function() {
+                               $scope.refreshTimeframe();
+                });
+            }
 
             $scope.openGMMode = function() {
                 $scope.displayMode = "validate";
@@ -190,7 +208,10 @@ timeForGamesApp.directive('openTfSetting', ['config', 'plannerService', 'userSer
             };
         
             $scope.resetDisplayMode = function() {
-                if ($scope.tfsetting.hasgame) {
+                if ($scope.tfsetting.mode == 3) {
+                    $scope.displayMode = "event";               
+                }
+                else if ($scope.tfsetting.hasgame) {
                     $scope.displayMode = "game";               
                 }
                 else {
